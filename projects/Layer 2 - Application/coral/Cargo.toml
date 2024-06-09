@@ -1,0 +1,10 @@
+[package]
+name = "coral"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+teal = { path = "../../Layer 0 - Domain/teal" }
+coral-commons = { path = "../../Layer 0 - Domain/coral-commons" }
