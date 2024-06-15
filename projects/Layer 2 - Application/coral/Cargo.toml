@@ -8,3 +8,4 @@ edition = "2021"
 [dependencies]
 teal = { path = "../../Layer 0 - Domain/teal" }
 coral-commons = { path = "../../Layer 0 - Domain/coral-commons" }
+redis = "*"
