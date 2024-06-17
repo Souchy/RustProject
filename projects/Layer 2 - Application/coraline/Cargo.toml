@@ -6,3 +6,11 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+teal = { path = "../../Layer - Util/teal" }
+coral-commons = { path = "../../Layer 0 - Domain/coral-commons" }
+protobuf = "3.4.0"
+
+tokio = {version = "*", features = ["full"]}
+serde = "1.0.188"
+futures = "0.3.28"
+async-trait = "0.1.79"

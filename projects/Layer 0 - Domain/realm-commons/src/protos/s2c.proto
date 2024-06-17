@@ -1,0 +1,26 @@
+
+message CreatedLobby {
+	required int32 queue = 1;
+}
+
+message RelayInvitationToLobby {
+	required int32 queue = 1;
+	required int32 player_to = 2;
+	required int32 player_from = 3;
+	required int32 lobby = 4;
+	required string token = 5;
+}
+
+message BroadcastPlayerListInLobby {
+	repeated int32 players = 1;
+}
+
+message ListLobbies {
+	// juste les lobby, sans token
+	repeated Lobby lobbies = 1; 
+}
+
+message Lobby {
+	required int32 id = 1;
+	required int32 queue = 2;
+}

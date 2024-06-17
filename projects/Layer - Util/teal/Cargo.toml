@@ -7,9 +7,8 @@ description = "Utility Library"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-protobuf = "3.4.0"
 redis = "*"
-tokio = {version = "*", features = ["full"]}
+tokio = { version = "*", features = ["full"] }
 tracing = "*"
 
 serde = { version = "*", features = ["derive"] }
@@ -23,3 +22,12 @@ bytes = "1"
 async-trait = "0.1.79"
 futures = "*"
 
+protobuf = "3.4.0"
+
+mockall = "0.12.1"
+
+[build-dependencies]
+protobuf = "3.4.0"
+protobuf-codegen = "3.4.0"
+
+# [dev-dependencies]

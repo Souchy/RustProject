@@ -1,0 +1,8 @@
+message Heartbeat {
+	optional int32 term = 1;
+	optional int32 leader_id = 2;
+}
+
+// message RaftState {
+// 	required 
+// }

@@ -1,0 +1,8 @@
+
+message Ping {
+	
+}
+
+message Pong {
+	
+}

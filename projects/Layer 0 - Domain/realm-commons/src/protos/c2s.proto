@@ -1,0 +1,15 @@
+
+message CreateLobby {
+	required int32 queue = 1;
+}
+
+message SendInvitationToLobby {
+	required int32 queue = 1;
+	required int32 player_to = 2;
+}
+
+message JoinLobby {
+	required int32 queue = 1;
+	required int32 lobby = 2;
+	required string token = 3;
+}

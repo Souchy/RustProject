@@ -1,5 +1,5 @@
 [package]
-name = "coral-commons"
+name = "realm-commons"
 version = "0.1.0"
 edition = "2021"
 
@@ -8,8 +8,6 @@ edition = "2021"
 [dependencies]
 teal = { path = "../../Layer - Util/teal" }
 protobuf = "3.4.0"
-bincode = "*"
-async-trait = "0.1.79"
 
 
 [build-dependencies]

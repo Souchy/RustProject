@@ -1,0 +1,13 @@
+message RequestMatch {
+	required int32 queue = 1;
+	repeated int32 players = 2;
+}
+message SetInQueue {
+	required int32 queue = 1;
+	required int32 state = 2;
+}
+message Match {
+	required int32 moonstone_port = 1;
+	repeated int32 players = 2;
+	required string token = 3;
+}
