@@ -32,7 +32,7 @@ pub struct RequestMatch {
     // @@protoc_insertion_point(field:RequestMatch.queue)
     pub queue: ::std::option::Option<i32>,
     // @@protoc_insertion_point(field:RequestMatch.players)
-    pub players: ::std::vec::Vec<i32>,
+    pub players: ::std::vec::Vec<i64>,
     // special fields
     // @@protoc_insertion_point(special_field:RequestMatch.special_fields)
     pub special_fields: ::protobuf::SpecialFields,
@@ -106,10 +106,10 @@ impl ::protobuf::Message for RequestMatch {
                     self.queue = ::std::option::Option::Some(is.read_int32()?);
                 },
                 18 => {
-                    is.read_repeated_packed_int32_into(&mut self.players)?;
+                    is.read_repeated_packed_int64_into(&mut self.players)?;
                 },
                 16 => {
-                    self.players.push(is.read_int32()?);
+                    self.players.push(is.read_int64()?);
                 },
                 tag => {
                     ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
@@ -127,7 +127,7 @@ impl ::protobuf::Message for RequestMatch {
             my_size += ::protobuf::rt::int32_size(1, v);
         }
         for value in &self.players {
-            my_size += ::protobuf::rt::int32_size(2, *value);
+            my_size += ::protobuf::rt::int64_size(2, *value);
         };
         my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
         self.special_fields.cached_size().set(my_size as u32);
@@ -139,7 +139,7 @@ impl ::protobuf::Message for RequestMatch {
             os.write_int32(1, v)?;
         }
         for v in &self.players {
-            os.write_int32(2, *v)?;
+            os.write_int64(2, *v)?;
         };
         os.write_unknown_fields(self.special_fields.unknown_fields())?;
         ::std::result::Result::Ok(())
@@ -381,7 +381,7 @@ pub struct Match {
     // @@protoc_insertion_point(field:Match.moonstone_port)
     pub moonstone_port: ::std::option::Option<i32>,
     // @@protoc_insertion_point(field:Match.players)
-    pub players: ::std::vec::Vec<i32>,
+    pub players: ::std::vec::Vec<i64>,
     // @@protoc_insertion_point(field:Match.token)
     pub token: ::std::option::Option<::std::string::String>,
     // special fields
@@ -501,10 +501,10 @@ impl ::protobuf::Message for Match {
                     self.moonstone_port = ::std::option::Option::Some(is.read_int32()?);
                 },
                 18 => {
-                    is.read_repeated_packed_int32_into(&mut self.players)?;
+                    is.read_repeated_packed_int64_into(&mut self.players)?;
                 },
                 16 => {
-                    self.players.push(is.read_int32()?);
+                    self.players.push(is.read_int64()?);
                 },
                 26 => {
                     self.token = ::std::option::Option::Some(is.read_string()?);
@@ -525,7 +525,7 @@ impl ::protobuf::Message for Match {
             my_size += ::protobuf::rt::int32_size(1, v);
         }
         for value in &self.players {
-            my_size += ::protobuf::rt::int32_size(2, *value);
+            my_size += ::protobuf::rt::int64_size(2, *value);
         };
         if let Some(v) = self.token.as_ref() {
             my_size += ::protobuf::rt::string_size(3, &v);
@@ -540,7 +540,7 @@ impl ::protobuf::Message for Match {
             os.write_int32(1, v)?;
         }
         for v in &self.players {
-            os.write_int32(2, *v)?;
+            os.write_int64(2, *v)?;
         };
         if let Some(v) = self.token.as_ref() {
             os.write_string(3, v)?;
@@ -598,11 +598,11 @@ impl ::protobuf::reflect::ProtobufValue for Match {
 
 static file_descriptor_proto_data: &'static [u8] = b"\
     \n\x0emessages.proto\">\n\x0cRequestMatch\x12\x14\n\x05queue\x18\x01\x20\
-    \x02(\x05R\x05queue\x12\x18\n\x07players\x18\x02\x20\x03(\x05R\x07player\
+    \x02(\x05R\x05queue\x12\x18\n\x07players\x18\x02\x20\x03(\x03R\x07player\
     s\"8\n\nSetInQueue\x12\x14\n\x05queue\x18\x01\x20\x02(\x05R\x05queue\x12\
     \x14\n\x05state\x18\x02\x20\x02(\x05R\x05state\"^\n\x05Match\x12%\n\x0em\
     oonstone_port\x18\x01\x20\x02(\x05R\rmoonstonePort\x12\x18\n\x07players\
-    \x18\x02\x20\x03(\x05R\x07players\x12\x14\n\x05token\x18\x03\x20\x02(\tR\
+    \x18\x02\x20\x03(\x03R\x07players\x12\x14\n\x05token\x18\x03\x20\x02(\tR\
     \x05tokenb\x06proto2\
 ";
 

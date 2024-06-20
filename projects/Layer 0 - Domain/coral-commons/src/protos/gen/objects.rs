@@ -30,13 +30,13 @@ const _PROTOBUF_VERSION_CHECK: () = ::protobuf::VERSION_3_4_0;
 pub struct Lobby {
     // message fields
     // @@protoc_insertion_point(field:Lobby.id)
-    pub id: ::std::option::Option<i32>,
+    pub id: ::std::option::Option<i64>,
     // @@protoc_insertion_point(field:Lobby.queue)
     pub queue: ::std::option::Option<i32>,
-    // @@protoc_insertion_point(field:Lobby.LobbyState)
-    pub LobbyState: ::std::option::Option<i32>,
+    // @@protoc_insertion_point(field:Lobby.state)
+    pub state: ::std::option::Option<::protobuf::EnumOrUnknown<lobby::LobbyState>>,
     // @@protoc_insertion_point(field:Lobby.players)
-    pub players: ::std::vec::Vec<i32>,
+    pub players: ::std::vec::Vec<i64>,
     // @@protoc_insertion_point(field:Lobby.queueStartTime)
     pub queueStartTime: ::std::option::Option<i32>,
     // special fields
@@ -55,9 +55,9 @@ impl Lobby {
         ::std::default::Default::default()
     }
 
-    // required int32 id = 1;
+    // required int64 id = 1;
 
-    pub fn id(&self) -> i32 {
+    pub fn id(&self) -> i64 {
         self.id.unwrap_or(0)
     }
 
@@ -70,7 +70,7 @@ impl Lobby {
     }
 
     // Param is passed by value, moved
-    pub fn set_id(&mut self, v: i32) {
+    pub fn set_id(&mut self, v: i64) {
         self.id = ::std::option::Option::Some(v);
     }
 
@@ -93,23 +93,26 @@ impl Lobby {
         self.queue = ::std::option::Option::Some(v);
     }
 
-    // optional int32 LobbyState = 3;
+    // optional .Lobby.LobbyState state = 3;
 
-    pub fn LobbyState(&self) -> i32 {
-        self.LobbyState.unwrap_or(0)
+    pub fn state(&self) -> lobby::LobbyState {
+        match self.state {
+            Some(e) => e.enum_value_or(lobby::LobbyState::LOBBY_STATE_IDLE),
+            None => lobby::LobbyState::LOBBY_STATE_IDLE,
+        }
     }
 
-    pub fn clear_LobbyState(&mut self) {
-        self.LobbyState = ::std::option::Option::None;
+    pub fn clear_state(&mut self) {
+        self.state = ::std::option::Option::None;
     }
 
-    pub fn has_LobbyState(&self) -> bool {
-        self.LobbyState.is_some()
+    pub fn has_state(&self) -> bool {
+        self.state.is_some()
     }
 
     // Param is passed by value, moved
-    pub fn set_LobbyState(&mut self, v: i32) {
-        self.LobbyState = ::std::option::Option::Some(v);
+    pub fn set_state(&mut self, v: lobby::LobbyState) {
+        self.state = ::std::option::Option::Some(::protobuf::EnumOrUnknown::new(v));
     }
 
     // optional int32 queueStartTime = 5;
@@ -145,9 +148,9 @@ impl Lobby {
             |m: &mut Lobby| { &mut m.queue },
         ));
         fields.push(::protobuf::reflect::rt::v2::make_option_accessor::<_, _>(
-            "LobbyState",
-            |m: &Lobby| { &m.LobbyState },
-            |m: &mut Lobby| { &mut m.LobbyState },
+            "state",
+            |m: &Lobby| { &m.state },
+            |m: &mut Lobby| { &mut m.state },
         ));
         fields.push(::protobuf::reflect::rt::v2::make_vec_simpler_accessor::<_, _>(
             "players",
@@ -184,19 +187,19 @@ impl ::protobuf::Message for Lobby {
         while let Some(tag) = is.read_raw_tag_or_eof()? {
             match tag {
                 8 => {
-                    self.id = ::std::option::Option::Some(is.read_int32()?);
+                    self.id = ::std::option::Option::Some(is.read_int64()?);
                 },
                 16 => {
                     self.queue = ::std::option::Option::Some(is.read_int32()?);
                 },
                 24 => {
-                    self.LobbyState = ::std::option::Option::Some(is.read_int32()?);
+                    self.state = ::std::option::Option::Some(is.read_enum_or_unknown()?);
                 },
                 34 => {
-                    is.read_repeated_packed_int32_into(&mut self.players)?;
+                    is.read_repeated_packed_int64_into(&mut self.players)?;
                 },
                 32 => {
-                    self.players.push(is.read_int32()?);
+                    self.players.push(is.read_int64()?);
                 },
                 40 => {
                     self.queueStartTime = ::std::option::Option::Some(is.read_int32()?);
@@ -214,16 +217,16 @@ impl ::protobuf::Message for Lobby {
     fn compute_size(&self) -> u64 {
         let mut my_size = 0;
         if let Some(v) = self.id {
-            my_size += ::protobuf::rt::int32_size(1, v);
+            my_size += ::protobuf::rt::int64_size(1, v);
         }
         if let Some(v) = self.queue {
             my_size += ::protobuf::rt::int32_size(2, v);
         }
-        if let Some(v) = self.LobbyState {
-            my_size += ::protobuf::rt::int32_size(3, v);
+        if let Some(v) = self.state {
+            my_size += ::protobuf::rt::int32_size(3, v.value());
         }
         for value in &self.players {
-            my_size += ::protobuf::rt::int32_size(4, *value);
+            my_size += ::protobuf::rt::int64_size(4, *value);
         };
         if let Some(v) = self.queueStartTime {
             my_size += ::protobuf::rt::int32_size(5, v);
@@ -235,16 +238,16 @@ impl ::protobuf::Message for Lobby {
 
     fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
         if let Some(v) = self.id {
-            os.write_int32(1, v)?;
+            os.write_int64(1, v)?;
         }
         if let Some(v) = self.queue {
             os.write_int32(2, v)?;
         }
-        if let Some(v) = self.LobbyState {
-            os.write_int32(3, v)?;
+        if let Some(v) = self.state {
+            os.write_enum(3, ::protobuf::EnumOrUnknown::value(&v))?;
         }
         for v in &self.players {
-            os.write_int32(4, *v)?;
+            os.write_int64(4, *v)?;
         };
         if let Some(v) = self.queueStartTime {
             os.write_int32(5, v)?;
@@ -268,7 +271,7 @@ impl ::protobuf::Message for Lobby {
     fn clear(&mut self) {
         self.id = ::std::option::Option::None;
         self.queue = ::std::option::Option::None;
-        self.LobbyState = ::std::option::Option::None;
+        self.state = ::std::option::Option::None;
         self.players.clear();
         self.queueStartTime = ::std::option::Option::None;
         self.special_fields.clear();
@@ -278,7 +281,7 @@ impl ::protobuf::Message for Lobby {
         static instance: Lobby = Lobby {
             id: ::std::option::Option::None,
             queue: ::std::option::Option::None,
-            LobbyState: ::std::option::Option::None,
+            state: ::std::option::Option::None,
             players: ::std::vec::Vec::new(),
             queueStartTime: ::std::option::Option::None,
             special_fields: ::protobuf::SpecialFields::new(),
@@ -379,17 +382,17 @@ pub mod lobby {
 pub struct Player {
     // message fields
     // @@protoc_insertion_point(field:Player.id)
-    pub id: ::std::option::Option<i32>,
+    pub id: ::std::option::Option<i64>,
     // @@protoc_insertion_point(field:Player.state)
     pub state: ::std::option::Option<::protobuf::EnumOrUnknown<player::PlayerState>>,
     // @@protoc_insertion_point(field:Player.lobby)
-    pub lobby: ::std::option::Option<i32>,
+    pub lobby: ::std::option::Option<i64>,
     // @@protoc_insertion_point(field:Player.mmr)
     pub mmr: ::std::option::Option<i32>,
     // @@protoc_insertion_point(field:Player.recentMatches)
-    pub recentMatches: ::std::option::Option<i32>,
+    pub recentMatches: ::std::vec::Vec<i64>,
     // @@protoc_insertion_point(field:Player.geolocalisation)
-    pub geolocalisation: ::std::option::Option<i32>,
+    pub geolocalisation: ::std::option::Option<i64>,
     // special fields
     // @@protoc_insertion_point(special_field:Player.special_fields)
     pub special_fields: ::protobuf::SpecialFields,
@@ -406,9 +409,9 @@ impl Player {
         ::std::default::Default::default()
     }
 
-    // required int32 id = 1;
+    // required int64 id = 1;
 
-    pub fn id(&self) -> i32 {
+    pub fn id(&self) -> i64 {
         self.id.unwrap_or(0)
     }
 
@@ -421,7 +424,7 @@ impl Player {
     }
 
     // Param is passed by value, moved
-    pub fn set_id(&mut self, v: i32) {
+    pub fn set_id(&mut self, v: i64) {
         self.id = ::std::option::Option::Some(v);
     }
 
@@ -447,9 +450,9 @@ impl Player {
         self.state = ::std::option::Option::Some(::protobuf::EnumOrUnknown::new(v));
     }
 
-    // optional int32 lobby = 3;
+    // optional int64 lobby = 3;
 
-    pub fn lobby(&self) -> i32 {
+    pub fn lobby(&self) -> i64 {
         self.lobby.unwrap_or(0)
     }
 
@@ -462,7 +465,7 @@ impl Player {
     }
 
     // Param is passed by value, moved
-    pub fn set_lobby(&mut self, v: i32) {
+    pub fn set_lobby(&mut self, v: i64) {
         self.lobby = ::std::option::Option::Some(v);
     }
 
@@ -485,28 +488,9 @@ impl Player {
         self.mmr = ::std::option::Option::Some(v);
     }
 
-    // optional int32 recentMatches = 5;
+    // optional int64 geolocalisation = 6;
 
-    pub fn recentMatches(&self) -> i32 {
-        self.recentMatches.unwrap_or(0)
-    }
-
-    pub fn clear_recentMatches(&mut self) {
-        self.recentMatches = ::std::option::Option::None;
-    }
-
-    pub fn has_recentMatches(&self) -> bool {
-        self.recentMatches.is_some()
-    }
-
-    // Param is passed by value, moved
-    pub fn set_recentMatches(&mut self, v: i32) {
-        self.recentMatches = ::std::option::Option::Some(v);
-    }
-
-    // optional int32 geolocalisation = 6;
-
-    pub fn geolocalisation(&self) -> i32 {
+    pub fn geolocalisation(&self) -> i64 {
         self.geolocalisation.unwrap_or(0)
     }
 
@@ -519,7 +503,7 @@ impl Player {
     }
 
     // Param is passed by value, moved
-    pub fn set_geolocalisation(&mut self, v: i32) {
+    pub fn set_geolocalisation(&mut self, v: i64) {
         self.geolocalisation = ::std::option::Option::Some(v);
     }
 
@@ -546,7 +530,7 @@ impl Player {
             |m: &Player| { &m.mmr },
             |m: &mut Player| { &mut m.mmr },
         ));
-        fields.push(::protobuf::reflect::rt::v2::make_option_accessor::<_, _>(
+        fields.push(::protobuf::reflect::rt::v2::make_vec_simpler_accessor::<_, _>(
             "recentMatches",
             |m: &Player| { &m.recentMatches },
             |m: &mut Player| { &mut m.recentMatches },
@@ -578,22 +562,25 @@ impl ::protobuf::Message for Player {
         while let Some(tag) = is.read_raw_tag_or_eof()? {
             match tag {
                 8 => {
-                    self.id = ::std::option::Option::Some(is.read_int32()?);
+                    self.id = ::std::option::Option::Some(is.read_int64()?);
                 },
                 16 => {
                     self.state = ::std::option::Option::Some(is.read_enum_or_unknown()?);
                 },
                 24 => {
-                    self.lobby = ::std::option::Option::Some(is.read_int32()?);
+                    self.lobby = ::std::option::Option::Some(is.read_int64()?);
                 },
                 32 => {
                     self.mmr = ::std::option::Option::Some(is.read_int32()?);
                 },
+                42 => {
+                    is.read_repeated_packed_int64_into(&mut self.recentMatches)?;
+                },
                 40 => {
-                    self.recentMatches = ::std::option::Option::Some(is.read_int32()?);
+                    self.recentMatches.push(is.read_int64()?);
                 },
                 48 => {
-                    self.geolocalisation = ::std::option::Option::Some(is.read_int32()?);
+                    self.geolocalisation = ::std::option::Option::Some(is.read_int64()?);
                 },
                 tag => {
                     ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
@@ -608,22 +595,22 @@ impl ::protobuf::Message for Player {
     fn compute_size(&self) -> u64 {
         let mut my_size = 0;
         if let Some(v) = self.id {
-            my_size += ::protobuf::rt::int32_size(1, v);
+            my_size += ::protobuf::rt::int64_size(1, v);
         }
         if let Some(v) = self.state {
             my_size += ::protobuf::rt::int32_size(2, v.value());
         }
         if let Some(v) = self.lobby {
-            my_size += ::protobuf::rt::int32_size(3, v);
+            my_size += ::protobuf::rt::int64_size(3, v);
         }
         if let Some(v) = self.mmr {
             my_size += ::protobuf::rt::int32_size(4, v);
         }
-        if let Some(v) = self.recentMatches {
-            my_size += ::protobuf::rt::int32_size(5, v);
-        }
+        for value in &self.recentMatches {
+            my_size += ::protobuf::rt::int64_size(5, *value);
+        };
         if let Some(v) = self.geolocalisation {
-            my_size += ::protobuf::rt::int32_size(6, v);
+            my_size += ::protobuf::rt::int64_size(6, v);
         }
         my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
         self.special_fields.cached_size().set(my_size as u32);
@@ -632,22 +619,22 @@ impl ::protobuf::Message for Player {
 
     fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
         if let Some(v) = self.id {
-            os.write_int32(1, v)?;
+            os.write_int64(1, v)?;
         }
         if let Some(v) = self.state {
             os.write_enum(2, ::protobuf::EnumOrUnknown::value(&v))?;
         }
         if let Some(v) = self.lobby {
-            os.write_int32(3, v)?;
+            os.write_int64(3, v)?;
         }
         if let Some(v) = self.mmr {
             os.write_int32(4, v)?;
         }
-        if let Some(v) = self.recentMatches {
-            os.write_int32(5, v)?;
-        }
+        for v in &self.recentMatches {
+            os.write_int64(5, *v)?;
+        };
         if let Some(v) = self.geolocalisation {
-            os.write_int32(6, v)?;
+            os.write_int64(6, v)?;
         }
         os.write_unknown_fields(self.special_fields.unknown_fields())?;
         ::std::result::Result::Ok(())
@@ -670,7 +657,7 @@ impl ::protobuf::Message for Player {
         self.state = ::std::option::Option::None;
         self.lobby = ::std::option::Option::None;
         self.mmr = ::std::option::Option::None;
-        self.recentMatches = ::std::option::Option::None;
+        self.recentMatches.clear();
         self.geolocalisation = ::std::option::Option::None;
         self.special_fields.clear();
     }
@@ -681,7 +668,7 @@ impl ::protobuf::Message for Player {
             state: ::std::option::Option::None,
             lobby: ::std::option::Option::None,
             mmr: ::std::option::Option::None,
-            recentMatches: ::std::option::Option::None,
+            recentMatches: ::std::vec::Vec::new(),
             geolocalisation: ::std::option::Option::None,
             special_fields: ::protobuf::SpecialFields::new(),
         };
@@ -791,7 +778,7 @@ pub mod player {
 pub struct User {
     // message fields
     // @@protoc_insertion_point(field:User.id)
-    pub id: ::std::option::Option<i32>,
+    pub id: ::std::option::Option<i64>,
     // @@protoc_insertion_point(field:User.name)
     pub name: ::std::option::Option<::std::string::String>,
     // @@protoc_insertion_point(field:User.email)
@@ -812,9 +799,9 @@ impl User {
         ::std::default::Default::default()
     }
 
-    // required int32 id = 1;
+    // required int64 id = 1;
 
-    pub fn id(&self) -> i32 {
+    pub fn id(&self) -> i64 {
         self.id.unwrap_or(0)
     }
 
@@ -827,7 +814,7 @@ impl User {
     }
 
     // Param is passed by value, moved
-    pub fn set_id(&mut self, v: i32) {
+    pub fn set_id(&mut self, v: i64) {
         self.id = ::std::option::Option::Some(v);
     }
 
@@ -943,7 +930,7 @@ impl ::protobuf::Message for User {
         while let Some(tag) = is.read_raw_tag_or_eof()? {
             match tag {
                 8 => {
-                    self.id = ::std::option::Option::Some(is.read_int32()?);
+                    self.id = ::std::option::Option::Some(is.read_int64()?);
                 },
                 18 => {
                     self.name = ::std::option::Option::Some(is.read_string()?);
@@ -964,7 +951,7 @@ impl ::protobuf::Message for User {
     fn compute_size(&self) -> u64 {
         let mut my_size = 0;
         if let Some(v) = self.id {
-            my_size += ::protobuf::rt::int32_size(1, v);
+            my_size += ::protobuf::rt::int64_size(1, v);
         }
         if let Some(v) = self.name.as_ref() {
             my_size += ::protobuf::rt::string_size(2, &v);
@@ -979,7 +966,7 @@ impl ::protobuf::Message for User {
 
     fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
         if let Some(v) = self.id {
-            os.write_int32(1, v)?;
+            os.write_int64(1, v)?;
         }
         if let Some(v) = self.name.as_ref() {
             os.write_string(2, v)?;
@@ -1039,23 +1026,24 @@ impl ::protobuf::reflect::ProtobufValue for User {
 }
 
 static file_descriptor_proto_data: &'static [u8] = b"\
-    \n\robjects.proto\"\xe9\x01\n\x05Lobby\x12\x0e\n\x02id\x18\x01\x20\x02(\
-    \x05R\x02id\x12\x14\n\x05queue\x18\x02\x20\x02(\x05R\x05queue\x12\x1e\n\
-    \nLobbyState\x18\x03\x20\x01(\x05R\nLobbyState\x12\x18\n\x07players\x18\
-    \x04\x20\x03(\x05R\x07players\x12&\n\x0equeueStartTime\x18\x05\x20\x01(\
-    \x05R\x0equeueStartTime\"X\n\nLobbyState\x12\x14\n\x10LOBBY_STATE_IDLE\
-    \x10\0\x12\x18\n\x14LOBBY_STATE_IN_QUEUE\x10\x01\x12\x1a\n\x16LOBBY_STAT\
-    E_IN_PREGAME\x10\x02\"\xcf\x02\n\x06Player\x12\x0e\n\x02id\x18\x01\x20\
-    \x02(\x05R\x02id\x12)\n\x05state\x18\x02\x20\x01(\x0e2\x13.Player.Player\
-    StateR\x05state\x12\x14\n\x05lobby\x18\x03\x20\x01(\x05R\x05lobby\x12\
-    \x10\n\x03mmr\x18\x04\x20\x01(\x05R\x03mmr\x12$\n\rrecentMatches\x18\x05\
-    \x20\x01(\x05R\rrecentMatches\x12(\n\x0fgeolocalisation\x18\x06\x20\x01(\
-    \x05R\x0fgeolocalisation\"\x91\x01\n\x0bPlayerState\x12\x15\n\x11PLAYER_\
-    STATE_IDLE\x10\0\x12\x19\n\x15PLAYER_STATE_IN_LOBBY\x10\x01\x12\x19\n\
-    \x15PLAYER_STATE_IN_QUEUE\x10\x02\x12\x1b\n\x17PLAYER_STATE_IN_PREGAME\
-    \x10\x03\x12\x18\n\x14PLAYER_STATE_IN_GAME\x10\x04\"@\n\x04User\x12\x0e\
-    \n\x02id\x18\x01\x20\x02(\x05R\x02id\x12\x12\n\x04name\x18\x02\x20\x01(\
-    \tR\x04name\x12\x14\n\x05email\x18\x03\x20\x01(\tR\x05emailb\x06proto2\
+    \n\robjects.proto\"\xf2\x01\n\x05Lobby\x12\x0e\n\x02id\x18\x01\x20\x02(\
+    \x03R\x02id\x12\x14\n\x05queue\x18\x02\x20\x02(\x05R\x05queue\x12'\n\x05\
+    state\x18\x03\x20\x01(\x0e2\x11.Lobby.LobbyStateR\x05state\x12\x18\n\x07\
+    players\x18\x04\x20\x03(\x03R\x07players\x12&\n\x0equeueStartTime\x18\
+    \x05\x20\x01(\x05R\x0equeueStartTime\"X\n\nLobbyState\x12\x14\n\x10LOBBY\
+    _STATE_IDLE\x10\0\x12\x18\n\x14LOBBY_STATE_IN_QUEUE\x10\x01\x12\x1a\n\
+    \x16LOBBY_STATE_IN_PREGAME\x10\x02\"\xcf\x02\n\x06Player\x12\x0e\n\x02id\
+    \x18\x01\x20\x02(\x03R\x02id\x12)\n\x05state\x18\x02\x20\x01(\x0e2\x13.P\
+    layer.PlayerStateR\x05state\x12\x14\n\x05lobby\x18\x03\x20\x01(\x03R\x05\
+    lobby\x12\x10\n\x03mmr\x18\x04\x20\x01(\x05R\x03mmr\x12$\n\rrecentMatche\
+    s\x18\x05\x20\x03(\x03R\rrecentMatches\x12(\n\x0fgeolocalisation\x18\x06\
+    \x20\x01(\x03R\x0fgeolocalisation\"\x91\x01\n\x0bPlayerState\x12\x15\n\
+    \x11PLAYER_STATE_IDLE\x10\0\x12\x19\n\x15PLAYER_STATE_IN_LOBBY\x10\x01\
+    \x12\x19\n\x15PLAYER_STATE_IN_QUEUE\x10\x02\x12\x1b\n\x17PLAYER_STATE_IN\
+    _PREGAME\x10\x03\x12\x18\n\x14PLAYER_STATE_IN_GAME\x10\x04\"@\n\x04User\
+    \x12\x0e\n\x02id\x18\x01\x20\x02(\x03R\x02id\x12\x12\n\x04name\x18\x02\
+    \x20\x01(\tR\x04name\x12\x14\n\x05email\x18\x03\x20\x01(\tR\x05emailb\
+    \x06proto2\
 ";
 
 /// `FileDescriptorProto` object which was a source for this generated file

@@ -7,6 +7,10 @@
 
 <https://github.com/stepancheg/rust-protobuf>
 
+### Build
+
+<https://dev.to/rogertorres/first-steps-with-docker-rust-30oi>
+
 ## CSharp
 
 ### Protobuf
@@ -24,3 +28,9 @@ Snowflake IdGen
 
 Redis OM
 <https://redis.io/learn/redis-om-dotnet>
+
+## Redis
+
+No transaction rollbacks: <https://redis.io/blog/you-dont-need-transaction-rollbacks-in-redis/>
+Transaction WATCH locking: <https://redis.io/docs/latest/develop/interact/transactions/#optimistic-locking-using-check-and-set>
+Keyspace events: <https://redis.io/docs/latest/develop/use/keyspace-notifications/#configuration>

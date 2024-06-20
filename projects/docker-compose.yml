@@ -1,12 +1,25 @@
 version: '2'
 services:
+
   mongo:
     image: mongo
+
   redis:
-    image: redis
+    image: redis/redis-stack
+    restart: always
     ports:
       - '6371:6379'
+
+  # realm:
+  #   build:
+  #     context: ./Layer 2 - Application/realm
+  #     dockerfile: Dockerfile
   coral:
-    build: ./Layer 2 - Application/coral
-  coraline:
-    build: ./Layer 2 - Application/coraline
+    build:
+      context: ./
+      dockerfile: "Layer 2 - Application/coral/Dockerfile"
+  # coraline:
+  #   build:
+  #     context: ./Layer 2 - Application/coraline
+  #     dockerfile: coraline/Dockerfile
+  #   # build: ./Layer 2 - Application/coraline
