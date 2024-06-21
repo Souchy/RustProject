@@ -34,3 +34,9 @@ Redis OM
 No transaction rollbacks: <https://redis.io/blog/you-dont-need-transaction-rollbacks-in-redis/>
 Transaction WATCH locking: <https://redis.io/docs/latest/develop/interact/transactions/#optimistic-locking-using-check-and-set>
 Keyspace events: <https://redis.io/docs/latest/develop/use/keyspace-notifications/#configuration>
+
+## Docker
+
+<https://docs.docker.com/language/rust/develop/>
+<https://dev.to/rogertorres/first-steps-with-docker-rust-30oi>
+<https://docs.docker.com/reference/dockerfile>
