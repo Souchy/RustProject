@@ -39,7 +39,7 @@ public class PlayerRepository
         return await _collection.FindByIdAsync(id);
     }
 
-    public IRedisCollection<Player> Get()
+    public IEnumerable<Player> Get()
     {
         return _collection.Where(p => true);
     }

@@ -15,10 +15,10 @@ services:
   #     context: ./Layer 2 - Application/realm
   #     dockerfile: Dockerfile
   coral:
-    container_name: Coral
+    # container_name: Coral
     ports:
       - '3001:8080'
-    command: [ "host.docker.internal", "8080" ]
+    command: [ "host.docker.internal:8080" ]
     build:
       context: ./
       dockerfile: "Layer 2 - Application/coral/Dockerfile"

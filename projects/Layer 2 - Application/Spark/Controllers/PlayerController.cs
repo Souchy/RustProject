@@ -28,7 +28,7 @@ public class PlayerController : ControllerBase
     }
 
     [HttpGet("all")]
-    public ICollection<Player> Get()
+    public IEnumerable<Player> Get()
     {
         return _playerRepository.Get();
     }
