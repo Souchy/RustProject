@@ -1,0 +1,4 @@
+message Lobby {
+	required int64 id = 1;
+	required int32 queue = 2;
+}

@@ -1,0 +1,3 @@
+message CreateLobby {
+	required int32 queue = 1;
+}

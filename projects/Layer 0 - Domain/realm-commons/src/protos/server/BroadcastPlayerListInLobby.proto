@@ -1,0 +1,3 @@
+message BroadcastPlayerListInLobby {
+	repeated int64 players = 1;
+}

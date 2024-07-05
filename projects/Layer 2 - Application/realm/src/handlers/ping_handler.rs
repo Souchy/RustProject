@@ -13,7 +13,7 @@ pub(crate) struct PingHandler;
 impl MessageHandler for PingHandler {
     async fn handle(&self, msg: BoxMessageDyn, client: &ArcClient) -> Result<(), Box<dyn Error>> {
         let message = msg.downcast_ref::<Ping>().unwrap();
-        println!("hey coral got ping {:?}", message);
+        println!("hey realm got ping {:?}", message);
         // TODO send
         // return client.send(Ping::new()).await;
         let buf = serialize(&Ping::new());

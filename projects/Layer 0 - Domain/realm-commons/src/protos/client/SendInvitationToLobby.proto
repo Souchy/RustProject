@@ -1,0 +1,4 @@
+message SendInvitationToLobby {
+	required int32 queue = 1;
+	required int64 player_to = 2;
+}

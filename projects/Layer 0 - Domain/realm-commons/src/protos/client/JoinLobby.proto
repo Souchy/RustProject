@@ -1,0 +1,5 @@
+message JoinLobby {
+	required int32 queue = 1;
+	required int64 lobby = 2;
+	required string token = 3;
+}

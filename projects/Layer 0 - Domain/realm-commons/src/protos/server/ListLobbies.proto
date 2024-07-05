@@ -1,0 +1,4 @@
+message ListLobbies {
+	// juste les lobby, sans token
+	repeated Lobby lobbies = 1; 
+}

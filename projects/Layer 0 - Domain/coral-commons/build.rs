@@ -8,10 +8,10 @@ fn main() {
 
     Codegen::new()
         .pure()
-        // .cargo_out_dir("messages")
         .include("src/protos")
         .out_dir("src/protos/gen")
         .input("src/protos/messages.proto")
         .input("src/protos/objects.proto")
         .run_from_script();
+    println!("Coral generated protos");
 }
