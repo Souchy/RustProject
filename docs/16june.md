@@ -24,3 +24,9 @@ Coral returns match to Realm
   - Spark can ask Realm to put a Lobby in queue (find match)
   - Spark can see the database and give stats to SparkUI on the number of players and lobbies finding matches, the average queue time, etc..
 - Make Spark + SparkUI
+
+
+
+For Corals to have dynamic ports and instances, they 
+Monitor as an optional module inside Realm?
+Coraline talks to Realm in the final produt, but we skip it with the Monitor who also would talk to Realm.

@@ -15,9 +15,10 @@ services:
   #     context: ./Layer 2 - Application/realm
   #     dockerfile: Dockerfile
   coral:
+    network_mode: "host"
     # container_name: Coral
     ports:
-      - '3001:8080'
+      - '0:8080'
     command: [ "host.docker.internal:8080" ]
     build:
       context: ./
@@ -25,6 +26,7 @@ services:
     deploy:
       mode: replicated
       replicas: 4
+
   # coraline:
   #   build:
   #     context: ./Layer 2 - Application/coraline
