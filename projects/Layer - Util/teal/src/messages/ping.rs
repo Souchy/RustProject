@@ -4,13 +4,13 @@ use crate::{
 };
 
 impl MessageIdentifiable for Ping {
-    fn id(&self) -> u8 {
+    fn id(&self) -> u16 {
         1
     }
 }
 
 impl MessageIdentifiable for Pong {
-    fn id(&self) -> u8 {
+    fn id(&self) -> u16 {
         2
     }
 }

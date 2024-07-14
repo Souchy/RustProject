@@ -39,7 +39,7 @@ fn test_message_manipulation() {
 #[test]
 fn test_message_serde() {
     // Setup
-    let mut deserializers: HashMap<u8, BoxMessageDyn> = HashMap::new();
+    let mut deserializers: HashMap<u16, BoxMessageDyn> = HashMap::new();
     let model_req = Heartbeat::new();
     deserializers.insert(model_req.id(), Box::new(model_req));
 

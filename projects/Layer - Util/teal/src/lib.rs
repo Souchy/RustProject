@@ -20,3 +20,6 @@ pub type ArcMessageHandler = Arc<dyn MessageHandler + Send + Sync>;
 pub type ArcClient = (dyn Client + Send + Sync); //Box<dyn Client + Send + Sync>;
 // pub type ArcClient = Arc<dyn Client + Send + Sync>;
 
+pub const ID_LEN: usize = 2;
+pub const LEN_LEN: usize = 8;
+pub const HEADER_LEN: usize = ID_LEN + LEN_LEN;

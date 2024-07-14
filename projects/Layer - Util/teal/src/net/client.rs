@@ -8,6 +8,7 @@ use tokio::sync::Mutex;
 
 use crate::net::handlers::MessageHandlers;
 use crate::{Reader, Writer};
+use crate::{HEADER_LEN, LEN_LEN};
 
 use super::server::Server;
 
@@ -100,27 +101,33 @@ impl Client for DefaultClient {
                 .await
                 .expect("failed to read data from socket");
 
-            println!("read {}", n);
+            // println!("read {}", n);
             if n == 0 {
                 println!("client stream terminated");
                 break;
             }
 
-            // total msg length, including the header (2 bytes for len + id)
-            let msg_length = buf[0] as usize;
+            if n < HEADER_LEN {
+                continue;
+            }
+            let mut dst = [0u8; LEN_LEN];
+            dst.clone_from_slice(&buf[0..LEN_LEN]);
+            // total msg length, including the header (2 bytes for id + 8 bytes for length)
+            let mut msg_length = usize::from_be_bytes(dst);
 
             // fragmentation
             if msg_length < n {
-                let mut i = 0;
+                let mut start = 0;
                 let mut end = msg_length;
-                while i < n {
-                    self.frame(&buf[i..end]).await;
-                    i = end;
-                    end += buf[i] as usize;
+                while start < n && msg_length >= HEADER_LEN {
+                    // println!("frame {} to {}", start, end);
+                    self.frame(&buf[start..end]).await;
+                    // read next frame
+                    start = end;
+                    dst.clone_from_slice(&buf[start..start + LEN_LEN]);
+                    msg_length = usize::from_be_bytes(dst);
+                    end += msg_length;
                 }
-                // TODO problem:
-                // the last message read could be incomplete
-                // on check 'i < n', puis lit le header du packet, mais 'end' pourrait dépasser 'n'
             }
             // perfect packet size
             else if msg_length == n {

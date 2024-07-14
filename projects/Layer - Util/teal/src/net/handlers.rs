@@ -1,10 +1,13 @@
-use crate::{net::message::MessageIdentifiable, ArcClient, ArcMessageHandler, BoxMessageDyn};
+use crate::{
+    net::message::MessageIdentifiable, ArcClient, ArcMessageHandler, BoxMessageDyn, HEADER_LEN,
+    ID_LEN, LEN_LEN,
+};
 use protobuf::MessageFull;
 use std::{collections::HashMap, error::Error};
 
 pub struct MessageHandlers {
-    deserializers: HashMap<u8, BoxMessageDyn>,
-    handlers: HashMap<u8, ArcMessageHandler>,
+    deserializers: HashMap<u16, BoxMessageDyn>,
+    handlers: HashMap<u16, ArcMessageHandler>,
     pub invalid_message_handler: fn(&[u8], &ArcClient),
 }
 
@@ -30,11 +33,16 @@ impl MessageHandlers {
         self.handlers.insert(id, handler);
     }
 
-    fn deserialize(&self, frame: &[u8]) -> Option<(u8, BoxMessageDyn)> {
-        let len = frame[0] as usize;
-        let id: u8 = frame[1];
+    fn deserialize(&self, frame: &[u8]) -> Option<(u16, BoxMessageDyn)> {
+        let mut dst = [0u8; LEN_LEN];
+        dst.clone_from_slice(&frame[0..LEN_LEN]);
+        let len = usize::from_be_bytes(dst);
+        let mut dstid = [0u8; ID_LEN];
+        dstid.clone_from_slice(&frame[LEN_LEN..HEADER_LEN]);
+        let id = u16::from_be_bytes(dstid);
+
         let mut msg: BoxMessageDyn = self.deserializers.get(&id)?.clone_box();
-        let _ = msg.merge_from_bytes_dyn(&frame[2..len]);
+        let _ = msg.merge_from_bytes_dyn(&frame[HEADER_LEN..len]);
         return Some((id, msg));
     }
 
@@ -53,7 +61,7 @@ impl MessageHandlers {
         }
     }
 
-    fn default_handler(frame: &[u8], client: &ArcClient) {
+    fn default_handler(frame: &[u8], _client: &ArcClient) {
         let st = std::str::from_utf8(&frame).unwrap();
         println!("received invalid message: {}", st);
     }

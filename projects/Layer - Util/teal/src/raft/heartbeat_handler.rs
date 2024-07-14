@@ -9,7 +9,7 @@ pub struct HeartbeatHandler;
 
 #[async_trait]
 impl MessageHandler for HeartbeatHandler {
-    async fn handle(&self, msg: BoxMessageDyn, client: &ArcClient) -> Result<(), Box<dyn Error>> {
+    async fn handle(&self, msg: BoxMessageDyn, _client: &ArcClient) -> Result<(), Box<dyn Error>> {
         let message = msg.downcast_ref::<Heartbeat>().unwrap();
         println!("hey server got heartbeat {:?}", message);
         Ok(())
