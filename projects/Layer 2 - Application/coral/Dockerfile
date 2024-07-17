@@ -41,5 +41,5 @@ COPY ["./Layer 2 - Application/coral/src", "./Layer 2 - Application/coral/src"]
 WORKDIR "/Layer 2 - Application/coral/"
 RUN cargo build --release
 
-EXPOSE 8080
+EXPOSE 8000
 ENTRYPOINT ["cargo", "run"]

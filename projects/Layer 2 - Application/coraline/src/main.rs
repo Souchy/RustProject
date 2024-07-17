@@ -14,7 +14,7 @@ pub async fn main() -> Result<(), Box<dyn Error>> {
     let reg = create_handlers();
 
     // Client
-    let client: DefaultClient = DefaultClient::new_connection("127.0.0.1:8080", Arc::new(reg)).await?;
+    let client: DefaultClient = DefaultClient::new_connection("127.0.0.1:8000", Arc::new(reg)).await?;
     let client_ref = Arc::new(client);
     let client_ref2 = client_ref.clone();
 

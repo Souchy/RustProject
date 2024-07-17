@@ -8,7 +8,7 @@ edition = "2021"
 [dependencies]
 teal = { path = "../../Layer - Util/teal" }
 coral-commons = { path = "../../Layer 0 - Domain/coral-commons" }
-protobuf = "3.4.0"
+protobuf = "3.5.0"
 
 tokio = {version = "*", features = ["full"]}
 serde = "1.0.188"

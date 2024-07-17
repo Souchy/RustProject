@@ -14,12 +14,13 @@ services:
   #   build:
   #     context: ./Layer 2 - Application/realm
   #     dockerfile: Dockerfile
+
   coral:
     network_mode: "host"
     # container_name: Coral
     ports:
-      - '0:8080'
-    command: [ "host.docker.internal:8080" ]
+      - '0:8000'
+    command: [ "host.docker.internal:8000" ]
     build:
       context: ./
       dockerfile: "Layer 2 - Application/coral/Dockerfile"

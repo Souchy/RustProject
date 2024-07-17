@@ -20,7 +20,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     // 127.0.0.1:8080 for connections.
     let addr = env::args()
         .nth(1)
-        .unwrap_or_else(|| "127.0.0.1:8080".to_string());
+        .unwrap_or_else(|| "127.0.0.1:8000".to_string());
 
     // Handlers
     let reg = create_handlers();
