@@ -1,0 +1,23 @@
+syntax = "proto2";
+
+package models;
+
+// Players are in Redis
+message Player {
+	required int64 id = 1;
+	optional PlayerState state = 2; // idle, in queue, in game 
+	optional int64 lobby = 3;
+	// optional int32 queue = 3;
+	optional int32 mmr = 4; //
+	// optional int32 queueStartTime = 4;
+	repeated int64 recentMatches = 5; // map of recent players <playerId, intGameAgo> 
+	optional int64 geolocalisation = 6;
+
+	enum PlayerState {
+		PLAYER_STATE_IDLE = 0;
+		PLAYER_STATE_IN_LOBBY = 1;
+		PLAYER_STATE_IN_QUEUE = 2; // State = Queue IDs start from here. Must match.
+		PLAYER_STATE_IN_PREGAME = 3;
+		PLAYER_STATE_IN_GAME = 4;
+	}
+}

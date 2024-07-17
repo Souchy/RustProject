@@ -1,3 +1,5 @@
+syntax = "proto3";
+
 message BroadcastPlayerListInLobby {
 	repeated int64 players = 1;
 }
