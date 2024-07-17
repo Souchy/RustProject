@@ -52,7 +52,7 @@ fn test_message_serde() {
 
     // Generic deserialization from id
     let n: usize = buf[0] as usize;
-    let id = buf[1];
+    let id = buf[1] as u16;
     let mut ms = deserializers[&id].clone();
     let _ = ms.merge_from_bytes_dyn(&buf[2..n]);
 
