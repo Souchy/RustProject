@@ -1,11 +1,14 @@
+syntax = "proto3";
+
+package objects;
 
 // Lobbies are stored in Redis
 message Lobby {
-	required int64 id = 1;
-	required int32 queue = 2;
-	optional LobbyState state = 3; // idle, in queue, in game 
+	int64 id = 1;
+	int32 queue = 2;
+	LobbyState state = 3; // idle, in queue, in game 
 	repeated int64 players = 4;
-	optional int32 queueStartTime = 5;
+	int32 queueStartTime = 5;
 	
 	enum LobbyState {
 		LOBBY_STATE_IDLE = 0;
@@ -16,14 +19,14 @@ message Lobby {
 
 // Players are in Redis
 message Player {
-	required int64 id = 1;
-	optional PlayerState state = 2; // idle, in queue, in game 
-	optional int64 lobby = 3;
-	// optional int32 queue = 3;
-	optional int32 mmr = 4; //
-	// optional int32 queueStartTime = 4;
+	int64 id = 1;
+	PlayerState state = 2; // idle, in queue, in game 
+	int64 lobby = 3;
+	// int32 queue = 3;
+	int32 mmr = 4; //
+	// int32 queueStartTime = 4;
 	repeated int64 recentMatches = 5; // map of recent players <playerId, intGameAgo> 
-	optional int64 geolocalisation = 6;
+	int64 geolocalisation = 6;
 
 	enum PlayerState {
 		PLAYER_STATE_IDLE = 0;
@@ -36,7 +39,7 @@ message Player {
 
 // Users are stored in a long-lasting DB like Mongo, etc
 message User {
-	required int64 id = 1;
-	optional string name = 2;
-	optional string email = 3;
+	int64 id = 1;
+	string name = 2;
+	string email = 3;
 }

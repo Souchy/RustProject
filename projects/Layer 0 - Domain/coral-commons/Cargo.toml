@@ -7,11 +7,10 @@ edition = "2021"
 
 [dependencies]
 teal = { path = "../../Layer - Util/teal" }
-protobuf = "3.4.0"
+tonic = "*"
 bincode = "*"
 async-trait = "0.1.79"
 
 
 [build-dependencies]
-protobuf = "3.4.0"
-protobuf-codegen = "3.4.0"
+tonic-build = "*"

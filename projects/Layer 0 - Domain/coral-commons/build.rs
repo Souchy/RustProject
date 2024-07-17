@@ -1,17 +1,17 @@
-use protobuf_codegen::Codegen;
-
-fn main() {
-
-    // Build protobuf messages refs:
-    // https://crates.io/crates/protobuf-codegen/3.4.0
-    // https://github.com/stepancheg/rust-protobuf/blob/master/protobuf-examples/customize-serde/build.rs
-
-    Codegen::new()
-        .pure()
-        .include("src/protos")
-        .out_dir("src/protos/gen")
-        .input("src/protos/messages.proto")
-        .input("src/protos/objects.proto")
-        .run_from_script();
-    println!("Coral generated protos");
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    tonic_build::configure()
+        .build_transport(false)
+        .message_attribute(".", "#[derive(serde::Serialize, serde::Deserialize)]")
+        .field_attribute("id", "#[serde(rename = \"_id\")]")
+        .compile(
+            &[
+                "src/protos/objects.proto",
+                "src/protos/Match.proto",
+                "src/protos/RequestMatch.proto",
+                "src/protos/SetInQueue.proto",
+            ],
+            &["src/protos"],
+        )?;
+    println!("Realm generated protos");
+    Ok(())
 }

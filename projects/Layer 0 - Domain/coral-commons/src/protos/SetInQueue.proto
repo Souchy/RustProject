@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package messages;
+
+message SetInQueueRequest {
+	int32 queue = 1;
+	int32 state = 2;
+}
+
+message SetInQueueResponse {
+	int32 response = 1;
+}

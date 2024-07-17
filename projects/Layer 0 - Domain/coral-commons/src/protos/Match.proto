@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package models;
+
+message Match {
+	int32 moonstone_port = 1;
+	string token = 2;
+	repeated int64 players = 3;
+}
+
