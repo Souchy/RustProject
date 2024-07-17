@@ -9,7 +9,6 @@ use tokio::sync::Mutex;
 pub mod net;
 pub mod protos;
 pub mod messages;
-pub mod raft;
 
 pub type Reader = Arc<Mutex<OwnedReadHalf>>;
 pub type Writer = Arc<Mutex<OwnedWriteHalf>>;

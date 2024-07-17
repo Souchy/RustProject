@@ -8,7 +8,7 @@ use teal::{
         handlers::MessageHandlers,
         message,
     },
-    protos::gen::{ping::Ping, raft::Heartbeat},
+    protos::gen::{ping::Ping},
     ArcClient, BoxMessageDyn,
 };
 

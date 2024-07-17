@@ -7,9 +7,7 @@ use teal::{
         handler::{MessageHandler, MockMessageHandler},
         handlers::MessageHandlers,
         message,
-    },
-    protos::gen::{ping::Ping, raft::Heartbeat},
-    ArcClient, BoxMessageDyn,
+    }, protos::messages::{Heartbeat, Ping}, ArcClient, BoxMessageDyn
 };
 
 pub async fn create_client() -> Result<(), Box<dyn Error>> {
@@ -23,7 +21,7 @@ pub async fn create_client() -> Result<(), Box<dyn Error>> {
 
     // Client
     let client: DefaultClient =
-        DefaultClient::new_connection("127.0.0.1:8080", Arc::new(reg)).await?;
+        DefaultClient::new_connection("127.0.0.1:8000", Arc::new(reg)).await?;
     let client_ref = Arc::new(client);
     let client_ref2 = client_ref.clone();
 
