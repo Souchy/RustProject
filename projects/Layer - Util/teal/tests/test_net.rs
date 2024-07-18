@@ -39,7 +39,9 @@ fn test_message_manipulation() {
 fn test_message_serde() -> Result<(), Box<dyn Error>> {
     // Setup
     let mut reg = MessageHandlers::new();
+    reg.register_pool(0, Arc::new(teal::DESCRIPTOR_POOL.to_owned()));
     reg.register(
+        0,
         &RaftHeartbeat::default(),
         Box::new(RaftHeartbeatHandlerAssertTerm4),
     );
@@ -63,7 +65,9 @@ fn test_message_serde() -> Result<(), Box<dyn Error>> {
 #[tokio::test]
 async fn test_handlers() {
     let mut reg = MessageHandlers::new();
+    reg.register_pool(0, Arc::new(teal::DESCRIPTOR_POOL.to_owned()));
     reg.register(
+        0,
         &RaftHeartbeat::default(),
         Box::new(RaftHeartbeatHandlerAssertTerm4),
     );

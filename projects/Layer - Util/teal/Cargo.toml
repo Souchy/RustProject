@@ -24,6 +24,7 @@ bytes = "1"
 async-trait = "0.1.79"
 futures = "*"
 
+# Protobuf
 tonic = "*"
 prost = "*"
 prost-reflect = { version = "*", features = ["serde", "derive", "text-format"] }

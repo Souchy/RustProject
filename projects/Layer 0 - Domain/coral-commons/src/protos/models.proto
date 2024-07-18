@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package objects;
+package models;
 
 // Lobbies are stored in Redis
 message Lobby {

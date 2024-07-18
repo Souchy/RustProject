@@ -13,7 +13,8 @@ pub async fn create_client() -> Result<(), Box<dyn Error>> {
 
     // Handlers
     let mut reg = MessageHandlers::new();
-    reg.register(&Ping::default(), Box::new(mock_handler));
+    reg.register_pool(0, Arc::new(teal::DESCRIPTOR_POOL.to_owned()));
+    reg.register(0, &Ping::default(), Box::new(mock_handler));
 
     // Client
     let client: DefaultClient =

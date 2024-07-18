@@ -18,7 +18,8 @@ pub async fn create_server() -> Result<(), Box<dyn Error>> {
 
     // Handlers
     let mut reg = MessageHandlers::new();
-    reg.register(&Ping::default(), Box::new(PingHandler::default()));
+    reg.register_pool(0, Arc::new(teal::DESCRIPTOR_POOL.to_owned()));
+    reg.register(0, &Ping::default(), Box::new(PingHandler::default()));
 
     // Server start
     Server::run(addr, Arc::new(reg)).await.ok();

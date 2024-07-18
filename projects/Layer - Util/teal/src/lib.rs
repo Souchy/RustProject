@@ -1,5 +1,4 @@
 use std::sync::Arc;
-
 use net::client::Client;
 use net::message::MessageIdentifiable;
 use tokio::net::tcp::{OwnedReadHalf, OwnedWriteHalf};
@@ -21,7 +20,7 @@ pub const ID_LEN: usize = 2;
 pub const LEN_LEN: usize = 8;
 pub const HEADER_LEN: usize = ID_LEN + LEN_LEN;
 
-static DESCRIPTOR_POOL: Lazy<DescriptorPool> = Lazy::new(|| {
+pub static DESCRIPTOR_POOL: Lazy<DescriptorPool> = Lazy::new(|| {
     DescriptorPool::decode(
         include_bytes!(concat!(env!("OUT_DIR"), "/file_descriptor_set.bin")).as_ref(),
     )
