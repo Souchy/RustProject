@@ -13,7 +13,7 @@ use crate::{HEADER_LEN, LEN_LEN};
 use super::server::Server;
 
 #[async_trait]
-pub trait Client {
+pub trait Client : Send + Sync {
     fn get_id(&self) -> i32;
     async fn send_bytes(&self, buf: &[u8]) -> Result<(), Box<dyn Error>>;
     // TODO Client.send() + Client.broadcast()

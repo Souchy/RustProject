@@ -1,6 +1,5 @@
 use crate::{
-    net::message::MessageIdentifiable,
-    protos::gen::ping::{Ping, Pong},
+    net::message::MessageIdentifiable, protos::messages::{Ping, Pong},
 };
 
 impl MessageIdentifiable for Ping {

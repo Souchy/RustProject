@@ -1,1 +1,3 @@
-pub mod gen;
+pub mod messages {
+    tonic::include_proto!("messages");
+}

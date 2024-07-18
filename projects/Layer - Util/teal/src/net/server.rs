@@ -1,6 +1,6 @@
 use std::{error::Error, sync::Arc};
 
-use protobuf::MessageFull;
+use prost::Message;
 use tokio::{net::TcpListener, sync::Mutex};
 use tracing::error;
 
@@ -53,7 +53,7 @@ impl Server {
         }
     }
 
-    pub async fn broadcast<T: MessageIdentifiable + MessageFull>(&self, msg: T) {
+    pub async fn broadcast<T: MessageIdentifiable + Message>(&self, msg: T) {
         let buf = serialize(&msg);
         for c in &self.clients {
             _ = c.send_bytes(&buf).await;

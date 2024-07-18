@@ -1,16 +1,16 @@
-use protobuf_codegen::Codegen;
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let protos = ["src/protos/ping.proto", "src/protos/heartbeat.proto"];
+    let includes = ["src/protos"];
 
-fn main() {
+    let mut config = prost_build::Config::new();
+    config
+        .message_attribute(".models", "#[derive(serde::Serialize, serde::Deserialize)]")
+        .field_attribute("id", "#[serde(rename = \"_id\")]");
 
-    // Build protobuf messages refs:
-    // https://crates.io/crates/protobuf-codegen/3.4.0
-    // https://github.com/stepancheg/rust-protobuf/blob/master/protobuf-examples/customize-serde/build.rs
+    prost_reflect_build::Builder::new()
+        .descriptor_pool("crate::DESCRIPTOR_POOL")
+        .compile_protos_with_config(config, &protos, &includes)?;
 
-    Codegen::new()
-        .pure()
-        .include("src/protos")
-        .out_dir("src/protos/gen")
-        .input("src/protos/ping.proto")
-        .input("src/protos/raft.proto")
-        .run_from_script();
+    println!("Realm generated protos");
+    Ok(())
 }

@@ -1,14 +1,13 @@
-use crate::{ArcClient, BoxMessageDyn};
+use crate::DynClient;
 use async_trait::async_trait;
-use std::error::Error;
-use mockall::*;
+use core::fmt::Debug;
 use mockall::predicate::*;
+use mockall::*;
+use prost_reflect::DynamicMessage;
+use std::error::Error;
 
-// #[cfg(test)]
-// use mockall::{automock, mock, predicate::*};
-// #[cfg_attr(test, automock)]
 #[automock]
 #[async_trait]
-pub trait MessageHandler {
-    async fn handle(&self, msg: BoxMessageDyn, client: &ArcClient) -> Result<(), Box<dyn Error>>;
+pub trait MessageHandler: Debug + Send + Sync {
+    async fn handle(&self, msg: DynamicMessage, client: &DynClient) -> Result<(), Box<dyn Error>>;
 }

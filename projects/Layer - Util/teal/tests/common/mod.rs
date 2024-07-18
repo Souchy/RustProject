@@ -1,17 +1,3 @@
-use std::{error::Error, sync::Arc};
-
-use async_trait::async_trait;
-use teal::{
-    net::{
-        client::{Client, DefaultClient},
-        handler::MessageHandler,
-        handlers::MessageHandlers,
-        message,
-    },
-    protos::gen::{ping::Ping},
-    ArcClient, BoxMessageDyn,
-};
-
 pub mod net;
 pub mod test_client;
 pub mod test_server;
