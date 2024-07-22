@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package models;
+
+message Match {
+	// Game server
+	int32 game_port = 1;
+	// Access token to the game on the game server
+	string token = 2;
+	// List of players in the match
+	repeated int64 players = 3;
+}
+

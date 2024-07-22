@@ -1,17 +1,14 @@
-use protobuf_codegen::Codegen;
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let protos = [
+        "src/protos/Match.proto",
+        "src/protos/SetQueue.proto",
+    ];
+    let includes = ["src/protos"];
 
-fn main() {
+    prost_reflect_build::Builder::new()
+        .descriptor_pool("crate::DESCRIPTOR_POOL")
+        .compile_protos(&protos, &includes)?;
 
-    // Build protobuf messages refs:
-    // https://crates.io/crates/protobuf-codegen/3.4.0
-    // https://github.com/stepancheg/rust-protobuf/blob/master/protobuf-examples/customize-serde/build.rs
-
-    Codegen::new()
-        .pure()
-        .include("src/protos")
-        .out_dir("src/protos/gen")
-        .input("src/protos/messages.proto")
-        .input("src/protos/objects.proto")
-        .run_from_script();
     println!("Coral generated protos");
+    Ok(())
 }

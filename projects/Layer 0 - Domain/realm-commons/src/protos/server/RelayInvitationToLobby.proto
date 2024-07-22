@@ -1,7 +1,10 @@
+syntax = "proto3";
+package server;
+
 message RelayInvitationToLobby {
-	required int32 queue = 1;
-	required int64 player_to = 2;
-	required int64 player_from = 3;
-	required int64 lobby = 4;
-	required string token = 5;
+	int32 queue = 1;
+	int64 player_to = 2;
+	int64 player_from = 3;
+	int64 lobby = 4;
+	string token = 5;
 }

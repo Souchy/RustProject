@@ -1,3 +1,6 @@
+syntax = "proto3";
+package client;
+
 message CreateLobby {
-	required int32 queue = 1;
+	int32 queue = 1;
 }

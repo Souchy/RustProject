@@ -1,4 +1,5 @@
 syntax = "proto3";
+package server;
 
 message CreatedLobby {
 	int32 queue = 1;

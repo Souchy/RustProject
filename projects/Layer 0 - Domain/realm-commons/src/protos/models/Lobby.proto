@@ -1,4 +1,20 @@
+syntax = "proto3";
+package models;
+
+enum LobbyState {
+	LOBBY_STATE_IDLE = 0;
+	LOBBY_STATE_IN_QUEUE = 1;
+	LOBBY_STATE_IN_PREMATCH = 2;
+}
+
+// Lobbies are stored in Redis
 message Lobby {
-	required int64 id = 1;
-	required int32 queue = 2;
+	string id = 1;
+	// extern.ObjectId id = 1;
+	// mongodb.bson.oid.ObjectId id = 1;
+	string token = 2;
+	int32 queue = 3;
+	LobbyState state = 4; // idle, in queue, in game 
+	repeated int64 players = 5;
+	int64 queueStartTime = 6;
 }

@@ -1,17 +1,16 @@
-syntax = "proto2";
-
+syntax = "proto3";
 package models;
 
 // Players are in Redis
 message Player {
-	required int64 id = 1;
-	optional PlayerState state = 2; // idle, in queue, in game 
-	optional int64 lobby = 3;
+	int64 id = 1;
+	PlayerState state = 2; // idle, in queue, in game 
+	int64 lobby = 3;
 	// optional int32 queue = 3;
-	optional int32 mmr = 4; //
+	int32 mmr = 4; //
 	// optional int32 queueStartTime = 4;
 	repeated int64 recentMatches = 5; // map of recent players <playerId, intGameAgo> 
-	optional int64 geolocalisation = 6;
+	int64 geolocalisation = 6;
 
 	enum PlayerState {
 		PLAYER_STATE_IDLE = 0;

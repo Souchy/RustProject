@@ -1,0 +1,10 @@
+syntax = "proto3";
+package messages;
+
+message Heartbeat {
+}
+
+message RaftHeartbeat {
+	int32 term = 1;
+	int32 leader = 2;
+}

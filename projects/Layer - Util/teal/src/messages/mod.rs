@@ -1,2 +1,2 @@
 pub mod ping;
-pub mod raft;
+pub mod heartbeat;

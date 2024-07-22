@@ -1,29 +1,24 @@
 use std::{error::Error, sync::Arc};
 
-use async_trait::async_trait;
 use teal::{
     net::{
-        client::{Client, DefaultClient},
-        handler::{MessageHandler, MockMessageHandler},
-        handlers::MessageHandlers,
-        message,
+        client::{Client, DefaultClient}, handler::MockMessageHandler, handlers::MessageHandlers, message
     },
-    protos::gen::{ping::Ping, raft::Heartbeat},
-    ArcClient, BoxMessageDyn,
+    protos::messages::{Ping, RaftHeartbeat},
 };
 
 pub async fn create_client() -> Result<(), Box<dyn Error>> {
     let mut mock_handler = MockMessageHandler::new();
-    mock_handler.expect_handle()
-        .times(1);
+    mock_handler.expect_handle().times(1);
 
     // Handlers
     let mut reg = MessageHandlers::new();
-    reg.register(Ping::new(), Arc::new(mock_handler));
+    reg.register_pool(0, Arc::new(teal::DESCRIPTOR_POOL.to_owned()));
+    reg.register(0, &Ping::default(), Box::new(mock_handler));
 
     // Client
     let client: DefaultClient =
-        DefaultClient::new_connection("127.0.0.1:8080", Arc::new(reg)).await?;
+        DefaultClient::new_connection("127.0.0.1:8000", Arc::new(reg)).await?;
     let client_ref = Arc::new(client);
     let client_ref2 = client_ref.clone();
 
@@ -32,28 +27,15 @@ pub async fn create_client() -> Result<(), Box<dyn Error>> {
         client_ref.run().await.unwrap();
     });
 
-    let mut hb = Heartbeat::new();
-    hb.set_leader_id(3);
-    let buf = message::serialize(&hb);
-    // TODO send
-    client_ref2.send_bytes(&buf).await.unwrap();
-    client_ref2
-        .send_bytes(&message::serialize(&Ping::new()))
-        .await
-        .unwrap();
-    // client_ref2.send(hb).await.unwrap();
-    // client_ref2.send(Ping::new()).await.unwrap();
+    let mut hb = RaftHeartbeat::default();
+    hb.leader = 3;
+    let hbbuf = message::serialize(&hb);
+    client_ref2.send_bytes(&hbbuf).await.unwrap();
+
+    let pingbuf = message::serialize(&Ping::default());
+    client_ref2.send_bytes(&pingbuf).await.unwrap();
     t1.await?;
 
     Ok(())
 }
 
-// struct PingHandler {}
-// #[async_trait]
-// impl MessageHandler for PingHandler {
-//     async fn handle(&self, msg: BoxMessageDyn, client: &ArcClient) -> Result<(), Box<dyn Error>> {
-//         let message = msg.downcast_ref::<Ping>().unwrap();
-//         println!("hey client got ping {:?}", message);
-// 		Ok(())
-//     }
-// }

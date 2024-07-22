@@ -8,9 +8,17 @@ edition = "2021"
 [dependencies]
 teal = { path = "../../Layer - Util/teal" }
 coral-commons = { path = "../../Layer 0 - Domain/coral-commons" }
-protobuf = "3.5.0"
+realm-commons = { path = "../../Layer 0 - Domain/realm-commons" }
 
+redis = "*"
 tokio = {version = "*", features = ["full"]}
 serde = "1.0.188"
 futures = "0.3.28"
 async-trait = "0.1.79"
+
+# Protobuf
+tonic = "*"
+prost = "*"
+prost-reflect = { version = "*", features = ["serde", "derive", "text-format"] }
+once_cell = "1.9.0"
+
