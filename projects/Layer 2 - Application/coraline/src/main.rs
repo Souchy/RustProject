@@ -30,7 +30,7 @@ pub async fn main() -> Result<(), Box<dyn Error>> {
             let _ = red_player::delete_all(db);
             for i in 0..1000 {
                 let mut player: Player = Player::default();
-                player.id = i;
+                player.id = i.to_string();
                 player.mmr = 1000;
                 player.state = PlayerState::InLobby as i32;
                 let _ = red_player::set(db, &player);
