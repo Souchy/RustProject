@@ -24,13 +24,12 @@ namespace Models {
     static MatchReflection() {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
-            "CgtNYXRjaC5wcm90bxIGbW9kZWxzIj8KBU1hdGNoEhYKDm1vb25zdG9uZV9w",
-            "b3J0GAEgASgFEg0KBXRva2VuGAIgASgJEg8KB3BsYXllcnMYAyADKANiBnBy",
-            "b3RvMw=="));
+            "CgtNYXRjaC5wcm90bxIGbW9kZWxzIjoKBU1hdGNoEhEKCWdhbWVfcG9ydBgB",
+            "IAEoBRINCgV0b2tlbhgCIAEoCRIPCgdwbGF5ZXJzGAMgAygDYgZwcm90bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
-            new pbr::GeneratedClrTypeInfo(typeof(global::Models.Match), global::Models.Match.Parser, new[]{ "MoonstonePort", "Token", "Players" }, null, null, null, null)
+            new pbr::GeneratedClrTypeInfo(typeof(global::Models.Match), global::Models.Match.Parser, new[]{ "GamePort", "Token", "Players" }, null, null, null, null)
           }));
     }
     #endregion
@@ -72,7 +71,7 @@ namespace Models {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public Match(Match other) : this() {
-      moonstonePort_ = other.moonstonePort_;
+      gamePort_ = other.gamePort_;
       token_ = other.token_;
       players_ = other.players_.Clone();
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
@@ -84,21 +83,27 @@ namespace Models {
       return new Match(this);
     }
 
-    /// <summary>Field number for the "moonstone_port" field.</summary>
-    public const int MoonstonePortFieldNumber = 1;
-    private int moonstonePort_;
+    /// <summary>Field number for the "game_port" field.</summary>
+    public const int GamePortFieldNumber = 1;
+    private int gamePort_;
+    /// <summary>
+    /// Game server
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public int MoonstonePort {
-      get { return moonstonePort_; }
+    public int GamePort {
+      get { return gamePort_; }
       set {
-        moonstonePort_ = value;
+        gamePort_ = value;
       }
     }
 
     /// <summary>Field number for the "token" field.</summary>
     public const int TokenFieldNumber = 2;
     private string token_ = "";
+    /// <summary>
+    /// Access token to the game on the game server
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public string Token {
@@ -113,6 +118,9 @@ namespace Models {
     private static readonly pb::FieldCodec<long> _repeated_players_codec
         = pb::FieldCodec.ForInt64(26);
     private readonly pbc::RepeatedField<long> players_ = new pbc::RepeatedField<long>();
+    /// <summary>
+    /// List of players in the match
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public pbc::RepeatedField<long> Players {
@@ -134,7 +142,7 @@ namespace Models {
       if (ReferenceEquals(other, this)) {
         return true;
       }
-      if (MoonstonePort != other.MoonstonePort) return false;
+      if (GamePort != other.GamePort) return false;
       if (Token != other.Token) return false;
       if(!players_.Equals(other.players_)) return false;
       return Equals(_unknownFields, other._unknownFields);
@@ -144,7 +152,7 @@ namespace Models {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override int GetHashCode() {
       int hash = 1;
-      if (MoonstonePort != 0) hash ^= MoonstonePort.GetHashCode();
+      if (GamePort != 0) hash ^= GamePort.GetHashCode();
       if (Token.Length != 0) hash ^= Token.GetHashCode();
       hash ^= players_.GetHashCode();
       if (_unknownFields != null) {
@@ -165,9 +173,9 @@ namespace Models {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       output.WriteRawMessage(this);
     #else
-      if (MoonstonePort != 0) {
+      if (GamePort != 0) {
         output.WriteRawTag(8);
-        output.WriteInt32(MoonstonePort);
+        output.WriteInt32(GamePort);
       }
       if (Token.Length != 0) {
         output.WriteRawTag(18);
@@ -184,9 +192,9 @@ namespace Models {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
-      if (MoonstonePort != 0) {
+      if (GamePort != 0) {
         output.WriteRawTag(8);
-        output.WriteInt32(MoonstonePort);
+        output.WriteInt32(GamePort);
       }
       if (Token.Length != 0) {
         output.WriteRawTag(18);
@@ -203,8 +211,8 @@ namespace Models {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public int CalculateSize() {
       int size = 0;
-      if (MoonstonePort != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeInt32Size(MoonstonePort);
+      if (GamePort != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(GamePort);
       }
       if (Token.Length != 0) {
         size += 1 + pb::CodedOutputStream.ComputeStringSize(Token);
@@ -222,8 +230,8 @@ namespace Models {
       if (other == null) {
         return;
       }
-      if (other.MoonstonePort != 0) {
-        MoonstonePort = other.MoonstonePort;
+      if (other.GamePort != 0) {
+        GamePort = other.GamePort;
       }
       if (other.Token.Length != 0) {
         Token = other.Token;
@@ -245,7 +253,7 @@ namespace Models {
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
           case 8: {
-            MoonstonePort = input.ReadInt32();
+            GamePort = input.ReadInt32();
             break;
           }
           case 18: {
@@ -273,7 +281,7 @@ namespace Models {
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
             break;
           case 8: {
-            MoonstonePort = input.ReadInt32();
+            GamePort = input.ReadInt32();
             break;
           }
           case 18: {

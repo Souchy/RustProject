@@ -24,13 +24,15 @@ namespace Messages {
     static SetQueueReflection() {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
-            "Cg5TZXRRdWV1ZS5wcm90bxIIbWVzc2FnZXMiQAoPU2V0UXVldWVSZXF1ZXN0",
-            "Eg0KBXF1ZXVlGAEgASgFEg0KBXN0YXRlGAIgASgFEg8KB3BsYXllcnMYAyAD",
-            "KAMiMAoQU2V0UXVldWVSZXNwb25zZRINCgVxdWV1ZRgBIAEoBRINCgVzdGF0",
-            "ZRgCIAEoBWIGcHJvdG8z"));
+            "Cg5TZXRRdWV1ZS5wcm90bxIIbWVzc2FnZXMiVgoPU2V0UXVldWVSZXF1ZXN0",
+            "Eg0KBXF1ZXVlGAEgASgFEiMKBXN0YXRlGAIgASgOMhQubWVzc2FnZXMuUXVl",
+            "dWVTdGF0ZRIPCgdwbGF5ZXJzGAMgAygDIkYKEFNldFF1ZXVlUmVzcG9uc2US",
+            "DQoFcXVldWUYASABKAUSIwoFc3RhdGUYAiABKA4yFC5tZXNzYWdlcy5RdWV1",
+            "ZVN0YXRlKjoKClF1ZXVlU3RhdGUSFAoQUVVFVUVfU1RBVEVfSURMRRAAEhYK",
+            "ElFVRVVFX1NUQVRFX0FDVElWRRABYgZwcm90bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
-          new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
+          new pbr::GeneratedClrTypeInfo(new[] {typeof(global::Messages.QueueState), }, null, new pbr::GeneratedClrTypeInfo[] {
             new pbr::GeneratedClrTypeInfo(typeof(global::Messages.SetQueueRequest), global::Messages.SetQueueRequest.Parser, new[]{ "Queue", "State", "Players" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Messages.SetQueueResponse), global::Messages.SetQueueResponse.Parser, new[]{ "Queue", "State" }, null, null, null, null)
           }));
@@ -38,6 +40,14 @@ namespace Messages {
     #endregion
 
   }
+  #region Enums
+  public enum QueueState {
+    [pbr::OriginalName("QUEUE_STATE_IDLE")] Idle = 0,
+    [pbr::OriginalName("QUEUE_STATE_ACTIVE")] Active = 1,
+  }
+
+  #endregion
+
   #region Messages
   /// <summary>
   /// Request to set queue state with players
@@ -103,10 +113,10 @@ namespace Messages {
 
     /// <summary>Field number for the "state" field.</summary>
     public const int StateFieldNumber = 2;
-    private int state_;
+    private global::Messages.QueueState state_ = global::Messages.QueueState.Idle;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public int State {
+    public global::Messages.QueueState State {
       get { return state_; }
       set {
         state_ = value;
@@ -150,7 +160,7 @@ namespace Messages {
     public override int GetHashCode() {
       int hash = 1;
       if (Queue != 0) hash ^= Queue.GetHashCode();
-      if (State != 0) hash ^= State.GetHashCode();
+      if (State != global::Messages.QueueState.Idle) hash ^= State.GetHashCode();
       hash ^= players_.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
@@ -174,9 +184,9 @@ namespace Messages {
         output.WriteRawTag(8);
         output.WriteInt32(Queue);
       }
-      if (State != 0) {
+      if (State != global::Messages.QueueState.Idle) {
         output.WriteRawTag(16);
-        output.WriteInt32(State);
+        output.WriteEnum((int) State);
       }
       players_.WriteTo(output, _repeated_players_codec);
       if (_unknownFields != null) {
@@ -193,9 +203,9 @@ namespace Messages {
         output.WriteRawTag(8);
         output.WriteInt32(Queue);
       }
-      if (State != 0) {
+      if (State != global::Messages.QueueState.Idle) {
         output.WriteRawTag(16);
-        output.WriteInt32(State);
+        output.WriteEnum((int) State);
       }
       players_.WriteTo(ref output, _repeated_players_codec);
       if (_unknownFields != null) {
@@ -211,8 +221,8 @@ namespace Messages {
       if (Queue != 0) {
         size += 1 + pb::CodedOutputStream.ComputeInt32Size(Queue);
       }
-      if (State != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeInt32Size(State);
+      if (State != global::Messages.QueueState.Idle) {
+        size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) State);
       }
       size += players_.CalculateSize(_repeated_players_codec);
       if (_unknownFields != null) {
@@ -230,7 +240,7 @@ namespace Messages {
       if (other.Queue != 0) {
         Queue = other.Queue;
       }
-      if (other.State != 0) {
+      if (other.State != global::Messages.QueueState.Idle) {
         State = other.State;
       }
       players_.Add(other.players_);
@@ -254,7 +264,7 @@ namespace Messages {
             break;
           }
           case 16: {
-            State = input.ReadInt32();
+            State = (global::Messages.QueueState) input.ReadEnum();
             break;
           }
           case 26:
@@ -282,7 +292,7 @@ namespace Messages {
             break;
           }
           case 16: {
-            State = input.ReadInt32();
+            State = (global::Messages.QueueState) input.ReadEnum();
             break;
           }
           case 26:
@@ -357,10 +367,10 @@ namespace Messages {
 
     /// <summary>Field number for the "state" field.</summary>
     public const int StateFieldNumber = 2;
-    private int state_;
+    private global::Messages.QueueState state_ = global::Messages.QueueState.Idle;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public int State {
+    public global::Messages.QueueState State {
       get { return state_; }
       set {
         state_ = value;
@@ -392,7 +402,7 @@ namespace Messages {
     public override int GetHashCode() {
       int hash = 1;
       if (Queue != 0) hash ^= Queue.GetHashCode();
-      if (State != 0) hash ^= State.GetHashCode();
+      if (State != global::Messages.QueueState.Idle) hash ^= State.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -415,9 +425,9 @@ namespace Messages {
         output.WriteRawTag(8);
         output.WriteInt32(Queue);
       }
-      if (State != 0) {
+      if (State != global::Messages.QueueState.Idle) {
         output.WriteRawTag(16);
-        output.WriteInt32(State);
+        output.WriteEnum((int) State);
       }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
@@ -433,9 +443,9 @@ namespace Messages {
         output.WriteRawTag(8);
         output.WriteInt32(Queue);
       }
-      if (State != 0) {
+      if (State != global::Messages.QueueState.Idle) {
         output.WriteRawTag(16);
-        output.WriteInt32(State);
+        output.WriteEnum((int) State);
       }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
@@ -450,8 +460,8 @@ namespace Messages {
       if (Queue != 0) {
         size += 1 + pb::CodedOutputStream.ComputeInt32Size(Queue);
       }
-      if (State != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeInt32Size(State);
+      if (State != global::Messages.QueueState.Idle) {
+        size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) State);
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -468,7 +478,7 @@ namespace Messages {
       if (other.Queue != 0) {
         Queue = other.Queue;
       }
-      if (other.State != 0) {
+      if (other.State != global::Messages.QueueState.Idle) {
         State = other.State;
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
@@ -491,7 +501,7 @@ namespace Messages {
             break;
           }
           case 16: {
-            State = input.ReadInt32();
+            State = (global::Messages.QueueState) input.ReadEnum();
             break;
           }
         }
@@ -514,7 +524,7 @@ namespace Messages {
             break;
           }
           case 16: {
-            State = input.ReadInt32();
+            State = (global::Messages.QueueState) input.ReadEnum();
             break;
           }
         }
