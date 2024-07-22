@@ -24,12 +24,13 @@ namespace Models {
     static MatchReflection() {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
-            "CgtNYXRjaC5wcm90bxIGbW9kZWxzIjoKBU1hdGNoEhEKCWdhbWVfcG9ydBgB",
-            "IAEoBRINCgV0b2tlbhgCIAEoCRIPCgdwbGF5ZXJzGAMgAygDYgZwcm90bzM="));
+            "CgtNYXRjaC5wcm90bxIGbW9kZWxzIlUKBU1hdGNoEgoKAmlkGAEgASgJEg0K",
+            "BXF1ZXVlGAIgASgFEhEKCWdhbWVfcG9ydBgDIAEoBRINCgV0b2tlbhgEIAEo",
+            "CRIPCgdwbGF5ZXJzGAUgAygDYgZwcm90bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
-            new pbr::GeneratedClrTypeInfo(typeof(global::Models.Match), global::Models.Match.Parser, new[]{ "GamePort", "Token", "Players" }, null, null, null, null)
+            new pbr::GeneratedClrTypeInfo(typeof(global::Models.Match), global::Models.Match.Parser, new[]{ "Id", "Queue", "GamePort", "Token", "Players" }, null, null, null, null)
           }));
     }
     #endregion
@@ -71,6 +72,8 @@ namespace Models {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public Match(Match other) : this() {
+      id_ = other.id_;
+      queue_ = other.queue_;
       gamePort_ = other.gamePort_;
       token_ = other.token_;
       players_ = other.players_.Clone();
@@ -83,8 +86,35 @@ namespace Models {
       return new Match(this);
     }
 
+    /// <summary>Field number for the "id" field.</summary>
+    public const int IdFieldNumber = 1;
+    private string id_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string Id {
+      get { return id_; }
+      set {
+        id_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "queue" field.</summary>
+    public const int QueueFieldNumber = 2;
+    private int queue_;
+    /// <summary>
+    /// Type of match
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int Queue {
+      get { return queue_; }
+      set {
+        queue_ = value;
+      }
+    }
+
     /// <summary>Field number for the "game_port" field.</summary>
-    public const int GamePortFieldNumber = 1;
+    public const int GamePortFieldNumber = 3;
     private int gamePort_;
     /// <summary>
     /// Game server
@@ -99,7 +129,7 @@ namespace Models {
     }
 
     /// <summary>Field number for the "token" field.</summary>
-    public const int TokenFieldNumber = 2;
+    public const int TokenFieldNumber = 4;
     private string token_ = "";
     /// <summary>
     /// Access token to the game on the game server
@@ -114,12 +144,12 @@ namespace Models {
     }
 
     /// <summary>Field number for the "players" field.</summary>
-    public const int PlayersFieldNumber = 3;
+    public const int PlayersFieldNumber = 5;
     private static readonly pb::FieldCodec<long> _repeated_players_codec
-        = pb::FieldCodec.ForInt64(26);
+        = pb::FieldCodec.ForInt64(42);
     private readonly pbc::RepeatedField<long> players_ = new pbc::RepeatedField<long>();
     /// <summary>
-    /// List of players in the match
+    /// List of players in the game
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
@@ -142,6 +172,8 @@ namespace Models {
       if (ReferenceEquals(other, this)) {
         return true;
       }
+      if (Id != other.Id) return false;
+      if (Queue != other.Queue) return false;
       if (GamePort != other.GamePort) return false;
       if (Token != other.Token) return false;
       if(!players_.Equals(other.players_)) return false;
@@ -152,6 +184,8 @@ namespace Models {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override int GetHashCode() {
       int hash = 1;
+      if (Id.Length != 0) hash ^= Id.GetHashCode();
+      if (Queue != 0) hash ^= Queue.GetHashCode();
       if (GamePort != 0) hash ^= GamePort.GetHashCode();
       if (Token.Length != 0) hash ^= Token.GetHashCode();
       hash ^= players_.GetHashCode();
@@ -173,12 +207,20 @@ namespace Models {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       output.WriteRawMessage(this);
     #else
+      if (Id.Length != 0) {
+        output.WriteRawTag(10);
+        output.WriteString(Id);
+      }
+      if (Queue != 0) {
+        output.WriteRawTag(16);
+        output.WriteInt32(Queue);
+      }
       if (GamePort != 0) {
-        output.WriteRawTag(8);
+        output.WriteRawTag(24);
         output.WriteInt32(GamePort);
       }
       if (Token.Length != 0) {
-        output.WriteRawTag(18);
+        output.WriteRawTag(34);
         output.WriteString(Token);
       }
       players_.WriteTo(output, _repeated_players_codec);
@@ -192,12 +234,20 @@ namespace Models {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
+      if (Id.Length != 0) {
+        output.WriteRawTag(10);
+        output.WriteString(Id);
+      }
+      if (Queue != 0) {
+        output.WriteRawTag(16);
+        output.WriteInt32(Queue);
+      }
       if (GamePort != 0) {
-        output.WriteRawTag(8);
+        output.WriteRawTag(24);
         output.WriteInt32(GamePort);
       }
       if (Token.Length != 0) {
-        output.WriteRawTag(18);
+        output.WriteRawTag(34);
         output.WriteString(Token);
       }
       players_.WriteTo(ref output, _repeated_players_codec);
@@ -211,6 +261,12 @@ namespace Models {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public int CalculateSize() {
       int size = 0;
+      if (Id.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(Id);
+      }
+      if (Queue != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(Queue);
+      }
       if (GamePort != 0) {
         size += 1 + pb::CodedOutputStream.ComputeInt32Size(GamePort);
       }
@@ -229,6 +285,12 @@ namespace Models {
     public void MergeFrom(Match other) {
       if (other == null) {
         return;
+      }
+      if (other.Id.Length != 0) {
+        Id = other.Id;
+      }
+      if (other.Queue != 0) {
+        Queue = other.Queue;
       }
       if (other.GamePort != 0) {
         GamePort = other.GamePort;
@@ -252,16 +314,24 @@ namespace Models {
           default:
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
-          case 8: {
+          case 10: {
+            Id = input.ReadString();
+            break;
+          }
+          case 16: {
+            Queue = input.ReadInt32();
+            break;
+          }
+          case 24: {
             GamePort = input.ReadInt32();
             break;
           }
-          case 18: {
+          case 34: {
             Token = input.ReadString();
             break;
           }
-          case 26:
-          case 24: {
+          case 42:
+          case 40: {
             players_.AddEntriesFrom(input, _repeated_players_codec);
             break;
           }
@@ -280,16 +350,24 @@ namespace Models {
           default:
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
             break;
-          case 8: {
+          case 10: {
+            Id = input.ReadString();
+            break;
+          }
+          case 16: {
+            Queue = input.ReadInt32();
+            break;
+          }
+          case 24: {
             GamePort = input.ReadInt32();
             break;
           }
-          case 18: {
+          case 34: {
             Token = input.ReadString();
             break;
           }
-          case 26:
-          case 24: {
+          case 42:
+          case 40: {
             players_.AddEntriesFrom(ref input, _repeated_players_codec);
             break;
           }

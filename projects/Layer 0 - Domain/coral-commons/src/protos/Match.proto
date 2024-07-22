@@ -3,11 +3,14 @@ syntax = "proto3";
 package models;
 
 message Match {
+	string id = 1;
+	// Type of match
+	int32 queue = 2;
 	// Game server
-	int32 game_port = 1;
+	int32 game_port = 3;
 	// Access token to the game on the game server
-	string token = 2;
+	string token = 4;
 	// List of players in the match
-	repeated int64 players = 3;
+	repeated int64 players = 5;
 }
 

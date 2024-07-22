@@ -10,6 +10,7 @@ description = "Matchmaking Library"
 teal = { path = "../../Layer - Util/teal" }
 bincode = "*"
 async-trait = "0.1.79"
+redis = "*"
 
 # Protobuf
 tonic = "*"
