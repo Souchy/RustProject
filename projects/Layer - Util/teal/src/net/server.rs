@@ -53,10 +53,15 @@ impl Server {
         }
     }
 
-    pub async fn broadcast<T: MessageIdentifiable + Message>(&self, msg: T) {
+    pub async fn broadcast<T: MessageIdentifiable>(&self, msg: T) -> Result<(), Box<dyn Error>> {
         let buf = serialize(&msg);
+        self.broadcast_bytes(&buf).await
+    }
+
+    pub async fn broadcast_bytes(&self, buf: &[u8]) -> Result<(), Box<dyn Error>> {
         for c in &self.clients {
             _ = c.send_bytes(&buf).await;
         }
+        Ok(())
     }
 }

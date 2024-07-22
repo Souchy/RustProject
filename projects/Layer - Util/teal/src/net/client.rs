@@ -1,3 +1,4 @@
+use std::any::{Any, TypeId};
 use std::error::Error;
 use std::sync::Arc;
 
@@ -7,28 +8,104 @@ use tokio::net::TcpStream;
 use tokio::sync::Mutex;
 
 use crate::net::handlers::MessageHandlers;
-use crate::{Reader, Writer};
+use crate::{ Reader, Writer};
 use crate::{HEADER_LEN, LEN_LEN};
 
 use super::server::Server;
 
 #[async_trait]
-pub trait Client : Send + Sync {
+pub trait Client : Send + Sync + 'static {
     fn get_id(&self) -> i32;
-    async fn send_bytes(&self, buf: &[u8]) -> Result<(), Box<dyn Error>>;
-    // TODO Client.send() + Client.broadcast()
-    // async fn send<T: MessageIdentifiable + MessageFull>(
-    //     &self,
-    //     msg: T,
-    // ) -> Result<(), Box<dyn Error>> {
-    //     Ok(())
-    //     // let buf = serialize(&msg);
-    //     // self.send_bytes(&buf).await
-    // }
-    // async fn broadcast<T: MessageIdentifiable + MessageFull>(&mut self, msg: T);
-    async fn frame(&self, buf: &[u8]);
+    fn get_server(&self) ->  &Option<Arc<Mutex<Server>>>;
+
     async fn run(&self) -> Result<(), Box<dyn Error + Send>>;
+    async fn frame(&self, buf: &[u8]);
+    async fn send_bytes(&self, buf: &[u8]) -> Result<(), Box<dyn Error>>;
+    // These make the object unsafe.
+    // async fn send<T: MessageIdentifiable>(
+    //     &self,
+    //     msg: &T,
+    // ) -> Result<(), Box<dyn Error>> {
+    //     let buf = serialize(msg);
+    //     self.send_bytes(&buf).await
+    // }
+    // async fn broadcast<T: MessageIdentifiable>(
+    //     &self,
+    //     msg: &T,
+    // ) -> Result<(), Box<dyn Error>> {
+    //     let buf = serialize(msg);
+    //     self.get_server().lock().await.broadcast(msg).await;
+    // }
+    // async fn broadcast_bytes(
+    //     &self,
+    //     buf: &[u8],
+    // ) -> Result<(), Box<dyn Error>> {
+    //     // let buf = serialize(msg);
+    //     self.get_server().ok_or(Errors::Missing("".to_string(), "".to_string()))?.lock().await.broadcast_bytes(&buf).await
+    // }
 }
+
+/**
+ * Downcast functions sourced from rust-protobuf
+ */
+impl dyn Client {
+    /// Downcast `Box<dyn Client>` to specific client type.
+    ///
+    /// ```
+    /// # use teal::net::client::Client;
+    /// # fn foo<MyMessage: Client>(client: Box<dyn Client>) {
+    /// let m: Box<dyn Client> = client;
+    /// let m: Box<MyMessage> = <dyn Client>::downcast_box(m).unwrap();
+    /// # }
+    /// ```
+    pub fn downcast_box<T: Any>(
+        self: Box<dyn Client>,
+    ) -> std::result::Result<Box<T>, Box<dyn Client>> {
+        if Any::type_id(&*self) == TypeId::of::<T>() {
+            unsafe {
+                let raw: *mut dyn Client = Box::into_raw(self);
+                Ok(Box::from_raw(raw as *mut T))
+            }
+        } else {
+            Err(self)
+        }
+    }
+
+    /// Downcast `&dyn Client` to specific client type.
+    ///
+    /// ```
+    /// # use teal::net::client::Client;
+    /// # fn foo<MyMessage: Client>(client: &dyn Client) {
+    /// let m: &dyn Client = client;
+    /// let m: &MyMessage = <dyn Client>::downcast_ref(m).unwrap();
+    /// # }
+    /// ```
+    pub fn downcast_ref<'a, M: Client + 'a>(&'a self) -> Option<&'a M> {
+        if Any::type_id(&*self) == TypeId::of::<M>() {
+            unsafe { Some(&*(self as *const dyn Client as *const M)) }
+        } else {
+            None
+        }
+    }
+
+    /// Downcast `&mut dyn Client` to specific client type.
+    ///
+    /// ```
+    /// # use teal::net::client::Client;
+    /// # fn foo<MyMessage: Client>(client: &mut dyn Client) {
+    /// let m: &mut dyn Client = client;
+    /// let m: &mut MyMessage = <dyn Client>::downcast_mut(m).unwrap();
+    /// # }
+    /// ```
+    pub fn downcast_mut<'a, M: Client + 'a>(&'a mut self) -> Option<&'a mut M> {
+        if Any::type_id(&*self) == TypeId::of::<M>() {
+            unsafe { Some(&mut *(self as *mut dyn Client as *mut M)) }
+        } else {
+            None
+        }
+    }
+}
+
 
 #[derive(Clone)]
 pub struct DefaultClient {
@@ -70,6 +147,9 @@ impl DefaultClient {
 impl Client for DefaultClient {
     fn get_id(&self) -> i32 {
         self.id
+    }
+    fn get_server(&self) ->  &Option<Arc<Mutex<Server>>> {
+        &self.server
     }
     async fn send_bytes(&self, buf: &[u8]) -> Result<(), Box<dyn Error>> {
         self.writer.lock().await.write_all(buf).await?;
