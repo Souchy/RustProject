@@ -6,6 +6,7 @@ use teal::net::handlers::MessageHandlers;
 
 pub mod message_ids;
 pub mod protos;
+pub mod red;
 
 pub static DESCRIPTOR_POOL: Lazy<DescriptorPool> = Lazy::new(|| {
     DescriptorPool::decode(include_bytes!(concat!(env!("OUT_DIR"), "/file_descriptor_set.bin")).as_ref(),

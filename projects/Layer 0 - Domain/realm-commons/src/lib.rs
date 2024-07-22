@@ -6,6 +6,7 @@ use teal::net::handlers::MessageHandlers;
 
 pub mod protos;
 pub mod message_ids;
+pub mod red;
 
 pub static DESCRIPTOR_POOL: Lazy<DescriptorPool> = Lazy::new(|| {
     DescriptorPool::decode(

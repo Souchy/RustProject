@@ -1,6 +1,5 @@
 use std::{error::Error, sync::Arc};
 
-use prost::Message;
 use tokio::{net::TcpListener, sync::Mutex};
 use tracing::error;
 

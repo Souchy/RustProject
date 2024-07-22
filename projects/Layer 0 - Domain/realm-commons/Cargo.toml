@@ -13,6 +13,7 @@ tonic = "*"
 prost = "*"
 prost-reflect = { version = "*", features = ["serde", "derive", "text-format"] }
 once_cell = "1.9.0"
+redis = "*"
 
 [build-dependencies]
 prost-build = "0.13.0"

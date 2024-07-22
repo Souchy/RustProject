@@ -1,7 +1,4 @@
 syntax = "proto3";
-// import "models/Extern.proto";
-// import "mongodb/bson/oid/ObjectId.proto";
-
 package models;
 
 enum LobbyState {
