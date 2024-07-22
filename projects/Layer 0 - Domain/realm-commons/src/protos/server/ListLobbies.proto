@@ -1,6 +1,6 @@
 syntax = "proto3";
+package server;
 
-package gen.server;
 import "models/Lobby.proto";
 
 message ListLobbies {

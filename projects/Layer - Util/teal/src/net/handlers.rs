@@ -1,7 +1,7 @@
 use prost_reflect::{DescriptorPool, DynamicMessage, MessageDescriptor};
 
 use crate::{net::message::MessageIdentifiable, DynClient, Errors, HEADER_LEN, ID_LEN, LEN_LEN};
-use std::{collections::HashMap, error::Error, rc::Rc, sync::Arc};
+use std::{collections::HashMap, error::Error, sync::Arc};
 
 use super::handler::MessageHandler;
 

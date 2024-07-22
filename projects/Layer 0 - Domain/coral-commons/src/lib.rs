@@ -1,7 +1,7 @@
 use prost_reflect::DescriptorPool;
 use once_cell::sync::Lazy;
 
-pub mod messages;
+pub mod message_ids;
 pub mod protos;
 
 pub static DESCRIPTOR_POOL: Lazy<DescriptorPool> = Lazy::new(|| {

@@ -1,25 +1,23 @@
 syntax = "proto3";
+// import "models/Extern.proto";
+// import "mongodb/bson/oid/ObjectId.proto";
 
-// package super.models;
 package models;
 
-// message Lobby {
-// 	int64 id = 1;
-// 	int32 queue = 2;
-// }
+enum LobbyState {
+	LOBBY_STATE_IDLE = 0;
+	LOBBY_STATE_IN_QUEUE = 1;
+	LOBBY_STATE_IN_PREGAME = 2;
+}
 
 // Lobbies are stored in Redis
 message Lobby {
-	int64 id = 1;
+	string id = 1;
+	// extern.ObjectId id = 1;
+	// mongodb.bson.oid.ObjectId id = 1;
 	string token = 2;
 	int32 queue = 3;
 	LobbyState state = 4; // idle, in queue, in game 
 	repeated int64 players = 5;
 	int64 queueStartTime = 6;
-	
-	enum LobbyState {
-		LOBBY_STATE_IDLE = 0;
-		LOBBY_STATE_IN_QUEUE = 1;
-		LOBBY_STATE_IN_PREGAME = 2;
-	}
 }
