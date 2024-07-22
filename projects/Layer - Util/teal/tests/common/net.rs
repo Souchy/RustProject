@@ -5,7 +5,7 @@ use prost_reflect::DynamicMessage;
 use teal::{
     net::{client::Client, handler::MessageHandler},
     protos::messages::RaftHeartbeat,
-    DynClient,
+    DynamicClient,
 };
 
 #[derive(Clone, Default)]
@@ -41,7 +41,7 @@ impl Client for StubClient {
 pub struct RaftHeartbeatHandlerAssertTerm4;
 #[async_trait]
 impl MessageHandler for RaftHeartbeatHandlerAssertTerm4 {
-    async fn handle(&self, msg: DynamicMessage, _client: &DynClient) -> Result<(), Box<dyn Error>> {
+    async fn handle(&self, msg: DynamicMessage, _client: &DynamicClient) -> Result<(), Box<dyn Error>> {
         let message = msg.transcode_to::<RaftHeartbeat>().unwrap();
         assert_eq!(message.term, 4);
         Ok(())

@@ -1,6 +1,6 @@
 use prost_reflect::{DescriptorPool, DynamicMessage, MessageDescriptor};
 
-use crate::{net::message::MessageIdentifiable, DynClient, Errors, HEADER_LEN, ID_LEN, LEN_LEN};
+use crate::{net::message::MessageIdentifiable, DynamicClient, Errors, HEADER_LEN, ID_LEN, LEN_LEN};
 use std::{collections::HashMap, error::Error, sync::Arc};
 
 use super::handler::MessageHandler;
@@ -25,8 +25,11 @@ impl MessageHandlers {
     /**
      * Register a message library.
      */
-    pub fn register_pool(&mut self, id: u16, pool: Arc<DescriptorPool>) {
-        self.pools.insert(id, pool);
+    pub fn register_pool(&mut self, pool_id: u16, pool: Arc<DescriptorPool>) {
+        if self.pools.contains_key(&pool_id) {
+            panic!("Tried to register a pool twice #{}.", pool_id);
+        }
+        self.pools.insert(pool_id, pool);
     }
 
     /**
@@ -35,7 +38,10 @@ impl MessageHandlers {
     pub fn register(&mut self, pool_id: u16, msg: &dyn MessageIdentifiable, handler: Box<dyn MessageHandler>) {
         let id = msg.id();
         if self.deserializers.contains_key(&id) {
-            panic!("Shouldn't register the same message deserializer + handler ID twice. Register only once or change the message ID to avoid duplicates.");
+            panic!("Tried to register the same message deserializer + handler ID twice. Register only once or change the message ID to avoid duplicates.");
+        }
+        if !self.pools.contains_key(&pool_id) {
+            panic!("Tried to register a message to an unexisting pool #{}. Register the pools first.", pool_id);
         }
         let pool = self.pools.get(&pool_id).unwrap(); //&(id / 1000)).unwrap();
         let message_descriptor = pool
@@ -65,7 +71,7 @@ impl MessageHandlers {
         Ok((id, dynamic_message))
     }
 
-    pub async fn handle(&self, frame: &[u8], client: &DynClient) -> Result<(), Box<dyn Error>> {
+    pub async fn handle(&self, frame: &[u8], client: &DynamicClient) -> Result<(), Box<dyn Error>> {
         let (id, dynamic_message) = self.deserialize(&frame)?;
         let handler = self
             .handlers
@@ -74,7 +80,7 @@ impl MessageHandlers {
         return handler.handle(dynamic_message, client).await;
     }
 
-    // fn default_handler(frame: &[u8], _client: &DynClient) {
+    // fn default_handler(frame: &[u8], _client: &DynamicClient) {
     //     let st = std::str::from_utf8(&frame).unwrap();
     //     println!("received invalid message: {}", st);
     // }

@@ -1,15 +1,24 @@
 use std::error::Error;
 
 use async_trait::async_trait;
-use teal::{net::handler::MessageHandler, protos::gen::ping::Ping, ArcClient, BoxMessageDyn};
+use prost_reflect::DynamicMessage;
+use teal::{
+    net::handler::MessageHandler,
+    protos::messages::Ping,
+    DynamicClient,
+};
 
+#[derive(Debug, Default)]
 pub(crate) struct PingHandler;
-
 #[async_trait]
 impl MessageHandler for PingHandler {
-    async fn handle(&self, msg: BoxMessageDyn, client: &ArcClient) -> Result<(), Box<dyn Error>> {
-        let message = msg.downcast_ref::<Ping>().unwrap();
-        println!("hey client got ping data {:?}", message);
+    async fn handle(
+        &self,
+        msg: DynamicMessage,
+        client: &DynamicClient,
+    ) -> Result<(), Box<dyn Error>> {
+        let message = msg.transcode_to::<Ping>();
+        println!("hey coraline got ping {:?}", message);
         Ok(())
     }
 }

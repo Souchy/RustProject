@@ -3,10 +3,7 @@ pub mod handlers;
 use std::{error::Error, sync::Arc};
 
 use handlers::ping_handler::PingHandler;
-use teal::{
-    net::{client::{Client, DefaultClient}, handlers::MessageHandlers, message},
-    protos::gen::{ping::Ping, raft::Heartbeat},
-};
+use teal::{net::{client::{Client, DefaultClient}, handlers::MessageHandlers, message}, protos::messages::{Heartbeat, Ping, RaftHeartbeat}};
 
 #[tokio::main]
 pub async fn main() -> Result<(), Box<dyn Error>> {
@@ -24,12 +21,14 @@ pub async fn main() -> Result<(), Box<dyn Error>> {
         client_ref.run().await.unwrap();
     });
 
-    let mut hb = Heartbeat::new();
-    hb.set_leader_id(3);
+    // Send Heartbeat
+    let mut hb = RaftHeartbeat::default();
+    hb.leader = 3;
     let buf = message::serialize(&hb);
-    // TODO send
     client_ref2.send_bytes(&buf).await.unwrap();
-    client_ref2.send_bytes(&message::serialize(&Ping::new())).await.unwrap();
+    // Send Ping
+    client_ref2.send_bytes(&message::serialize(&Ping::default())).await.unwrap();
+    // TODO send
     // client_ref2.send(hb).await.unwrap();
     // client_ref2.send(Ping::new()).await.unwrap();
     t1.await?;
@@ -39,6 +38,10 @@ pub async fn main() -> Result<(), Box<dyn Error>> {
 
 fn create_handlers() -> MessageHandlers {
     let mut reg = MessageHandlers::new();
-    reg.register(Ping::new(), Arc::new(PingHandler));
+    teal::register_pool(&mut reg);
+    coral_commons::register_pool(&mut reg);
+
+    reg.register(teal::POOL_ID, &Ping::default(), Box::new(PingHandler));
+
     return reg;
 }

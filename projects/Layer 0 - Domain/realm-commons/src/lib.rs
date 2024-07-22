@@ -1,5 +1,8 @@
+use std::sync::Arc;
+
 use once_cell::sync::Lazy;
 use prost_reflect::DescriptorPool;
+use teal::net::handlers::MessageHandlers;
 
 pub mod protos;
 pub mod message_ids;
@@ -10,3 +13,8 @@ pub static DESCRIPTOR_POOL: Lazy<DescriptorPool> = Lazy::new(|| {
     )
     .unwrap()
 });
+
+pub const POOL_ID: u16 = 2;
+pub fn register_pool(reg: &mut MessageHandlers) {
+    reg.register_pool(POOL_ID, Arc::new(DESCRIPTOR_POOL.to_owned()));
+}
