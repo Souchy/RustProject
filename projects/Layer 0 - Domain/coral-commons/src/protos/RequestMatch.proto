@@ -1,8 +1,0 @@
-syntax = "proto3";
-
-package messages;
-
-message RequestMatch {
-	int32 queue = 1;
-	repeated int64 players = 2;
-}

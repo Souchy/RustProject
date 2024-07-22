@@ -3,10 +3,19 @@ pub mod handlers;
 use std::{error::Error, sync::Arc};
 
 use handlers::ping_handler::PingHandler;
-use teal::{net::{client::{Client, DefaultClient}, handlers::MessageHandlers, message}, protos::messages::{Heartbeat, Ping, RaftHeartbeat}};
+use teal::{net::{client::{Client, DefaultClient}, handlers::MessageHandlers, message}, protos::messages::{Ping, RaftHeartbeat}};
+
+pub static mut DB: Option<redis::Connection> = None;
 
 #[tokio::main]
 pub async fn main() -> Result<(), Box<dyn Error>> {
+    
+    let client = redis::Client::open("redis://127.0.0.1:6371/")?;
+    let con = client.get_connection()?;
+    unsafe {
+        DB = Some(con);
+    }
+
     // Handlers
     let reg = create_handlers();
 

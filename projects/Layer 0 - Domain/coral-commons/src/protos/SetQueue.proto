@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package messages;
+
+// Request to set queue state with players
+message SetQueueRequest {
+	int32 queue = 1;
+	QueueState state = 2;
+	repeated int64 players = 3;
+}
+
+message SetQueueResponse {
+	int32 queue = 1;
+	QueueState state = 2;
+}
+
+enum QueueState {
+	QUEUE_STATE_IDLE = 0;
+	QUEUE_STATE_ACTIVE = 1;
+}

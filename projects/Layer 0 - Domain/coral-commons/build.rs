@@ -1,8 +1,7 @@
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let protos = [
         "src/protos/Match.proto",
-        "src/protos/RequestMatch.proto",
-        "src/protos/SetInQueue.proto",
+        "src/protos/SetQueue.proto",
     ];
     let includes = ["src/protos"];
 
