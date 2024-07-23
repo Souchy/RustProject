@@ -6,7 +6,8 @@ package messages;
 message SetQueueRequest {
 	int32 queue = 1;
 	QueueState state = 2;
-	repeated int64 players = 3;
+	string lobby = 3;
+	// repeated string players = 3;
 }
 
 message SetQueueResponse {

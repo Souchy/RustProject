@@ -9,7 +9,7 @@ message Player {
 	// optional int32 queue = 3;
 	int32 mmr = 4; //
 	// optional int32 queueStartTime = 4;
-	repeated int64 recentMatches = 5; // map of recent players <playerId, intGameAgo> 
+	repeated string recentMatches = 5; // map of recent players <playerId, intGameAgo> 
 	int64 geolocalisation = 6;
 
 	enum PlayerState {

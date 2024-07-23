@@ -86,7 +86,7 @@ pub fn get_game_port_by_id(db: &mut redis::Connection, id: &String) -> Result<i3
     let game_port = db.get(get_key_lobby_game_port(id))?;
     Ok(game_port)
 }
-pub fn get_players_by_id(db: &mut redis::Connection, id: &String) -> Result<Vec<i64>, Box<dyn Error>> {
+pub fn get_players_by_id(db: &mut redis::Connection, id: &String) -> Result<Vec<String>, Box<dyn Error>> {
     let players = db.get(get_key_lobby_players(id))?;
     Ok(players)
 }

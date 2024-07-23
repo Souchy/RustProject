@@ -11,6 +11,6 @@ message Match {
 	// Access token to the game on the game server
 	string token = 4;
 	// List of players in the match
-	repeated int64 players = 5;
+	repeated string players = 5;
 }
 

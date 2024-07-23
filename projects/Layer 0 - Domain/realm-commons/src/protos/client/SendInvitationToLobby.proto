@@ -3,6 +3,6 @@ package client;
 
 message SendInvitationToLobby {
 	int32 queue = 1;
-	int64 player_to = 2;
+	string player_to = 2;
 	string token = 3;
 }

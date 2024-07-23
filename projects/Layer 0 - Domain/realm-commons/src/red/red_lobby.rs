@@ -84,7 +84,7 @@ pub fn get_state_by_id(db: &mut redis::Connection, id: &String) -> Result<i32, B
     let state = db.get(get_key_lobby_state(id))?;
     Ok(state)
 }
-pub fn get_players_by_id(db: &mut redis::Connection, id: &String) -> Result<Vec<i64>, Box<dyn Error>> {
+pub fn get_players_by_id(db: &mut redis::Connection, id: &String) -> Result<Vec<String>, Box<dyn Error>> {
     let players = db.get(get_key_lobby_players(id))?;
     Ok(players)
 }
