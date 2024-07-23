@@ -1,0 +1,6 @@
+syntax = "proto3";
+package client;
+
+message Identify {
+	string player_id = 1;
+}

@@ -9,7 +9,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         "src/protos/server/CreatedLobby.proto",
         "src/protos/server/RelayInvitationToLobby.proto",
 
+        "src/protos/client/Identify.proto",
         "src/protos/client/CreateLobby.proto",
+        "src/protos/client/QuitLobby.proto",
         "src/protos/client/JoinLobby.proto",
         "src/protos/client/SendInvitationToLobby.proto",
     ];

@@ -10,20 +10,28 @@ use teal::{
 use tokio::sync::Mutex;
 
 #[derive(Clone, Default)]
-pub struct StubClient {}
+pub struct StubClient {
+    pub id: Arc<Mutex<String>>
+}
 impl StubClient {
     pub fn new() -> Self {
-        Self {}
+        Self {
+            id: Arc::new(Mutex::new(String::from("3")))
+        }
     }
 }
 
 #[async_trait]
 impl Client for StubClient {
-    fn get_id(&self) -> i32 {
-        3
+    fn get_id(&self) -> Arc<Mutex<String>> {
+        self.id.clone()
     }
-    fn get_server(&self) -> &Option<Arc<Mutex<Server>>> {
-        &None
+    async fn set_id(&self, id: String) -> Result<(), Box<dyn Error>> {
+        *self.id.lock().await = id;
+        Ok(())
+    }
+    fn get_server(&self) -> Arc<Mutex<Server>> {
+        Arc::new(Mutex::new(Server::default()))
     }
     async fn send_bytes(&self, _buf: &[u8]) -> Result<(), Box<dyn Error>> {
         Ok(())

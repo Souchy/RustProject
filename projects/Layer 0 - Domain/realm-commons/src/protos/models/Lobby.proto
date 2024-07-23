@@ -16,5 +16,5 @@ message Lobby {
 	int32 queue = 3;
 	LobbyState state = 4; // idle, in queue, in game 
 	repeated string players = 5;
-	int64 queueStartTime = 6;
+	uint64 queueStartTime = 6;
 }

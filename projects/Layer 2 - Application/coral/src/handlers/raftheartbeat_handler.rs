@@ -13,7 +13,7 @@ pub(crate) struct RaftHeartbeatHandler;
 impl MessageHandler for RaftHeartbeatHandler {
     async fn handle(&self, msg: DynamicMessage, _client: &DynamicClient) -> Result<(), Box<dyn Error>> {
         let message = msg.transcode_to::<RaftHeartbeat>().unwrap();
-        println!("hey coral got RaftHeartbeat {:?}", message);
+        println!("hey coral got {:?}", message);
         
         unsafe {
             if let Some(db) = &mut crate::DB {

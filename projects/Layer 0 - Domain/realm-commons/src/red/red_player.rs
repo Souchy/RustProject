@@ -54,12 +54,12 @@ pub fn set_state(db: &mut redis::Connection, player: &Player) -> Result<(), Box<
 }
 
 // Gets
-pub fn get(db: &mut redis::Connection, id: String) -> Result<Player, Box<dyn Error>> {
+pub fn get(db: &mut redis::Connection, id: &String) -> Result<Player, Box<dyn Error>> {
     let mut player = Player::default();
-    player.id = id;
-    let _ = get_lobby(db, &mut player);
-    let _ = get_mmr(db, &mut player);
-    let _ = get_state(db, &mut player);
+    player.id = id.clone();
+    get_lobby(db, &mut player)?;
+    get_mmr(db, &mut player)?;
+    get_state(db, &mut player)?;
     Ok(player)
 }
 pub fn get_lobby(db: &mut redis::Connection, player: &mut Player) -> Result<(), Box<dyn Error>> {

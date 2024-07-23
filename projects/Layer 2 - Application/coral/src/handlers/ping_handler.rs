@@ -18,7 +18,7 @@ impl MessageHandler for PingHandler {
         client: &DynamicClient,
     ) -> Result<(), Box<dyn Error>> {
         let message = msg.transcode_to::<Ping>();
-        println!("hey coral got ping {:?}", message);
+        println!("hey coral got {:?}", message);
         // TODO send
         // return client.send(Ping::new()).await;
         let buf = serialize(&Ping::default());

@@ -2,9 +2,17 @@ pub mod handlers;
 
 use std::{error::Error, sync::Arc};
 
-use handlers::ping_handler::PingHandler;
-use realm_commons::{protos::models::{player::PlayerState, Player}, red::red_player};
+use coral_commons::protos::{messages::{QueueState, SetQueueRequest, SetQueueResponse}, models::Match};
+use handlers::{created_lobby_handler::CreatedLobbyHandler, match_handler::MatchHandler, ping_handler::PingHandler, set_queue_response_handler::SetQueueResponseHandler};
+use realm_commons::{
+    protos::{
+        client::{CreateLobby, Identify},
+        models::{player::PlayerState, Player}, server::CreatedLobby,
+    },
+    red::red_player,
+};
 use redis::Commands;
+use snowflake::SnowflakeIdGenerator;
 use teal::{
     net::{
         client::{Client, DefaultClient},
@@ -28,13 +36,13 @@ pub async fn main() -> Result<(), Box<dyn Error>> {
     unsafe {
         if let Some(db) = &mut crate::DB {
             let _ = red_player::delete_all(db);
-            for i in 0..1000 {
-                let mut player: Player = Player::default();
-                player.id = i.to_string();
-                player.mmr = 1000;
-                player.state = PlayerState::InLobby as i32;
-                let _ = red_player::set(db, &player);
-            }
+            // for i in 0..1000 {
+            //     let mut player: Player = Player::default();
+            //     player.id = i.to_string();
+            //     player.mmr = 1000;
+            //     player.state = PlayerState::InLobby as i32;
+            //     let _ = red_player::set(db, &player);
+            // }
         }
     }
     // End Temporary redis setup
@@ -54,6 +62,29 @@ pub async fn main() -> Result<(), Box<dyn Error>> {
         client_ref.run().await.unwrap();
     });
 
+    let mut id_generator_generator = SnowflakeIdGenerator::new(1, 1);
+    let player_id = id_generator_generator.real_time_generate();
+    
+    let mut player: Player = Player::default();
+    unsafe {
+        if let Some(db) = &mut crate::DB {
+            player.id = player_id.to_string();
+            player.mmr = 1000;
+            player.state = PlayerState::InLobby as i32;
+            let _ = red_player::set(db, &player);
+        }
+    }
+
+    let identify = Identify { player_id: player_id.to_string() };
+    let identify_buf = message::serialize(&identify);
+    client_ref2.send_bytes(&identify_buf).await.unwrap();
+
+    // Send a message to create a Lobby. When it is created, we'll respond by setting the queue active.
+    let create_lobby = CreateLobby { queue: 1 };
+    let create_lobby_buf = message::serialize(&create_lobby);
+    client_ref2.send_bytes(&create_lobby_buf).await.unwrap();
+
+    /*
     // Send Heartbeat
     let mut hb = RaftHeartbeat::default();
     hb.leader = 3;
@@ -67,8 +98,14 @@ pub async fn main() -> Result<(), Box<dyn Error>> {
     // TODO send
     // client_ref2.send(hb).await.unwrap();
     // client_ref2.send(Ping::new()).await.unwrap();
+    */
     t1.await?;
 
+    // unsafe {
+    //     if let Some(db) = &mut crate::DB {
+    //         let _ = red_player::delete(db, &player);
+    //     }
+    // }
     Ok(())
 }
 
@@ -76,8 +113,15 @@ fn create_handlers() -> MessageHandlers {
     let mut reg = MessageHandlers::new();
     teal::register_pool(&mut reg);
     coral_commons::register_pool(&mut reg);
+    realm_commons::register_pool(&mut reg);
 
+    // teal
     reg.register(teal::POOL_ID, &Ping::default(), Box::new(PingHandler));
+    // realm
+    reg.register(realm_commons::POOL_ID, &CreatedLobby::default(), Box::new(CreatedLobbyHandler));
+    // coral
+    reg.register(coral_commons::POOL_ID, &Match::default(), Box::new(MatchHandler));
+    reg.register(coral_commons::POOL_ID, &SetQueueResponse::default(), Box::new(SetQueueResponseHandler));
 
     return reg;
 }

@@ -8,6 +8,7 @@ use crate::net::handlers::MessageHandlers;
 
 use super::message::{serialize, MessageIdentifiable};
 
+#[derive(Default)]
 pub struct Server {
     clients: Vec<Arc<DefaultClient>>,
 }
@@ -39,7 +40,7 @@ impl Server {
             // let server_ref = Arc::new(self);
 
             let client: DefaultClient =
-                DefaultClient::new(socket, handlers.clone(), Some(server_ptr.clone()));
+                DefaultClient::new(socket, handlers.clone(), server_ptr.clone());
 
             let client_runner = Arc::new(client);
             server_ptr.lock().await.clients.push(client_runner.clone());

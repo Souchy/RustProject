@@ -2,10 +2,13 @@
 mod handlers;
 
 use coral_commons::protos::messages::SetQueueRequest;
+use handlers::create_lobby_handler::CreateLobbyHandler;
+use handlers::identify_handler::IdentifyHandler;
 use handlers::ping_handler::PingHandler;
 use handlers::raftheartbeat_handler::RaftHeartbeatHandler;
 use handlers::set_queue_handler::SetQueueHandler;
 use once_cell::sync::OnceCell;
+use realm_commons::protos::client::{CreateLobby, Identify};
 use teal::net::handlers::MessageHandlers;
 use teal::net::server::Server;
 use teal::protos::messages::{Ping, RaftHeartbeat};
@@ -57,6 +60,9 @@ fn create_handlers() -> MessageHandlers {
     );
     // coral
     reg.register(coral_commons::POOL_ID, &SetQueueRequest::default(), Box::new(SetQueueHandler));
+    // realm
+    reg.register(realm_commons::POOL_ID, &Identify::default(), Box::new(IdentifyHandler));
+    reg.register(realm_commons::POOL_ID, &CreateLobby::default(), Box::new(CreateLobbyHandler));
 
     return reg;
 }

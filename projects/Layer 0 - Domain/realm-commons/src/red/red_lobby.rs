@@ -56,12 +56,12 @@ pub fn set_players(db: &mut redis::Connection, lobby: &Lobby) -> Result<(), Box<
 }
 
 // Gets
-pub fn get(db: &mut redis::Connection, id: String) -> Result<Lobby, Box<dyn Error>> {
+pub fn get(db: &mut redis::Connection, id: &String) -> Result<Lobby, Box<dyn Error>> {
     let mut lobby = Lobby::default();
-    lobby.id = id;
-    let _ = get_queue(db, &mut lobby);
-    let _ = get_state(db, &mut lobby);
-    let _ = get_players(db, &mut lobby);
+    lobby.id = id.clone();
+    get_queue(db, &mut lobby)?;
+    get_state(db, &mut lobby)?;
+    get_players(db, &mut lobby)?;
     Ok(lobby)
 }
 pub fn get_queue(db: &mut redis::Connection, lobby: &mut Lobby) -> Result<i32, Box<dyn Error>> {
@@ -85,7 +85,7 @@ pub fn get_state_by_id(db: &mut redis::Connection, id: &String) -> Result<i32, B
     Ok(state)
 }
 pub fn get_players_by_id(db: &mut redis::Connection, id: &String) -> Result<Vec<String>, Box<dyn Error>> {
-    let players = db.get(get_key_lobby_players(id))?;
+    let players = db.lrange(get_key_lobby_players(id), 0, -1)?;
     Ok(players)
 }
 

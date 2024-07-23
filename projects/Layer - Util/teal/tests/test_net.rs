@@ -80,7 +80,7 @@ async fn test_handlers() {
     let buf = serialize(req.as_ref());
 
     // Generic deserialization + Handle
-    let client = StubClient::new();
+    let mut client = StubClient::new();
     _ = reg.handle(&buf, &client).await; // RaftHeartbeatHandlerAssertTerm4 will assert that the term is 4
 }
 

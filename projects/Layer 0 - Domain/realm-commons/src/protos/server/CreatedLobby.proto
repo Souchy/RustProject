@@ -2,6 +2,7 @@ syntax = "proto3";
 package server;
 
 message CreatedLobby {
-	int32 queue = 1;
-	string token = 2;
+	string lobby = 1;
+	int32 queue = 2;
+	string token = 3;
 }

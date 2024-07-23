@@ -3,6 +3,11 @@
 
 ## Rust
 
+### Pointers
+
+<https://users.rust-lang.org/t/confused-between-box-rc-cell-arc/10946/4>
+<https://www.reddit.com/r/rust/comments/llzewm/when_should_i_use_box_arc_rc_cell_and_refcell_can/>
+
 ### Protobuf
 
 <https://github.com/stepancheg/rust-protobuf>
