@@ -141,7 +141,7 @@ impl DefaultClient {
     pub async fn new_connection(
         addr: &str,
         handlers: Arc<MessageHandlers>,
-    ) -> Result<Self, Box<dyn Error>> {
+    ) -> Result<Self, Box<dyn Error + Send + Sync>> {
         let socket = TcpStream::connect(addr).await?;
         Ok(Self::new(socket, handlers, Arc::new(Mutex::new(Server::default()))))
     }

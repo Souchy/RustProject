@@ -35,13 +35,19 @@ pub fn set(db: &mut redis::Connection, lobby: &Lobby) -> Result<(), Box<dyn Erro
     set_average_mmr(db, lobby)?;
     Ok(())
 }
-pub fn delete(db: &mut redis::Connection, lobby: &Lobby) -> Result<(), Box<dyn Error + Send + Sync>> {
-    db.del(get_key_lobby(&lobby.id))?;
-    Ok(())
-}
 pub fn delete_all(db: &mut redis::Connection) -> Result<(), Box<dyn Error + Send + Sync>> {
     let keys: Vec<String> = db.keys("lobby:*")?;
     db.del(keys)?;
+    Ok(())
+}
+pub fn delete(db: &mut redis::Connection, lobby: &Lobby) -> Result<(), Box<dyn Error + Send + Sync>> {
+    delete_by_id(db, &lobby.id)
+}
+pub fn delete_by_id(db: &mut redis::Connection, id: &String) -> Result<(), Box<dyn Error + Send + Sync>> {
+    db.del(get_key_lobby_queue(&id))?;
+    db.del(get_key_lobby_state(&id))?;
+    db.del(get_key_lobby_players(&id))?;
+    db.del(get_key_lobby_average_mmr(&id))?;
     Ok(())
 }
 pub fn set_queue(db: &mut redis::Connection, lobby: &Lobby) -> Result<(), Box<dyn Error + Send + Sync>> {

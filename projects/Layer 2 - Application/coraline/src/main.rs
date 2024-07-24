@@ -2,14 +2,21 @@ pub mod handlers;
 
 use std::{error::Error, sync::Arc};
 
-use coral_commons::protos::{messages::{QueueState, SetQueueRequest, SetQueueResponse}, models::Match};
-use handlers::{created_lobby_handler::CreatedLobbyHandler, match_handler::MatchHandler, ping_handler::PingHandler, set_queue_response_handler::SetQueueResponseHandler};
+use coral_commons::protos::{
+    messages::{QueueState, SetQueueRequest, SetQueueResponse},
+    models::Match,
+};
+use handlers::{
+    created_lobby_handler::CreatedLobbyHandler, match_handler::MatchHandler,
+    ping_handler::PingHandler, set_queue_response_handler::SetQueueResponseHandler,
+};
 use realm_commons::{
     protos::{
         client::{CreateLobby, Identify},
-        models::{player::PlayerState, Player}, server::CreatedLobby,
+        models::{player::PlayerState, Player},
+        server::CreatedLobby,
     },
-    red::red_player,
+    red::{red_lobby, red_player},
 };
 use redis::Commands;
 use snowflake::SnowflakeIdGenerator;
@@ -25,7 +32,7 @@ use teal::{
 pub static mut DB: Option<redis::Connection> = None;
 
 #[tokio::main]
-pub async fn main() -> Result<(), Box<dyn Error>> {
+pub async fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     let client = redis::Client::open("redis://127.0.0.1:6371/")?;
     let con = client.get_connection()?;
     unsafe {
@@ -48,7 +55,7 @@ pub async fn main() -> Result<(), Box<dyn Error>> {
 
     let mut id_generator_generator = SnowflakeIdGenerator::new(1, 1);
     let player_id = id_generator_generator.real_time_generate();
-    
+
     let mut player: Player = Player::default();
     unsafe {
         if let Some(db) = &mut crate::DB {
@@ -59,7 +66,9 @@ pub async fn main() -> Result<(), Box<dyn Error>> {
         }
     }
 
-    let identify = Identify { player_id: player_id.to_string() };
+    let identify = Identify {
+        player_id: player_id.to_string(),
+    };
     let identify_buf = message::serialize(&identify);
     client_ref2.send_bytes(&identify_buf).await.unwrap();
 
@@ -68,13 +77,26 @@ pub async fn main() -> Result<(), Box<dyn Error>> {
     let create_lobby_buf = message::serialize(&create_lobby);
     client_ref2.send_bytes(&create_lobby_buf).await.unwrap();
 
-    t1.await?;
+    let thread_err = t1.await;
 
-    // unsafe {
-    //     if let Some(db) = &mut crate::DB {
-    //         let _ = red_player::delete(db, &player);
-    //     }
+    unsafe {
+        if let Some(db) = &mut crate::DB {
+            println!("Delete player {}", player.id);
+            let lobby_id = red_player::get_lobby_by_id(db, &player.id)?;
+            let _ = red_player::delete_by_id(db, &player.id)?;
+            println!("Delete lobby {}", lobby_id);
+            let _ = red_lobby::delete_by_id(db, &lobby_id)?;
+        }
+    }
+
+    let _ = thread_err?;
+
+    // match thread_err {
+    //     Err(err) => return Err(err),
+    //     Ok(()) => return Ok(())
     // }
+
+    // return thread_err?;
     Ok(())
 }
 
@@ -87,10 +109,22 @@ fn create_handlers() -> MessageHandlers {
     // teal
     reg.register(teal::POOL_ID, &Ping::default(), Box::new(PingHandler));
     // realm
-    reg.register(realm_commons::POOL_ID, &CreatedLobby::default(), Box::new(CreatedLobbyHandler));
+    reg.register(
+        realm_commons::POOL_ID,
+        &CreatedLobby::default(),
+        Box::new(CreatedLobbyHandler),
+    );
     // coral
-    reg.register(coral_commons::POOL_ID, &Match::default(), Box::new(MatchHandler));
-    reg.register(coral_commons::POOL_ID, &SetQueueResponse::default(), Box::new(SetQueueResponseHandler));
+    reg.register(
+        coral_commons::POOL_ID,
+        &Match::default(),
+        Box::new(MatchHandler),
+    );
+    reg.register(
+        coral_commons::POOL_ID,
+        &SetQueueResponse::default(),
+        Box::new(SetQueueResponseHandler),
+    );
 
     return reg;
 }

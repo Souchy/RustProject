@@ -31,13 +31,18 @@ pub fn set(db: &mut redis::Connection, player: &Player) -> Result<(), Box<dyn Er
     set_state(db, player)?;
     Ok(())
 }
-pub fn delete(db: &mut redis::Connection, player: &Player) -> Result<(), Box<dyn Error + Send + Sync>> {
-    db.del(get_key_player(&player.id))?;
-    Ok(())
-}
 pub fn delete_all(db: &mut redis::Connection) -> Result<(), Box<dyn Error + Send + Sync>> {
     let keys: Vec<String> = db.keys("player:*")?;
     db.del(keys)?;
+    Ok(())
+}
+pub fn delete(db: &mut redis::Connection, player: &Player) -> Result<(), Box<dyn Error + Send + Sync>> {
+    delete_by_id(db, &player.id)
+}
+pub fn delete_by_id(db: &mut redis::Connection, id: &String) -> Result<(), Box<dyn Error + Send + Sync>> {
+    db.del(get_key_player_lobby(&id))?;
+    db.del(get_key_player_mmr(&id))?;
+    db.del(get_key_player_state(&id))?;
     Ok(())
 }
 pub fn set_lobby(db: &mut redis::Connection, player: &Player) -> Result<(), Box<dyn Error + Send + Sync>> {
