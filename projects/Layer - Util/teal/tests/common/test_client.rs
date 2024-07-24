@@ -7,7 +7,7 @@ use teal::{
     protos::messages::{Ping, RaftHeartbeat},
 };
 
-pub async fn create_client() -> Result<(), Box<dyn Error>> {
+pub async fn create_client() -> Result<(), Box<dyn Error + Send + Sync>> {
     let mut mock_handler = MockMessageHandler::new();
     mock_handler.expect_handle().times(1);
 
