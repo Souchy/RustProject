@@ -27,4 +27,5 @@ Negatives
 - global mutable variables are a pain
 	- mutex/locks
 	- unsafe
+	- https://stackoverflow.com/questions/27791532/how-do-i-create-a-global-mutable-singleton
 - Result<(), Box<dyn Error + Send + Sync>> partout en async

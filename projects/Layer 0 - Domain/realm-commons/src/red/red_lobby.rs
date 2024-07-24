@@ -60,7 +60,7 @@ pub fn set_state(db: &mut redis::Connection, lobby: &Lobby) -> Result<(), Box<dy
 }
 pub fn set_players(db: &mut redis::Connection, lobby: &Lobby) -> Result<(), Box<dyn Error + Send + Sync>> {
     let key = get_key_lobby_players(&lobby.id);
-    let len = db.llen("key")?;
+    let len = db.llen(&key)?;
     let opt_len = NonZeroUsize::new(len);
     db.lpop(&key, opt_len)?;
     db.lpush(&key, &lobby.players)?;

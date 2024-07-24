@@ -10,8 +10,6 @@ enum LobbyState {
 // Lobbies are stored in Redis
 message Lobby {
 	string id = 1;
-	// extern.ObjectId id = 1;
-	// mongodb.bson.oid.ObjectId id = 1;
 	string token = 2;
 	int32 queue = 3;
 	LobbyState state = 4; // idle, in queue, in game 
