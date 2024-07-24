@@ -9,5 +9,5 @@ use std::error::Error;
 #[automock]
 #[async_trait]
 pub trait MessageHandler: Debug + Send + Sync {
-    async fn handle(&self, msg: DynamicMessage, client: &DynamicClient) -> Result<(), Box<dyn Error>>;
+    async fn handle(&self, msg: DynamicMessage, client: &DynamicClient) -> Result<(), Box<dyn Error + Send + Sync>>;
 }

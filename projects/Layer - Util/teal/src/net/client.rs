@@ -1,6 +1,7 @@
 use std::any::{Any, TypeId};
 use std::error::Error;
 use std::sync::Arc;
+use std::fmt::Debug;
 
 use async_trait::async_trait;
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
@@ -14,16 +15,16 @@ use crate::{HEADER_LEN, LEN_LEN};
 use super::server::Server;
 
 #[async_trait]
-pub trait Client : Send + Sync + 'static {
+pub trait Client : Send + Sync + Debug + 'static {
     fn get_id_ref(&self) -> Arc<Mutex<String>>;
     fn get_id_sync(&self) -> String;
-    async fn set_id(&self, id: String) -> Result<(), Box<dyn Error>>;
+    async fn set_id(&self, id: String) -> Result<(), Box<dyn Error + Send + Sync>>;
     // fn set_id(&self, id: String);
     fn get_server(&self) ->  Arc<Mutex<Server>>;
 
     async fn run(&self) -> Result<(), Box<dyn Error + Send>>;
     async fn frame(&self, buf: &[u8]);
-    async fn send_bytes(&self, buf: &[u8]) -> Result<(), Box<dyn Error>>;
+    async fn send_bytes(&self, buf: &[u8]) -> Result<(), Box<dyn Error + Send + Sync>>;
     // These make the object unsafe.
     // async fn send<T: MessageIdentifiable>(
     //     &self,
@@ -56,9 +57,9 @@ impl dyn Client {
     ///
     /// ```
     /// # use teal::net::client::Client;
-    /// # fn foo<MyMessage: Client>(client: Box<dyn Client>) {
-    /// let m: Box<dyn Client> = client;
-    /// let m: Box<MyMessage> = <dyn Client>::downcast_box(m).unwrap();
+    /// # fn foo<T: Client>(client: Box<dyn Client>) {
+    /// let c: Box<dyn Client> = client;
+    /// let dc: Box<T> = <dyn Client>::downcast_box(c).unwrap();
     /// # }
     /// ```
     pub fn downcast_box<T: Any>(
@@ -78,9 +79,9 @@ impl dyn Client {
     ///
     /// ```
     /// # use teal::net::client::Client;
-    /// # fn foo<MyMessage: Client>(client: &dyn Client) {
-    /// let m: &dyn Client = client;
-    /// let m: &MyMessage = <dyn Client>::downcast_ref(m).unwrap();
+    /// # fn foo<T: Client>(client: &dyn Client) {
+    /// let c: &dyn Client = client;
+    /// let dc: &T = <dyn Client>::downcast_ref(c).unwrap();
     /// # }
     /// ```
     pub fn downcast_ref<'a, M: Client + 'a>(&'a self) -> Option<&'a M> {
@@ -95,9 +96,9 @@ impl dyn Client {
     ///
     /// ```
     /// # use teal::net::client::Client;
-    /// # fn foo<MyMessage: Client>(client: &mut dyn Client) {
-    /// let m: &mut dyn Client = client;
-    /// let m: &mut MyMessage = <dyn Client>::downcast_mut(m).unwrap();
+    /// # fn foo<T: Client>(client: &mut dyn Client) {
+    /// let c: &mut dyn Client = client;
+    /// let dc: &mut T = <dyn Client>::downcast_mut(c).unwrap();
     /// # }
     /// ```
     pub fn downcast_mut<'a, M: Client + 'a>(&'a mut self) -> Option<&'a mut M> {
@@ -110,7 +111,7 @@ impl dyn Client {
 }
 
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct DefaultClient {
     pub id: Arc<Mutex<String>>,
     pub server: Arc<Mutex<Server>>,
@@ -155,15 +156,15 @@ impl Client for DefaultClient {
     fn get_id_sync(&self) -> String {
         self.id.blocking_lock().clone()
     }
-    async fn set_id(&self, id: String) -> Result<(), Box<dyn Error>> {
+    async fn set_id(&self, id: String) -> Result<(), Box<dyn Error + Send + Sync>> {
         *self.id.lock().await = id;
         Ok(())
     }
     fn get_server(&self) -> Arc<Mutex<Server>> {
         self.server.clone()
     }
-    async fn send_bytes(&self, buf: &[u8]) -> Result<(), Box<dyn Error>> {
-        self.writer.lock().await.write_all(buf).await?;
+    async fn send_bytes(&self, buf: &[u8]) -> Result<(), Box<dyn Error + Send + Sync>> {
+        let _ = self.writer.lock().await.write_all(buf).await;
         return Ok(());
     }
     // async fn broadcast<T: MessageIdentifiable + MessageFull>(&mut self, msg: T) {

@@ -16,7 +16,7 @@ impl MessageHandler for MatchHandler {
         &self,
         msg: DynamicMessage,
         _client: &DynamicClient,
-    ) -> Result<(), Box<dyn Error>> {
+    ) -> Result<(), Box<dyn Error + Send + Sync>> {
         let message = msg.transcode_to::<Match>().unwrap();
         println!("hey coraline got {:?}", message);
 

@@ -13,7 +13,7 @@ impl MessageHandler for IdentifyHandler {
         &self,
         msg: DynamicMessage,
         _client: &DynamicClient,
-    ) -> Result<(), Box<dyn Error>> {
+    ) -> Result<(), Box<dyn Error + Send + Sync>> {
         let message = msg.transcode_to::<Identify>().unwrap();
         println!("hey coral got {:?}", message);
 

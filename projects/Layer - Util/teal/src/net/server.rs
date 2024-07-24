@@ -16,7 +16,7 @@ use super::message::{serialize, MessageIdentifiable};
 //     async fn broadcast_bytes(&self, buf: &[u8]) -> Result<(), Box<dyn Error>>;
 // }
 
-#[derive(Default)]
+#[derive(Default, Debug)]
 pub struct Server {
     pub clients: Vec<Arc<DefaultClient>>,
 }

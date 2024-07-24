@@ -1,10 +1,13 @@
 use prost_reflect::{DescriptorPool, DynamicMessage, MessageDescriptor};
 
-use crate::{net::message::MessageIdentifiable, DynamicClient, Errors, HEADER_LEN, ID_LEN, LEN_LEN};
+use crate::{
+    net::message::MessageIdentifiable, DynamicClient, Errors, HEADER_LEN, ID_LEN, LEN_LEN,
+};
 use std::{collections::HashMap, error::Error, sync::Arc};
 
 use super::handler::MessageHandler;
 
+#[derive(Debug)]
 pub struct MessageHandlers {
     pools: HashMap<u16, Arc<DescriptorPool>>,
     deserializers: HashMap<u16, MessageDescriptor>,
@@ -35,13 +38,21 @@ impl MessageHandlers {
     /**
      * Register a message handler.
      */
-    pub fn register(&mut self, pool_id: u16, msg: &dyn MessageIdentifiable, handler: Box<dyn MessageHandler>) {
+    pub fn register(
+        &mut self,
+        pool_id: u16,
+        msg: &dyn MessageIdentifiable,
+        handler: Box<dyn MessageHandler>,
+    ) {
         let id = msg.id();
         if self.deserializers.contains_key(&id) {
             panic!("Tried to register the same message deserializer + handler ID twice. Register only once or change the message ID to avoid duplicates.");
         }
         if !self.pools.contains_key(&pool_id) {
-            panic!("Tried to register a message to an unexisting pool #{}. Register the pools first.", pool_id);
+            panic!(
+                "Tried to register a message to an unexisting pool #{}. Register the pools first.",
+                pool_id
+            );
         }
         let pool = self.pools.get(&pool_id).unwrap(); //&(id / 1000)).unwrap();
         let message_descriptor = pool
@@ -52,7 +63,10 @@ impl MessageHandlers {
         self.handlers.insert(id, handler);
     }
 
-    pub fn deserialize(&self, frame: &[u8]) -> Result<(u16, DynamicMessage), Box<dyn Error>> {
+    pub fn deserialize(
+        &self,
+        frame: &[u8],
+    ) -> Result<(u16, DynamicMessage), Box<dyn Error + Send + Sync>> {
         let mut dst = [0u8; LEN_LEN];
         dst.clone_from_slice(&frame[0..LEN_LEN]);
         let len = usize::from_be_bytes(dst);
@@ -71,7 +85,11 @@ impl MessageHandlers {
         Ok((id, dynamic_message))
     }
 
-    pub async fn handle(&self, frame: &[u8], client: &DynamicClient) -> Result<(), Box<dyn Error>> {
+    pub async fn handle(
+        &self,
+        frame: &[u8],
+        client: &DynamicClient,
+    ) -> Result<(), Box<dyn Error + Send + Sync>> {
         let (id, dynamic_message) = self.deserialize(&frame)?;
         let handler = self
             .handlers

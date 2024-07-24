@@ -31,7 +31,7 @@ pub async fn create_server() -> Result<(), Box<dyn Error>> {
 struct PingHandler {}
 #[async_trait]
 impl MessageHandler for PingHandler {
-    async fn handle(&self, msg: DynamicMessage, client: &DynamicClient) -> Result<(), Box<dyn Error>> {
+    async fn handle(&self, msg: DynamicMessage, client: &DynamicClient) -> Result<(), Box<dyn Error + Send + Sync>> {
         let message = msg.transcode_to::<Ping>();
         println!("hey server got ping {:?}", message);
         let buf = message::serialize(&Ping::default());

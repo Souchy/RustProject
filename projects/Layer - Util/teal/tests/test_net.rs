@@ -36,7 +36,7 @@ fn test_message_manipulation() {
 }
 
 #[test]
-fn test_message_serde() -> Result<(), Box<dyn Error>> {
+fn test_message_serde() -> Result<(), Box<dyn Error + Send + Sync>> {
     // Setup
     let mut reg = MessageHandlers::new();
     reg.register_pool(0, Arc::new(teal::DESCRIPTOR_POOL.to_owned()));

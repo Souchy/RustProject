@@ -28,7 +28,7 @@ impl MessageHandler for SetQueueHandler {
         &self,
         msg: DynamicMessage,
         client: &DynamicClient,
-    ) -> Result<(), Box<dyn Error>> {
+    ) -> Result<(), Box<dyn Error + Send + Sync>> {
         let message = msg.transcode_to::<SetQueueRequest>().unwrap();
         println!("hey coral got {:?}", message);
 
@@ -63,12 +63,11 @@ impl MessageHandler for SetQueueHandler {
                     red_player::set_state(db, &player)?;
 
                     // TDOO Try to find a match for the lobby
-                    let lobby2 = lobby.clone();
-                    let task = tokio::spawn(async move {
-                        let clients = server.lock().await.clients.clone();
-                        let _result = find_match(lobby2, clients).await;
-                    });
-                    task.await?;
+                    // let lobby2 = lobby.clone();
+                    // let task = tokio::spawn(async move {
+                    //     let _result = find_match(lobby2, server).await;
+                    // });
+                    // task.await?;
                 }
 
                 let response = SetQueueResponse {
@@ -85,8 +84,7 @@ impl MessageHandler for SetQueueHandler {
 }
 
 // TODO find a match between 2 lobbies
-// server: Arc<Mutex<Server>>
-async fn find_match(lobby: Lobby, clients: Vec<Arc<DefaultClient>>) -> Result<(), Box<dyn Error + Send + Sync>> {
+async fn find_match(lobby: Lobby, server: Arc<Mutex<Server>>) -> Result<(), Box<dyn Error + Send + Sync>> {
     let lobby2: Lobby = Lobby::default();
 
     unsafe {
@@ -113,14 +111,14 @@ async fn find_match(lobby: Lobby, clients: Vec<Arc<DefaultClient>>) -> Result<()
                     let r#match = Match::default();
                     let match_buf = serialize(&r#match);
 
-                    // let serv = server.lock().await;
-                    // let clients = &serv.clients;
-                    // for id in &lobby.players {
-                    //     // clients.fin
-                    //     if let Some(client) = clients.iter().find(|&c| c.get_id_sync().eq(id)) {
-                    //         let _ = client.send_bytes(&match_buf).await;
-                    //     }
-                    // }
+                    let serv = server.lock().await;
+                    let clients = &serv.clients;
+                    for id in &lobby.players {
+                        // clients.fin
+                        if let Some(client) = clients.iter().find(|&c| c.get_id_sync().eq(id)) {
+                            let _ = client.send_bytes(&match_buf).await;
+                        }
+                    }
                     return Ok(());
                 } 
                 

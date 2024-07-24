@@ -9,7 +9,7 @@ use teal::{
 };
 use tokio::sync::Mutex;
 
-#[derive(Clone, Default)]
+#[derive(Clone, Default, Debug)]
 pub struct StubClient {
     pub id: Arc<Mutex<String>>
 }
@@ -29,14 +29,14 @@ impl Client for StubClient {
     fn get_id_sync(&self) -> String {
         self.id.blocking_lock().clone()
     }
-    async fn set_id(&self, id: String) -> Result<(), Box<dyn Error>> {
+    async fn set_id(&self, id: String) -> Result<(), Box<dyn Error + Send + Sync>> {
         *self.id.lock().await = id;
         Ok(())
     }
     fn get_server(&self) -> Arc<Mutex<Server>> {
         Arc::new(Mutex::new(Server::default()))
     }
-    async fn send_bytes(&self, _buf: &[u8]) -> Result<(), Box<dyn Error>> {
+    async fn send_bytes(&self, _buf: &[u8]) -> Result<(), Box<dyn Error + Send + Sync>> {
         Ok(())
     }
     async fn run(&self) -> Result<(), Box<dyn Error + Send>> {
@@ -60,7 +60,7 @@ impl MessageHandler for RaftHeartbeatHandlerAssertTerm4 {
         &self,
         msg: DynamicMessage,
         _client: &DynamicClient,
-    ) -> Result<(), Box<dyn Error>> {
+    ) -> Result<(), Box<dyn Error + Send + Sync>> {
         let message = msg.transcode_to::<RaftHeartbeat>().unwrap();
         assert_eq!(message.term, 4);
         Ok(())

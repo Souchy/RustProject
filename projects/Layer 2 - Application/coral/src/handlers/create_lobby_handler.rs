@@ -24,7 +24,7 @@ impl MessageHandler for CreateLobbyHandler {
         &self,
         msg: DynamicMessage,
         client: &DynamicClient,
-    ) -> Result<(), Box<dyn Error>> {
+    ) -> Result<(), Box<dyn Error + Send + Sync>> {
         let message = msg.transcode_to::<CreateLobby>().unwrap();
         println!("hey coral got {:?}", message);
 

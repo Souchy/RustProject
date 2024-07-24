@@ -16,7 +16,7 @@ impl MessageHandler for PingHandler {
         &self,
         msg: DynamicMessage,
         client: &DynamicClient,
-    ) -> Result<(), Box<dyn Error>> {
+    ) -> Result<(), Box<dyn Error + Send + Sync>> {
         let message = msg.transcode_to::<Ping>();
         println!("hey coraline got {:?}", message);
         Ok(())

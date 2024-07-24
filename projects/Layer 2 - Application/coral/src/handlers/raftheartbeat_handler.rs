@@ -11,7 +11,7 @@ use teal::{
 pub(crate) struct RaftHeartbeatHandler;
 #[async_trait]
 impl MessageHandler for RaftHeartbeatHandler {
-    async fn handle(&self, msg: DynamicMessage, _client: &DynamicClient) -> Result<(), Box<dyn Error>> {
+    async fn handle(&self, msg: DynamicMessage, _client: &DynamicClient) -> Result<(), Box<dyn Error + Send + Sync>> {
         let message = msg.transcode_to::<RaftHeartbeat>().unwrap();
         println!("hey coral got {:?}", message);
         

@@ -36,9 +36,9 @@ impl dyn MessageIdentifiable {
     ///
     /// ```
     /// # use teal::net::message::MessageIdentifiable;
-    /// # fn foo<MyMessage: MessageIdentifiable>(message: Box<dyn MessageIdentifiable>) {
+    /// # fn foo<T: MessageIdentifiable>(message: Box<dyn MessageIdentifiable>) {
     /// let m: Box<dyn MessageIdentifiable> = message;
-    /// let m: Box<MyMessage> = <dyn MessageIdentifiable>::downcast_box(m).unwrap();
+    /// let m: Box<T> = <dyn MessageIdentifiable>::downcast_box(m).unwrap();
     /// # }
     /// ```
     pub fn downcast_box<T: Any>(
@@ -58,9 +58,9 @@ impl dyn MessageIdentifiable {
     ///
     /// ```
     /// # use teal::net::message::MessageIdentifiable;
-    /// # fn foo<MyMessage: MessageIdentifiable>(message: &dyn MessageIdentifiable) {
+    /// # fn foo<T: MessageIdentifiable>(message: &dyn MessageIdentifiable) {
     /// let m: &dyn MessageIdentifiable = message;
-    /// let m: &MyMessage = <dyn MessageIdentifiable>::downcast_ref(m).unwrap();
+    /// let m: &T = <dyn MessageIdentifiable>::downcast_ref(m).unwrap();
     /// # }
     /// ```
     pub fn downcast_ref<'a, M: MessageIdentifiable + 'a>(&'a self) -> Option<&'a M> {
@@ -75,9 +75,9 @@ impl dyn MessageIdentifiable {
     ///
     /// ```
     /// # use teal::net::message::MessageIdentifiable;
-    /// # fn foo<MyMessage: MessageIdentifiable>(message: &mut dyn MessageIdentifiable) {
+    /// # fn foo<T: MessageIdentifiable>(message: &mut dyn MessageIdentifiable) {
     /// let m: &mut dyn MessageIdentifiable = message;
-    /// let m: &mut MyMessage = <dyn MessageIdentifiable>::downcast_mut(m).unwrap();
+    /// let m: &mut T = <dyn MessageIdentifiable>::downcast_mut(m).unwrap();
     /// # }
     /// ```
     pub fn downcast_mut<'a, M: MessageIdentifiable + 'a>(&'a mut self) -> Option<&'a mut M> {
