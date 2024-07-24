@@ -14,9 +14,8 @@ use realm_commons::{
     protos::models::{player::PlayerState, Lobby},
     red::{red_lobby, red_player},
 };
-use redis::Iter;
 use teal::{
-    net::{client::Client, handler::MessageHandler, message::serialize, server::Server},
+    net::{client::{Client, DefaultClient}, handler::MessageHandler, message::serialize, server::Server},
     DynamicClient,
 };
 use tokio::sync::Mutex;
@@ -64,10 +63,12 @@ impl MessageHandler for SetQueueHandler {
                     red_player::set_state(db, &player)?;
 
                     // TDOO Try to find a match for the lobby
-                    // let lobby2 = lobby.clone();
-                    // tokio::spawn(async move {
-                    //     let _result = find_match(lobby2, server).await;
-                    // });
+                    let lobby2 = lobby.clone();
+                    let task = tokio::spawn(async move {
+                        let clients = server.lock().await.clients.clone();
+                        let _result = find_match(lobby2, clients).await;
+                    });
+                    task.await?;
                 }
 
                 let response = SetQueueResponse {
@@ -84,28 +85,46 @@ impl MessageHandler for SetQueueHandler {
 }
 
 // TODO find a match between 2 lobbies
-async fn find_match(lobby: Lobby, server: Arc<Mutex<Server>>) -> Result<(), Box<dyn Error>> {
+// server: Arc<Mutex<Server>>
+async fn find_match(lobby: Lobby, clients: Vec<Arc<DefaultClient>>) -> Result<(), Box<dyn Error + Send + Sync>> {
     let lobby2: Lobby = Lobby::default();
 
     unsafe {
         if let Some(db) = &mut crate::DB {
-            let ids = red_lobby::get_ids(db);
-            let lobbies: redis::Iter<'_, String> = redis::cmd("FT.SEARCH")
-                .arg("idx:lobby \"@average_mmr:[1000 +inf]\"")
-                .clone()
-                .iter(db)?;
-        }
-    }
+            loop {
+                let ids = red_lobby::get_ids(db);
+                
+                // TODO: query lobbies that have a different ID, have state=InQueue and have average_mmr=within { lobby.mmr -100, lobby.mmr + 100 };
+                // let lobbies: redis::Iter<'_, String> = redis::cmd("FT.SEARCH")
+                //     .arg("idx:lobby \"@average_mmr:[1000 +inf]\"")
+                //     .clone()
+                //     .iter(db)?;
+                
+                // TODO: compare lobbies mmr with the given lobby.
 
-    let r#match = Match::default();
-    let match_buf = serialize(&r#match);
 
-    let serv = server.lock().await;
-    let clients = &serv.clients;
-    for id in &lobby.players {
-        // clients.fin
-        if let Some(client) = clients.iter().find(|&c| c.get_id_sync().eq(id)) {
-            let _ = client.send_bytes(&match_buf).await;
+                // FIXME return if lobby state changes or players leave.
+                if true {
+                    return Ok(());
+                }
+
+                // FIXME if found a match
+                if false {
+                    let r#match = Match::default();
+                    let match_buf = serialize(&r#match);
+
+                    // let serv = server.lock().await;
+                    // let clients = &serv.clients;
+                    // for id in &lobby.players {
+                    //     // clients.fin
+                    //     if let Some(client) = clients.iter().find(|&c| c.get_id_sync().eq(id)) {
+                    //         let _ = client.send_bytes(&match_buf).await;
+                    //     }
+                    // }
+                    return Ok(());
+                } 
+                
+            }
         }
     }
 

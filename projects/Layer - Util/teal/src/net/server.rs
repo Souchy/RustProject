@@ -1,5 +1,6 @@
 use std::{error::Error, sync::Arc};
 
+use async_trait::async_trait;
 use tokio::{net::TcpListener, sync::Mutex};
 use tracing::error;
 
@@ -7,6 +8,13 @@ use crate::net::client::{Client, DefaultClient};
 use crate::net::handlers::MessageHandlers;
 
 use super::message::{serialize, MessageIdentifiable};
+
+// #[async_trait]
+// pub trait Server: Send + Sync + 'static {
+//     async fn run(addr: String, handlers: Arc<MessageHandlers>) -> Result<(), Box<dyn Error>>;
+//     async fn broadcast<T: MessageIdentifiable>(&self, msg: T) -> Result<(), Box<dyn Error>>;
+//     async fn broadcast_bytes(&self, buf: &[u8]) -> Result<(), Box<dyn Error>>;
+// }
 
 #[derive(Default)]
 pub struct Server {
