@@ -15,7 +15,8 @@ use super::server::Server;
 
 #[async_trait]
 pub trait Client : Send + Sync + 'static {
-    fn get_id(&self) -> Arc<Mutex<String>>;
+    fn get_id_ref(&self) -> Arc<Mutex<String>>;
+    fn get_id_sync(&self) -> String;
     async fn set_id(&self, id: String) -> Result<(), Box<dyn Error>>;
     // fn set_id(&self, id: String);
     fn get_server(&self) ->  Arc<Mutex<Server>>;
@@ -143,12 +144,16 @@ impl DefaultClient {
         let socket = TcpStream::connect(addr).await?;
         Ok(Self::new(socket, handlers, Arc::new(Mutex::new(Server::default()))))
     }
+
 }
 
 #[async_trait]
 impl Client for DefaultClient {
-    fn get_id(&self) -> Arc<Mutex<String>> {
+    fn get_id_ref(&self) -> Arc<Mutex<String>> {
         self.id.clone()
+    }
+    fn get_id_sync(&self) -> String {
+        self.id.blocking_lock().clone()
     }
     async fn set_id(&self, id: String) -> Result<(), Box<dyn Error>> {
         *self.id.lock().await = id;

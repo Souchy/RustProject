@@ -17,4 +17,5 @@ message Lobby {
 	LobbyState state = 4; // idle, in queue, in game 
 	repeated string players = 5;
 	uint64 queueStartTime = 6;
+	uint32 average_mmr = 7;
 }

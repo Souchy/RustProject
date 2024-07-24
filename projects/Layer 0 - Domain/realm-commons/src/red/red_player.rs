@@ -26,9 +26,9 @@ fn get_key_player_state(player: &String) -> String {
 
 // Values
 pub fn set(db: &mut redis::Connection, player: &Player) -> Result<(), Box<dyn Error>> {
-    let _ = set_lobby(db, player);
-    let _ = set_mmr(db, player);
-    let _ = set_state(db, player);
+    set_lobby(db, player)?;
+    set_mmr(db, player)?;
+    set_state(db, player)?;
     Ok(())
 }
 pub fn delete(db: &mut redis::Connection, player: &Player) -> Result<(), Box<dyn Error>> {
@@ -66,7 +66,7 @@ pub fn get_lobby(db: &mut redis::Connection, player: &mut Player) -> Result<(), 
     player.lobby = get_lobby_by_id(db, &player.id)?;
     Ok(())
 }
-pub fn get_mmr(db: &mut redis::Connection, player: &mut Player) -> Result<i32, Box<dyn Error>> {
+pub fn get_mmr(db: &mut redis::Connection, player: &mut Player) -> Result<u32, Box<dyn Error>> {
     player.mmr = get_mmr_by_id(db, &player.id)?;
     Ok(player.mmr)
 }
@@ -79,7 +79,7 @@ pub fn get_lobby_by_id(db: &mut redis::Connection, id: &String) -> Result<String
     Ok(lobby)
 }
 
-pub fn get_mmr_by_id(db: &mut redis::Connection, id: &String) -> Result<i32, Box<dyn Error>> {
+pub fn get_mmr_by_id(db: &mut redis::Connection, id: &String) -> Result<u32, Box<dyn Error>> {
     let mmr = db.get(get_key_player_mmr(id))?;
     Ok(mmr)
 }

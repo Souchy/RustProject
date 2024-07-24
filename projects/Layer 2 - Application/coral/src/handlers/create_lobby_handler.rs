@@ -2,12 +2,15 @@ use std::error::Error;
 
 use async_trait::async_trait;
 use prost_reflect::DynamicMessage;
-use realm_commons::{protos::{
-    client::CreateLobby,
-    models::{player::{self, PlayerState}, Lobby, LobbyState},
-    server::CreatedLobby,
-}, red::{red_lobby, red_player}};
-use snowflake::{SnowflakeIdBucket, SnowflakeIdGenerator};
+use realm_commons::{
+    protos::{
+        client::CreateLobby,
+        models::{player::PlayerState, Lobby, LobbyState},
+        server::CreatedLobby,
+    },
+    red::{red_lobby, red_player},
+};
+use snowflake::SnowflakeIdGenerator;
 use teal::{
     net::{handler::MessageHandler, message::serialize},
     DynamicClient,
@@ -27,8 +30,8 @@ impl MessageHandler for CreateLobbyHandler {
 
         let mut id_generator_generator = SnowflakeIdGenerator::new(1, 1);
         let id = id_generator_generator.real_time_generate();
-		let player_id = client.get_id().lock().await.clone();
-		// println!("With player {}", player_id);
+        let player_id = client.get_id_ref().lock().await.clone();
+        // println!("With player {}", player_id);
 
         // Create lobby
         let mut lobby = Lobby::default();
@@ -36,19 +39,19 @@ impl MessageHandler for CreateLobbyHandler {
         lobby.queue = message.queue;
         lobby.state = LobbyState::Idle as i32;
         lobby.token = "token".to_string();
-		lobby.players.push(player_id.clone());
-		
-		// Set lobby in Redis
-		unsafe {
-			if let Some(db) = &mut crate::DB {
-				red_lobby::set(db, &lobby)?;
+        lobby.players.push(player_id.clone());
+
+        // Set lobby in Redis
+        unsafe {
+            if let Some(db) = &mut crate::DB {
+                red_lobby::set(db, &lobby)?;
 
                 let mut player = red_player::get(db, &player_id)?;
-				player.lobby = lobby.id.clone();
-				player.state = PlayerState::InLobby as i32;
-				red_player::set(db, &player)?;
-			}
-		}
+                player.lobby = lobby.id.clone();
+                player.state = PlayerState::InLobby as i32;
+                red_player::set(db, &player)?;
+            }
+        }
 
         // Return lobby info to player
         let mut response = CreatedLobby::default();

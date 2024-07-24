@@ -21,12 +21,18 @@ fn get_key_lobby_players(lobby: &String) -> String {
     str.push_str(":players");
     str
 }
+fn get_key_lobby_average_mmr(lobby: &String) -> String {
+    let mut str: String = get_key_lobby(lobby);
+    str.push_str(":average_mmr");
+    str
+}
 
 // Sets
 pub fn set(db: &mut redis::Connection, lobby: &Lobby) -> Result<(), Box<dyn Error>> {
-    let _ = set_queue(db, lobby);
-    let _ = set_state(db, lobby);
-    let _ = set_players(db, lobby);
+    set_queue(db, lobby)?;
+    set_state(db, lobby)?;
+    set_players(db, lobby)?;
+    set_average_mmr(db, lobby)?;
     Ok(())
 }
 pub fn delete(db: &mut redis::Connection, lobby: &Lobby) -> Result<(), Box<dyn Error>> {
@@ -54,6 +60,10 @@ pub fn set_players(db: &mut redis::Connection, lobby: &Lobby) -> Result<(), Box<
     db.lpush(&key, &lobby.players)?;
     Ok(())
 }
+pub fn set_average_mmr(db: &mut redis::Connection, lobby: &Lobby) -> Result<(), Box<dyn Error>> {
+    db.set(get_key_lobby_average_mmr(&lobby.id), lobby.average_mmr)?;
+    Ok(())
+}
 
 // Gets
 pub fn get(db: &mut redis::Connection, id: &String) -> Result<Lobby, Box<dyn Error>> {
@@ -62,7 +72,16 @@ pub fn get(db: &mut redis::Connection, id: &String) -> Result<Lobby, Box<dyn Err
     get_queue(db, &mut lobby)?;
     get_state(db, &mut lobby)?;
     get_players(db, &mut lobby)?;
+    set_average_mmr(db, &lobby)?;
     Ok(lobby)
+}
+// TODO get lobbies
+pub fn get_ids(db: &mut redis::Connection) -> Result<Vec<String>, Box<dyn Error>> {
+    let _ds = db.scan_match::<&str, String>("lobby:*")?;
+
+    // let keys = db.scan(0, "lobby:*:".to_string())?;
+    // return keys;
+    Ok(Vec::new())
 }
 pub fn get_queue(db: &mut redis::Connection, lobby: &mut Lobby) -> Result<i32, Box<dyn Error>> {
     lobby.queue = get_queue_by_id(db, &lobby.id)?;
@@ -76,6 +95,10 @@ pub fn get_players(db: &mut redis::Connection, lobby: &mut Lobby) -> Result<(), 
     lobby.players = get_players_by_id(db, &lobby.id)?;
     Ok(())
 }
+pub fn get_average_mmr(db: &mut redis::Connection, lobby: &mut Lobby) -> Result<u32, Box<dyn Error>> {
+    lobby.average_mmr = get_average_mmr_by_id(db, &lobby.id)?;
+    Ok(lobby.average_mmr)
+}
 pub fn get_queue_by_id(db: &mut redis::Connection, id: &String) -> Result<i32, Box<dyn Error>> {
     let queue = db.get(get_key_lobby_queue(id))?;
     Ok(queue)
@@ -87,5 +110,9 @@ pub fn get_state_by_id(db: &mut redis::Connection, id: &String) -> Result<i32, B
 pub fn get_players_by_id(db: &mut redis::Connection, id: &String) -> Result<Vec<String>, Box<dyn Error>> {
     let players = db.lrange(get_key_lobby_players(id), 0, -1)?;
     Ok(players)
+}
+pub fn get_average_mmr_by_id(db: &mut redis::Connection, id: &String) -> Result<u32, Box<dyn Error>> {
+    let mmr = db.get(get_key_lobby_average_mmr(id))?;
+    Ok(mmr)
 }
 

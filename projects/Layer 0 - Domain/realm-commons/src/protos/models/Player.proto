@@ -7,7 +7,7 @@ message Player {
 	PlayerState state = 2; // idle, in queue, in game 
 	string lobby = 3;
 	// optional int32 queue = 3;
-	int32 mmr = 4; //
+	uint32 mmr = 4; //
 	// optional int32 queueStartTime = 4;
 	repeated string recentMatches = 5; // map of recent players <playerId, intGameAgo> 
 	int64 geolocalisation = 6;

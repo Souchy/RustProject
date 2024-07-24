@@ -23,8 +23,11 @@ impl StubClient {
 
 #[async_trait]
 impl Client for StubClient {
-    fn get_id(&self) -> Arc<Mutex<String>> {
+    fn get_id_ref(&self) -> Arc<Mutex<String>> {
         self.id.clone()
+    }
+    fn get_id_sync(&self) -> String {
+        self.id.blocking_lock().clone()
     }
     async fn set_id(&self, id: String) -> Result<(), Box<dyn Error>> {
         *self.id.lock().await = id;
