@@ -32,21 +32,6 @@ pub async fn main() -> Result<(), Box<dyn Error>> {
         DB = Some(con);
     }
 
-    // Temporary redis setup
-    unsafe {
-        if let Some(db) = &mut crate::DB {
-            let _ = red_player::delete_all(db);
-            // for i in 0..1000 {
-            //     let mut player: Player = Player::default();
-            //     player.id = i.to_string();
-            //     player.mmr = 1000;
-            //     player.state = PlayerState::InLobby as i32;
-            //     let _ = red_player::set(db, &player);
-            // }
-        }
-    }
-    // End Temporary redis setup
-
     // Handlers
     let reg = create_handlers();
 
@@ -58,7 +43,6 @@ pub async fn main() -> Result<(), Box<dyn Error>> {
 
     // Start
     let t1 = tokio::spawn(async move {
-        println!("t1 start");
         client_ref.run().await.unwrap();
     });
 
@@ -84,21 +68,6 @@ pub async fn main() -> Result<(), Box<dyn Error>> {
     let create_lobby_buf = message::serialize(&create_lobby);
     client_ref2.send_bytes(&create_lobby_buf).await.unwrap();
 
-    /*
-    // Send Heartbeat
-    let mut hb = RaftHeartbeat::default();
-    hb.leader = 3;
-    let buf = message::serialize(&hb);
-    client_ref2.send_bytes(&buf).await.unwrap();
-    // Send Ping
-    client_ref2
-        .send_bytes(&message::serialize(&Ping::default()))
-        .await
-        .unwrap();
-    // TODO send
-    // client_ref2.send(hb).await.unwrap();
-    // client_ref2.send(Ping::new()).await.unwrap();
-    */
     t1.await?;
 
     // unsafe {
