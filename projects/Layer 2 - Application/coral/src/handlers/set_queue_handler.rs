@@ -156,27 +156,30 @@ async fn find_match(
                     .iter()
                     .for_each(|p| game.players.push(p.clone()));
 
-                // Delete the lobbies
+                // Delete the lobbies and the queue threads
                 let _ = red_lobby::delete(db, &lobby1);
                 let _ = red_lobby::delete(db, &lobby2);
 
+                let mut queues = QUEUES.lock().await;
+                queues.tasks.remove(&lobby1.id);
+                queues.tasks.remove(&lobby2.id);
+                drop(queues);
+
                 let serv = server.lock().await;
                 let clients = &serv.clients;
-
-                // Send Match to all players in the game
                 let match_buf = serialize(&game);
+
+                // For all players in the game
                 for id in &game.players {
 
                     // Set players in game 
                     let _ = red_player::set_state_by_id(db, id, PlayerState::InGame);
                     
+                    // Send Match
                     if let Some(client) = clients.iter().find(|&c| c.get_id_sync().eq(id)) {
                         let _ = client.send_bytes(&match_buf).await;
                     }
                 }
-
-                QUEUES.lock().await.tasks.remove(&lobby1.id);
-                QUEUES.lock().await.tasks.remove(&lobby2.id);
 
                 return Ok(());
             }
