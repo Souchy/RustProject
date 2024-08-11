@@ -1,0 +1,62 @@
+@startuml vue-module
+
+component prost {
+	interface DynamicMessage {
+
+	}
+}
+
+component Teal {
+	package net {
+		interface "Client" as client {
+			+get_id_ref(&self) -> Arc<Mutex<String>>
+			+get_id_sync(&self) -> String
+			+set_id(&self, id: String) -> Result<(), Box<dyn Error + Send + Sync>>
+			+get_server(&self) ->  Arc<Mutex<Server>>
+			+run(&self) -> Result<(), Box<dyn Error + Send>>
+			+frame(&self, buf: &[u8])
+			+send_bytes(&self, buf: &[u8]) -> Result<(), Box<dyn Error + Send + Sync>>
+		}
+		interface "MessageIdentifiable" as mi {
+			+id(&self) -> u16
+			+name(&self) -> String
+		}
+		object Message {
+			+serialize<T: MessageIdentifiable>(msg: &T) -> Vec<u8>
+		}
+		struct "DefaultClient" as dc {
+			+id: Arc<Mutex<String>>
+			+server: Arc<Mutex<Server>>
+			+reader: Reader
+			+writer: Writer
+			+handlers: Arc<MessageHandlers>
+		}
+		interface "MessageHandler" as mh {
+			+handle(&self, msg: DynamicMessage, client: &dyn Client) -> Result<(), Box<dyn Error + Send + Sync>>
+		}
+		struct "MessageHandlers" as mhs {
+			+pools: HashMap<u16, Arc<DescriptorPool>>
+			+deserializers: HashMap<u16, MessageDescriptor>
+			+handlers: HashMap<u16, Box<dyn MessageHandler>>
+		}
+		struct "Server" as server {
+			+clients: Vec<Arc<DefaultClient>>
+		}
+		dc .up.|> client
+		dc -right-o server
+		mh -up-o mhs
+		dc o-- mhs
+	}
+	package protos {
+		struct "Heartbeat" as heartbeat
+		struct "Ping" as ping
+		struct "Pong" as pong
+	}
+	' ping .up.|> mi
+	' pong .up.|> mi
+	' heartbeat .up.|> mi
+	protos .up.|> mi
+	protos .up.|> DynamicMessage
+	' mi <|.. ping
+}
+@enduml

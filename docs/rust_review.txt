@@ -4,7 +4,7 @@ Positives
 - cool
 - Best package manager + build system, easy and works the same on every platform.
 - Decent ecosystem.
-- Fast.
+- Fast. Reliable.
 
 Negatives
 - Almost no dedicated IDE. Intellij RustRover and Zed. VSCode rust-analyzer is buggy + slow.

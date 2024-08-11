@@ -26,7 +26,7 @@ namespace Models {
           string.Concat(
             "CgtNYXRjaC5wcm90bxIGbW9kZWxzIlUKBU1hdGNoEgoKAmlkGAEgASgJEg0K",
             "BXF1ZXVlGAIgASgFEhEKCWdhbWVfcG9ydBgDIAEoBRINCgV0b2tlbhgEIAEo",
-            "CRIPCgdwbGF5ZXJzGAUgAygDYgZwcm90bzM="));
+            "CRIPCgdwbGF5ZXJzGAUgAygJYgZwcm90bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
@@ -145,15 +145,15 @@ namespace Models {
 
     /// <summary>Field number for the "players" field.</summary>
     public const int PlayersFieldNumber = 5;
-    private static readonly pb::FieldCodec<long> _repeated_players_codec
-        = pb::FieldCodec.ForInt64(42);
-    private readonly pbc::RepeatedField<long> players_ = new pbc::RepeatedField<long>();
+    private static readonly pb::FieldCodec<string> _repeated_players_codec
+        = pb::FieldCodec.ForString(42);
+    private readonly pbc::RepeatedField<string> players_ = new pbc::RepeatedField<string>();
     /// <summary>
-    /// List of players in the game
+    /// List of players in the match
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public pbc::RepeatedField<long> Players {
+    public pbc::RepeatedField<string> Players {
       get { return players_; }
     }
 
@@ -330,8 +330,7 @@ namespace Models {
             Token = input.ReadString();
             break;
           }
-          case 42:
-          case 40: {
+          case 42: {
             players_.AddEntriesFrom(input, _repeated_players_codec);
             break;
           }
@@ -366,8 +365,7 @@ namespace Models {
             Token = input.ReadString();
             break;
           }
-          case 42:
-          case 40: {
+          case 42: {
             players_.AddEntriesFrom(ref input, _repeated_players_codec);
             break;
           }

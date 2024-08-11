@@ -24,16 +24,16 @@ namespace Messages {
     static SetQueueReflection() {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
-            "Cg5TZXRRdWV1ZS5wcm90bxIIbWVzc2FnZXMiVgoPU2V0UXVldWVSZXF1ZXN0",
+            "Cg5TZXRRdWV1ZS5wcm90bxIIbWVzc2FnZXMiVAoPU2V0UXVldWVSZXF1ZXN0",
             "Eg0KBXF1ZXVlGAEgASgFEiMKBXN0YXRlGAIgASgOMhQubWVzc2FnZXMuUXVl",
-            "dWVTdGF0ZRIPCgdwbGF5ZXJzGAMgAygDIkYKEFNldFF1ZXVlUmVzcG9uc2US",
-            "DQoFcXVldWUYASABKAUSIwoFc3RhdGUYAiABKA4yFC5tZXNzYWdlcy5RdWV1",
-            "ZVN0YXRlKjoKClF1ZXVlU3RhdGUSFAoQUVVFVUVfU1RBVEVfSURMRRAAEhYK",
-            "ElFVRVVFX1NUQVRFX0FDVElWRRABYgZwcm90bzM="));
+            "dWVTdGF0ZRINCgVsb2JieRgDIAEoCSJGChBTZXRRdWV1ZVJlc3BvbnNlEg0K",
+            "BXF1ZXVlGAEgASgFEiMKBXN0YXRlGAIgASgOMhQubWVzc2FnZXMuUXVldWVT",
+            "dGF0ZSo6CgpRdWV1ZVN0YXRlEhQKEFFVRVVFX1NUQVRFX0lETEUQABIWChJR",
+            "VUVVRV9TVEFURV9BQ1RJVkUQAWIGcHJvdG8z"));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(new[] {typeof(global::Messages.QueueState), }, null, new pbr::GeneratedClrTypeInfo[] {
-            new pbr::GeneratedClrTypeInfo(typeof(global::Messages.SetQueueRequest), global::Messages.SetQueueRequest.Parser, new[]{ "Queue", "State", "Players" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Messages.SetQueueRequest), global::Messages.SetQueueRequest.Parser, new[]{ "Queue", "State", "Lobby" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Messages.SetQueueResponse), global::Messages.SetQueueResponse.Parser, new[]{ "Queue", "State" }, null, null, null, null)
           }));
     }
@@ -89,7 +89,7 @@ namespace Messages {
     public SetQueueRequest(SetQueueRequest other) : this() {
       queue_ = other.queue_;
       state_ = other.state_;
-      players_ = other.players_.Clone();
+      lobby_ = other.lobby_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -123,15 +123,19 @@ namespace Messages {
       }
     }
 
-    /// <summary>Field number for the "players" field.</summary>
-    public const int PlayersFieldNumber = 3;
-    private static readonly pb::FieldCodec<long> _repeated_players_codec
-        = pb::FieldCodec.ForInt64(26);
-    private readonly pbc::RepeatedField<long> players_ = new pbc::RepeatedField<long>();
+    /// <summary>Field number for the "lobby" field.</summary>
+    public const int LobbyFieldNumber = 3;
+    private string lobby_ = "";
+    /// <summary>
+    /// repeated string players = 3;
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public pbc::RepeatedField<long> Players {
-      get { return players_; }
+    public string Lobby {
+      get { return lobby_; }
+      set {
+        lobby_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -151,7 +155,7 @@ namespace Messages {
       }
       if (Queue != other.Queue) return false;
       if (State != other.State) return false;
-      if(!players_.Equals(other.players_)) return false;
+      if (Lobby != other.Lobby) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -161,7 +165,7 @@ namespace Messages {
       int hash = 1;
       if (Queue != 0) hash ^= Queue.GetHashCode();
       if (State != global::Messages.QueueState.Idle) hash ^= State.GetHashCode();
-      hash ^= players_.GetHashCode();
+      if (Lobby.Length != 0) hash ^= Lobby.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -188,7 +192,10 @@ namespace Messages {
         output.WriteRawTag(16);
         output.WriteEnum((int) State);
       }
-      players_.WriteTo(output, _repeated_players_codec);
+      if (Lobby.Length != 0) {
+        output.WriteRawTag(26);
+        output.WriteString(Lobby);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -207,7 +214,10 @@ namespace Messages {
         output.WriteRawTag(16);
         output.WriteEnum((int) State);
       }
-      players_.WriteTo(ref output, _repeated_players_codec);
+      if (Lobby.Length != 0) {
+        output.WriteRawTag(26);
+        output.WriteString(Lobby);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -224,7 +234,9 @@ namespace Messages {
       if (State != global::Messages.QueueState.Idle) {
         size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) State);
       }
-      size += players_.CalculateSize(_repeated_players_codec);
+      if (Lobby.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(Lobby);
+      }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
       }
@@ -243,7 +255,9 @@ namespace Messages {
       if (other.State != global::Messages.QueueState.Idle) {
         State = other.State;
       }
-      players_.Add(other.players_);
+      if (other.Lobby.Length != 0) {
+        Lobby = other.Lobby;
+      }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
 
@@ -267,9 +281,8 @@ namespace Messages {
             State = (global::Messages.QueueState) input.ReadEnum();
             break;
           }
-          case 26:
-          case 24: {
-            players_.AddEntriesFrom(input, _repeated_players_codec);
+          case 26: {
+            Lobby = input.ReadString();
             break;
           }
         }
@@ -295,9 +308,8 @@ namespace Messages {
             State = (global::Messages.QueueState) input.ReadEnum();
             break;
           }
-          case 26:
-          case 24: {
-            players_.AddEntriesFrom(ref input, _repeated_players_codec);
+          case 26: {
+            Lobby = input.ReadString();
             break;
           }
         }
