@@ -8,21 +8,9 @@ use crate::protos::models::Player;
 fn get_key_player(player: &String) -> String {
     "player:".to_string() + player
 }
-fn get_key_player_lobby(player: &String) -> String {
-    let mut str: String = get_key_player(player);
-    str.push_str(":lobby");
-    str
-}
-fn get_key_player_mmr(player: &String) -> String {
-    let mut str: String = get_key_player(player);
-    str.push_str(":mmr");
-    str
-}
-fn get_key_player_state(player: &String) -> String {
-    let mut str: String = get_key_player(player);
-    str.push_str(":state");
-    str
-}
+const KEY_STATE: &str = "state";
+const KEY_LOBBY: &str = "lobby";
+const KEY_MMR: &str = "mmr";
 
 // Values
 pub fn set(db: &mut redis::Connection, player: &Player) -> Result<(), Box<dyn Error + Send + Sync>> {
@@ -32,7 +20,7 @@ pub fn set(db: &mut redis::Connection, player: &Player) -> Result<(), Box<dyn Er
     Ok(())
 }
 pub fn delete_all(db: &mut redis::Connection) -> Result<(), Box<dyn Error + Send + Sync>> {
-    let keys: Vec<String> = db.keys("player:*")?;
+    let keys: Vec<String> = db.keys("player:*")?; // TODO use SCAN instead
     db.del(keys)?;
     Ok(())
 }
@@ -40,21 +28,19 @@ pub fn delete(db: &mut redis::Connection, player: &Player) -> Result<(), Box<dyn
     delete_by_id(db, &player.id)
 }
 pub fn delete_by_id(db: &mut redis::Connection, id: &String) -> Result<(), Box<dyn Error + Send + Sync>> {
-    db.del(get_key_player_lobby(&id))?;
-    db.del(get_key_player_mmr(&id))?;
-    db.del(get_key_player_state(&id))?;
+    db.del(get_key_player(&id))?;
     Ok(())
 }
 pub fn set_lobby(db: &mut redis::Connection, player: &Player) -> Result<(), Box<dyn Error + Send + Sync>> {
-    db.set(get_key_player_lobby(&player.id), &player.lobby)?;
+    db.hset(get_key_player(&player.id), KEY_LOBBY, &player.lobby)?;
     Ok(())
 }
 pub fn set_mmr(db: &mut redis::Connection, player: &Player) -> Result<(), Box<dyn Error + Send + Sync>> {
-    db.set(get_key_player_mmr(&player.id), player.mmr)?;
+    db.hset(get_key_player(&player.id), KEY_MMR, &player.mmr)?;
     Ok(())
 }
 pub fn set_state(db: &mut redis::Connection, player: &Player) -> Result<(), Box<dyn Error + Send + Sync>> {
-    db.set(get_key_player_state(&player.id), player.state)?;
+    db.hset(get_key_player(&player.id), KEY_STATE, &player.state)?;
     Ok(())
 }
 
@@ -80,15 +66,15 @@ pub fn get_state(db: &mut redis::Connection, player: &mut Player) -> Result<i32,
     Ok(player.state)
 }
 pub fn get_lobby_by_id(db: &mut redis::Connection, id: &String) -> Result<String, Box<dyn Error + Send + Sync>> {
-    let lobby = db.get(get_key_player_lobby(id))?;
+    let lobby = db.hget(get_key_player(&id), KEY_LOBBY)?;
     Ok(lobby)
 }
 
 pub fn get_mmr_by_id(db: &mut redis::Connection, id: &String) -> Result<u32, Box<dyn Error + Send + Sync>> {
-    let mmr = db.get(get_key_player_mmr(id))?;
+    let mmr = db.hget(get_key_player(&id), KEY_MMR)?;
     Ok(mmr)
 }
 pub fn get_state_by_id(db: &mut redis::Connection, id: &String) -> Result<i32, Box<dyn Error + Send + Sync>> {
-    let state = db.get(get_key_player_state(id))?;
+    let state = db.hget(get_key_player(&id), KEY_STATE)?;
     Ok(state)
 }
