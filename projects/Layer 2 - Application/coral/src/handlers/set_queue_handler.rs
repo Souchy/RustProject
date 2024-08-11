@@ -1,11 +1,13 @@
 use async_trait::async_trait;
 use coral_commons::protos::messages::{QueueType, SetQueueRequest, SetQueueResponse};
+use coral_commons::protos::models::Match;
 use once_cell::sync::Lazy;
 use prost_reflect::DynamicMessage;
 use realm_commons::{
     protos::models::{player::PlayerState, Lobby, LobbyState},
     red::{red_lobby, red_player},
 };
+use snowflake::SnowflakeIdGenerator;
 use std::{
     collections::HashMap,
     error::Error,
@@ -88,6 +90,7 @@ impl MessageHandler for SetQueueHandler {
                             let _result = find_match(lobby_find_match, server).await;
                         });
                         QUEUES.lock().await.tasks.insert(lobby.id.clone(), task);
+                        
                         println!("Activated queue for lobby {}", lobby.id);
                     }
                 }
@@ -104,57 +107,81 @@ impl MessageHandler for SetQueueHandler {
 
 // TODO find a match between 2 lobbies
 async fn find_match(
-    lobby: Lobby,
+    lobby1: Lobby,
     server: Arc<Mutex<Server>>,
 ) -> Result<(), Box<dyn Error + Send + Sync>> {
     // let lobby2: Lobby = Lobby::default();
     let mut i = 0;
-    loop {
-        println!("In task! {}", i);
-        i = i + 1;
-        tokio::time::sleep(Duration::from_secs(3)).await;
+
+    unsafe {
+        if let Some(db) = &mut crate::DB {
+            loop {
+                println!("In task! {}", i);
+                i = i + 1;
+                tokio::time::sleep(Duration::from_secs(3)).await;
+
+                // let ids = red_lobby::get_ids(db);
+                let result = red_lobby::find_lobby_match(db, &lobby1);
+                if result.is_err() {
+                    continue;
+                }
+                if let Ok(None) = result {
+                    continue;
+                }
+                let lobby2id = result.unwrap().unwrap();
+                let lobby2res = red_lobby::get(db, &lobby2id);
+                if lobby2res.is_err() {
+                    continue;
+                }
+                let lobby2 = lobby2res.unwrap();
+
+                // FIXME if found a match
+                let mut id_generator_generator = SnowflakeIdGenerator::new(1, 1);
+                let id = id_generator_generator.real_time_generate();
+
+                // Create Match
+                let mut game = Match {
+                    id: id.to_string(),
+                    queue: lobby1.queue,
+                    game_port: 9999,
+                    token: "".to_string(),
+                    players: vec![],
+                };
+                lobby1
+                    .players
+                    .iter()
+                    .for_each(|p| game.players.push(p.clone()));
+                lobby2
+                    .players
+                    .iter()
+                    .for_each(|p| game.players.push(p.clone()));
+
+                // Delete the lobbies
+                let _ = red_lobby::delete(db, &lobby1);
+                let _ = red_lobby::delete(db, &lobby2);
+
+                let serv = server.lock().await;
+                let clients = &serv.clients;
+
+                // Send Match to all players in the game
+                let match_buf = serialize(&game);
+                for id in &game.players {
+
+                    // Set players in game 
+                    let _ = red_player::set_state_by_id(db, id, PlayerState::InGame);
+                    
+                    if let Some(client) = clients.iter().find(|&c| c.get_id_sync().eq(id)) {
+                        let _ = client.send_bytes(&match_buf).await;
+                    }
+                }
+
+                QUEUES.lock().await.tasks.remove(&lobby1.id);
+                QUEUES.lock().await.tasks.remove(&lobby2.id);
+
+                return Ok(());
+            }
+        }
     }
-
-    // unsafe {
-    //     if let Some(db) = &mut crate::DB {
-    //         loop {
-    //             // let ids = red_lobby::get_ids(db);
-    //             let lobby2id = red_lobby::find_lobby_match(db, &lobby);
-    //             if lobby2id.is_err() {
-    //                 continue;
-    //             }
-
-    //             // TODO: query lobbies that have a different ID, have state=InQueue and have average_mmr=within { lobby.mmr -100, lobby.mmr + 100 };
-    //             // let lobbies: redis::Iter<'_, String> = redis::cmd("FT.SEARCH")
-    //             //     .arg("idx:lobby \"@average_mmr:[1000 +inf]\"")
-    //             //     .clone()
-    //             //     .iter(db)?;
-
-    //             // TODO: compare lobbies mmr with the given lobby.
-
-    //             // FIXME return if lobby state changes or players leave.
-    //             if true {
-    //                 return Ok(());
-    //             }
-
-    //             // FIXME if found a match
-    //             if false {
-    //                 let r#match = Match::default();
-    //                 let match_buf = serialize(&r#match);
-
-    //                 let serv = server.lock().await;
-    //                 let clients = &serv.clients;
-    //                 for id in &lobby.players {
-    //                     // clients.fin
-    //                     if let Some(client) = clients.iter().find(|&c| c.get_id_sync().eq(id)) {
-    //                         let _ = client.send_bytes(&match_buf).await;
-    //                     }
-    //                 }
-    //                 return Ok(());
-    //             }
-    //         }
-    //     }
-    // }
 
     Ok(())
 }

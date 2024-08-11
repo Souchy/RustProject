@@ -2,7 +2,7 @@ use std::error::Error;
 
 use redis::Commands;
 
-use crate::protos::models::Player;
+use crate::protos::models::{player::PlayerState, Player};
 
 // Keys
 fn get_key_player(player: &String) -> String {
@@ -41,6 +41,10 @@ pub fn set_mmr(db: &mut redis::Connection, player: &Player) -> Result<(), Box<dy
 }
 pub fn set_state(db: &mut redis::Connection, player: &Player) -> Result<(), Box<dyn Error + Send + Sync>> {
     db.hset(get_key_player(&player.id), KEY_STATE, &player.state)?;
+    Ok(())
+}
+pub fn set_state_by_id(db: &mut redis::Connection, player_id: &String, state: PlayerState) -> Result<(), Box<dyn Error + Send + Sync>> {
+    db.hset(get_key_player(player_id), KEY_STATE, &(state as i32))?;
     Ok(())
 }
 

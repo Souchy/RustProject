@@ -1,4 +1,5 @@
-pub mod api;
+pub mod api_player;
+pub mod api_queue;
 
 use rocket::{Ignite, Rocket};
 use rocket_okapi::{
@@ -18,7 +19,8 @@ pub async fn rocket_launch() -> Result<Rocket<Ignite>, rocket::error::Error> {
 
     rocket::build()
         .configure(&config)
-        .mount("/", api::get_routes())
+        .mount("/queue", api_queue::get_routes())
+        .mount("/player", api_player::get_routes())
         .mount(
             "/swagger/",
             make_swagger_ui(&SwaggerUIConfig {

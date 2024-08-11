@@ -38,12 +38,12 @@ services:
       context: ./Layer 2 - Application/coraline
       dockerfile: coraline/Dockerfile
       
-  coraline-3:
-    build:
-      context: ./Layer 2 - Application/coraline
-      dockerfile: coraline/Dockerfile
+  # coraline-3:
+  #   build:
+  #     context: ./Layer 2 - Application/coraline
+  #     dockerfile: coraline/Dockerfile
       
-  coraline-4:
-    build:
-      context: ./Layer 2 - Application/coraline
-      dockerfile: coraline/Dockerfile
+  # coraline-4:
+  #   build:
+  #     context: ./Layer 2 - Application/coraline
+  #     dockerfile: coraline/Dockerfile

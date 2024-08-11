@@ -24,33 +24,33 @@ namespace Messages {
     static SetQueueReflection() {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
-            "Cg5TZXRRdWV1ZS5wcm90bxIIbWVzc2FnZXMiVAoPU2V0UXVldWVSZXF1ZXN0",
-            "Eg0KBXF1ZXVlGAEgASgFEiMKBXN0YXRlGAIgASgOMhQubWVzc2FnZXMuUXVl",
-            "dWVTdGF0ZRINCgVsb2JieRgDIAEoCSJGChBTZXRRdWV1ZVJlc3BvbnNlEg0K",
-            "BXF1ZXVlGAEgASgFEiMKBXN0YXRlGAIgASgOMhQubWVzc2FnZXMuUXVldWVT",
-            "dGF0ZSo6CgpRdWV1ZVN0YXRlEhQKEFFVRVVFX1NUQVRFX0lETEUQABIWChJR",
-            "VUVVRV9TVEFURV9BQ1RJVkUQAWIGcHJvdG8z"));
+            "Cg5TZXRRdWV1ZS5wcm90bxIIbWVzc2FnZXMiRAoPU2V0UXVldWVSZXF1ZXN0",
+            "Eg0KBWxvYmJ5GAEgASgJEiIKBXF1ZXVlGAIgASgOMhMubWVzc2FnZXMuUXVl",
+            "dWVUeXBlIjYKEFNldFF1ZXVlUmVzcG9uc2USIgoFcXVldWUYASABKA4yEy5t",
+            "ZXNzYWdlcy5RdWV1ZVR5cGUqLQoJUXVldWVUeXBlEggKBElETEUQABIKCgZO",
+            "T1JNQUwQARIKCgZSQU5LRUQQAmIGcHJvdG8z"));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
-          new pbr::GeneratedClrTypeInfo(new[] {typeof(global::Messages.QueueState), }, null, new pbr::GeneratedClrTypeInfo[] {
-            new pbr::GeneratedClrTypeInfo(typeof(global::Messages.SetQueueRequest), global::Messages.SetQueueRequest.Parser, new[]{ "Queue", "State", "Lobby" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Messages.SetQueueResponse), global::Messages.SetQueueResponse.Parser, new[]{ "Queue", "State" }, null, null, null, null)
+          new pbr::GeneratedClrTypeInfo(new[] {typeof(global::Messages.QueueType), }, null, new pbr::GeneratedClrTypeInfo[] {
+            new pbr::GeneratedClrTypeInfo(typeof(global::Messages.SetQueueRequest), global::Messages.SetQueueRequest.Parser, new[]{ "Lobby", "Queue" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Messages.SetQueueResponse), global::Messages.SetQueueResponse.Parser, new[]{ "Queue" }, null, null, null, null)
           }));
     }
     #endregion
 
   }
   #region Enums
-  public enum QueueState {
-    [pbr::OriginalName("QUEUE_STATE_IDLE")] Idle = 0,
-    [pbr::OriginalName("QUEUE_STATE_ACTIVE")] Active = 1,
+  public enum QueueType {
+    [pbr::OriginalName("IDLE")] Idle = 0,
+    [pbr::OriginalName("NORMAL")] Normal = 1,
+    [pbr::OriginalName("RANKED")] Ranked = 2,
   }
 
   #endregion
 
   #region Messages
   /// <summary>
-  /// Request to set queue state with players
+  /// Request to set lobby's queue state
   /// </summary>
   [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
   public sealed partial class SetQueueRequest : pb::IMessage<SetQueueRequest>
@@ -87,9 +87,8 @@ namespace Messages {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public SetQueueRequest(SetQueueRequest other) : this() {
-      queue_ = other.queue_;
-      state_ = other.state_;
       lobby_ = other.lobby_;
+      queue_ = other.queue_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -99,42 +98,27 @@ namespace Messages {
       return new SetQueueRequest(this);
     }
 
-    /// <summary>Field number for the "queue" field.</summary>
-    public const int QueueFieldNumber = 1;
-    private int queue_;
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public int Queue {
-      get { return queue_; }
-      set {
-        queue_ = value;
-      }
-    }
-
-    /// <summary>Field number for the "state" field.</summary>
-    public const int StateFieldNumber = 2;
-    private global::Messages.QueueState state_ = global::Messages.QueueState.Idle;
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public global::Messages.QueueState State {
-      get { return state_; }
-      set {
-        state_ = value;
-      }
-    }
-
     /// <summary>Field number for the "lobby" field.</summary>
-    public const int LobbyFieldNumber = 3;
+    public const int LobbyFieldNumber = 1;
     private string lobby_ = "";
-    /// <summary>
-    /// repeated string players = 3;
-    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public string Lobby {
       get { return lobby_; }
       set {
         lobby_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "queue" field.</summary>
+    public const int QueueFieldNumber = 2;
+    private global::Messages.QueueType queue_ = global::Messages.QueueType.Idle;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public global::Messages.QueueType Queue {
+      get { return queue_; }
+      set {
+        queue_ = value;
       }
     }
 
@@ -153,9 +137,8 @@ namespace Messages {
       if (ReferenceEquals(other, this)) {
         return true;
       }
-      if (Queue != other.Queue) return false;
-      if (State != other.State) return false;
       if (Lobby != other.Lobby) return false;
+      if (Queue != other.Queue) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -163,9 +146,8 @@ namespace Messages {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override int GetHashCode() {
       int hash = 1;
-      if (Queue != 0) hash ^= Queue.GetHashCode();
-      if (State != global::Messages.QueueState.Idle) hash ^= State.GetHashCode();
       if (Lobby.Length != 0) hash ^= Lobby.GetHashCode();
+      if (Queue != global::Messages.QueueType.Idle) hash ^= Queue.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -184,17 +166,13 @@ namespace Messages {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       output.WriteRawMessage(this);
     #else
-      if (Queue != 0) {
-        output.WriteRawTag(8);
-        output.WriteInt32(Queue);
-      }
-      if (State != global::Messages.QueueState.Idle) {
-        output.WriteRawTag(16);
-        output.WriteEnum((int) State);
-      }
       if (Lobby.Length != 0) {
-        output.WriteRawTag(26);
+        output.WriteRawTag(10);
         output.WriteString(Lobby);
+      }
+      if (Queue != global::Messages.QueueType.Idle) {
+        output.WriteRawTag(16);
+        output.WriteEnum((int) Queue);
       }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
@@ -206,17 +184,13 @@ namespace Messages {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
-      if (Queue != 0) {
-        output.WriteRawTag(8);
-        output.WriteInt32(Queue);
-      }
-      if (State != global::Messages.QueueState.Idle) {
-        output.WriteRawTag(16);
-        output.WriteEnum((int) State);
-      }
       if (Lobby.Length != 0) {
-        output.WriteRawTag(26);
+        output.WriteRawTag(10);
         output.WriteString(Lobby);
+      }
+      if (Queue != global::Messages.QueueType.Idle) {
+        output.WriteRawTag(16);
+        output.WriteEnum((int) Queue);
       }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
@@ -228,14 +202,11 @@ namespace Messages {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public int CalculateSize() {
       int size = 0;
-      if (Queue != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeInt32Size(Queue);
-      }
-      if (State != global::Messages.QueueState.Idle) {
-        size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) State);
-      }
       if (Lobby.Length != 0) {
         size += 1 + pb::CodedOutputStream.ComputeStringSize(Lobby);
+      }
+      if (Queue != global::Messages.QueueType.Idle) {
+        size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) Queue);
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -249,14 +220,11 @@ namespace Messages {
       if (other == null) {
         return;
       }
-      if (other.Queue != 0) {
-        Queue = other.Queue;
-      }
-      if (other.State != global::Messages.QueueState.Idle) {
-        State = other.State;
-      }
       if (other.Lobby.Length != 0) {
         Lobby = other.Lobby;
+      }
+      if (other.Queue != global::Messages.QueueType.Idle) {
+        Queue = other.Queue;
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
@@ -273,16 +241,12 @@ namespace Messages {
           default:
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
-          case 8: {
-            Queue = input.ReadInt32();
+          case 10: {
+            Lobby = input.ReadString();
             break;
           }
           case 16: {
-            State = (global::Messages.QueueState) input.ReadEnum();
-            break;
-          }
-          case 26: {
-            Lobby = input.ReadString();
+            Queue = (global::Messages.QueueType) input.ReadEnum();
             break;
           }
         }
@@ -300,16 +264,12 @@ namespace Messages {
           default:
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
             break;
-          case 8: {
-            Queue = input.ReadInt32();
+          case 10: {
+            Lobby = input.ReadString();
             break;
           }
           case 16: {
-            State = (global::Messages.QueueState) input.ReadEnum();
-            break;
-          }
-          case 26: {
-            Lobby = input.ReadString();
+            Queue = (global::Messages.QueueType) input.ReadEnum();
             break;
           }
         }
@@ -355,7 +315,6 @@ namespace Messages {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public SetQueueResponse(SetQueueResponse other) : this() {
       queue_ = other.queue_;
-      state_ = other.state_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -367,25 +326,13 @@ namespace Messages {
 
     /// <summary>Field number for the "queue" field.</summary>
     public const int QueueFieldNumber = 1;
-    private int queue_;
+    private global::Messages.QueueType queue_ = global::Messages.QueueType.Idle;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public int Queue {
+    public global::Messages.QueueType Queue {
       get { return queue_; }
       set {
         queue_ = value;
-      }
-    }
-
-    /// <summary>Field number for the "state" field.</summary>
-    public const int StateFieldNumber = 2;
-    private global::Messages.QueueState state_ = global::Messages.QueueState.Idle;
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public global::Messages.QueueState State {
-      get { return state_; }
-      set {
-        state_ = value;
       }
     }
 
@@ -405,7 +352,6 @@ namespace Messages {
         return true;
       }
       if (Queue != other.Queue) return false;
-      if (State != other.State) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -413,8 +359,7 @@ namespace Messages {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override int GetHashCode() {
       int hash = 1;
-      if (Queue != 0) hash ^= Queue.GetHashCode();
-      if (State != global::Messages.QueueState.Idle) hash ^= State.GetHashCode();
+      if (Queue != global::Messages.QueueType.Idle) hash ^= Queue.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -433,13 +378,9 @@ namespace Messages {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       output.WriteRawMessage(this);
     #else
-      if (Queue != 0) {
+      if (Queue != global::Messages.QueueType.Idle) {
         output.WriteRawTag(8);
-        output.WriteInt32(Queue);
-      }
-      if (State != global::Messages.QueueState.Idle) {
-        output.WriteRawTag(16);
-        output.WriteEnum((int) State);
+        output.WriteEnum((int) Queue);
       }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
@@ -451,13 +392,9 @@ namespace Messages {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
-      if (Queue != 0) {
+      if (Queue != global::Messages.QueueType.Idle) {
         output.WriteRawTag(8);
-        output.WriteInt32(Queue);
-      }
-      if (State != global::Messages.QueueState.Idle) {
-        output.WriteRawTag(16);
-        output.WriteEnum((int) State);
+        output.WriteEnum((int) Queue);
       }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
@@ -469,11 +406,8 @@ namespace Messages {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public int CalculateSize() {
       int size = 0;
-      if (Queue != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeInt32Size(Queue);
-      }
-      if (State != global::Messages.QueueState.Idle) {
-        size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) State);
+      if (Queue != global::Messages.QueueType.Idle) {
+        size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) Queue);
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -487,11 +421,8 @@ namespace Messages {
       if (other == null) {
         return;
       }
-      if (other.Queue != 0) {
+      if (other.Queue != global::Messages.QueueType.Idle) {
         Queue = other.Queue;
-      }
-      if (other.State != global::Messages.QueueState.Idle) {
-        State = other.State;
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
@@ -509,11 +440,7 @@ namespace Messages {
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
           case 8: {
-            Queue = input.ReadInt32();
-            break;
-          }
-          case 16: {
-            State = (global::Messages.QueueState) input.ReadEnum();
+            Queue = (global::Messages.QueueType) input.ReadEnum();
             break;
           }
         }
@@ -532,11 +459,7 @@ namespace Messages {
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
             break;
           case 8: {
-            Queue = input.ReadInt32();
-            break;
-          }
-          case 16: {
-            State = (global::Messages.QueueState) input.ReadEnum();
+            Queue = (global::Messages.QueueType) input.ReadEnum();
             break;
           }
         }

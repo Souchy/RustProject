@@ -58,7 +58,6 @@ pub async fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     drop(coraline);
     println!("Coraline db set");
 
-
     // Start
     let _ = tokio::join!(
         // game client
@@ -145,12 +144,14 @@ fn create_handlers() -> MessageHandlers {
 
     // teal
     reg.register(teal::POOL_ID, &Ping::default(), Box::new(PingHandler));
+
     // realm
     reg.register(
         realm_commons::POOL_ID,
         &CreatedLobby::default(),
         Box::new(CreatedLobbyHandler),
     );
+
     // coral
     reg.register(
         coral_commons::POOL_ID,
