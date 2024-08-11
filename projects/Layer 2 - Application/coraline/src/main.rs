@@ -1,15 +1,12 @@
+pub mod api;
 pub mod handlers;
 
-use std::{error::Error, sync::Arc};
-
-use coral_commons::protos::{
-    messages::{QueueState, SetQueueRequest, SetQueueResponse},
-    models::Match,
-};
+use coral_commons::protos::{messages::SetQueueResponse, models::Match};
 use handlers::{
     created_lobby_handler::CreatedLobbyHandler, match_handler::MatchHandler,
     ping_handler::PingHandler, set_queue_response_handler::SetQueueResponseHandler,
 };
+use once_cell::sync::Lazy;
 use realm_commons::{
     protos::{
         client::{CreateLobby, Identify},
@@ -18,26 +15,34 @@ use realm_commons::{
     },
     red::{red_lobby, red_player},
 };
-use redis::Commands;
 use snowflake::SnowflakeIdGenerator;
+use std::{error::Error, sync::Arc};
 use teal::{
     net::{
         client::{Client, DefaultClient},
         handlers::MessageHandlers,
         message,
     },
-    protos::messages::{Ping, RaftHeartbeat},
+    protos::messages::Ping,
 };
+use tokio::{sync::Mutex, task::JoinError};
 
-pub static mut DB: Option<redis::Connection> = None;
+#[derive(Default)]
+pub struct Coraline {
+    pub client: Option<Arc<dyn Client>>,
+    pub player: Player,
+    pub db: Option<redis::Connection>,
+}
+pub static CORALINE: Lazy<Mutex<Coraline>> = Lazy::new(|| Mutex::new(Coraline::default()));
 
+/**
+ * Coraline is a game client.
+ * Coraline creates a player and a game lobby to find a match on the server.
+ */
 #[tokio::main]
 pub async fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
-    let client = redis::Client::open("redis://127.0.0.1:6371/")?;
+    let client = redis::Client::open("redis://127.0.0.1:6379/")?;
     let con = client.get_connection()?;
-    unsafe {
-        DB = Some(con);
-    }
 
     // Handlers
     let reg = create_handlers();
@@ -45,61 +50,93 @@ pub async fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     // Client
     let client: DefaultClient =
         DefaultClient::new_connection("127.0.0.1:8000", Arc::new(reg)).await?;
-    let client_ref = Arc::new(client);
-    let client_ref2 = client_ref.clone();
+
+    println!("Coraline client created");
+    let mut coraline = CORALINE.lock().await;
+    coraline.client = Some(Arc::new(client));
+    coraline.db = Some(con);
+    drop(coraline);
+    println!("Coraline db set");
+
 
     // Start
-    let t1 = tokio::spawn(async move {
-        client_ref.run().await.unwrap();
-    });
+    let _ = tokio::join!(
+        // game client
+        coraline_launch(),
+        // api server
+        api::rocket_launch()
+    );
+    coraline_dispose().await?;
+    Ok(())
+}
 
+/**
+ * Start the coraline client, create a player, and identify self on the server
+ */
+async fn coraline_launch() -> Result<(), JoinError> {
+    println!("Coraline launch");
+    let mut coraline = CORALINE.lock().await;
+
+    // Start client
+    let client_ref = coraline.client.clone().unwrap();
+    let client_ref_thread = client_ref.clone();
+    let t1 = tokio::spawn(async move {
+        client_ref_thread.run().await.unwrap();
+    });
+    println!("Coraline started client");
+
+    // Create Player
     let mut id_generator_generator = SnowflakeIdGenerator::new(1, 1);
     let player_id = id_generator_generator.real_time_generate();
-
     let mut player: Player = Player::default();
-    unsafe {
-        if let Some(db) = &mut crate::DB {
-            player.id = player_id.to_string();
-            player.mmr = 1000;
-            player.state = PlayerState::InLobby as i32;
-            let _ = red_player::set(db, &player);
-        }
+    if let Some(db) = &mut coraline.db {
+        player.id = player_id.to_string();
+        player.mmr = 1000;
+        player.state = PlayerState::InLobby as i32;
+        let _ = red_player::set(db, &player);
     }
+    coraline.player = player;
 
+    // Release the mutex
+    drop(coraline);
+
+    // Identify player on the server
     let identify = Identify {
         player_id: player_id.to_string(),
     };
     let identify_buf = message::serialize(&identify);
-    client_ref2.send_bytes(&identify_buf).await.unwrap();
+    client_ref.send_bytes(&identify_buf).await.unwrap();
 
-    // Send a message to create a Lobby. When it is created, we'll respond by setting the queue active.
+    // Send a message to create a Lobby.
+    // When it is created, we'll respond by setting the queue active.
     let create_lobby = CreateLobby { queue: 1 };
     let create_lobby_buf = message::serialize(&create_lobby);
-    client_ref2.send_bytes(&create_lobby_buf).await.unwrap();
+    client_ref.send_bytes(&create_lobby_buf).await.unwrap();
 
-    let thread_err = t1.await;
+    println!("Coraline t1 await");
+    t1.await
+}
 
-    unsafe {
-        if let Some(db) = &mut crate::DB {
-            println!("Delete player {}", player.id);
-            let lobby_id = red_player::get_lobby_by_id(db, &player.id)?;
-            let _ = red_player::delete_by_id(db, &player.id)?;
-            println!("Delete lobby {}", lobby_id);
-            let _ = red_lobby::delete_by_id(db, &lobby_id)?;
-        }
+/**
+ * Delete the player and lobby when we're done
+ */
+async fn coraline_dispose() -> Result<(), Box<dyn Error + Send + Sync>> {
+    let mut coraline = CORALINE.lock().await;
+    let player = coraline.player.clone();
+    if let Some(db) = &mut coraline.db {
+        //crate::DB {
+        println!("Delete player {}", player.id);
+        let lobby_id = red_player::get_lobby_by_id(db, &player.id)?;
+        let _ = red_player::delete_by_id(db, &player.id)?;
+        println!("Delete lobby {}", lobby_id);
+        let _ = red_lobby::delete_by_id(db, &lobby_id)?;
     }
-
-    let _ = thread_err?;
-
-    // match thread_err {
-    //     Err(err) => return Err(err),
-    //     Ok(()) => return Ok(())
-    // }
-
-    // return thread_err?;
     Ok(())
 }
 
+/**
+ * Create message handlers
+ */
 fn create_handlers() -> MessageHandlers {
     let mut reg = MessageHandlers::new();
     teal::register_pool(&mut reg);

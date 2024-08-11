@@ -2,20 +2,18 @@ syntax = "proto3";
 
 package messages;
 
-// Request to set queue state with players
+// Request to set lobby's queue state
 message SetQueueRequest {
-	int32 queue = 1;
-	QueueState state = 2;
-	string lobby = 3;
-	// repeated string players = 3;
+	string lobby = 1;
+	QueueType queue = 2;
 }
 
 message SetQueueResponse {
-	int32 queue = 1;
-	QueueState state = 2;
+	QueueType queue = 1;
 }
 
-enum QueueState {
-	QUEUE_STATE_IDLE = 0;
-	QUEUE_STATE_ACTIVE = 1;
+enum QueueType {
+	IDLE = 0;
+	NORMAL = 1;
+	RANKED = 2;
 }

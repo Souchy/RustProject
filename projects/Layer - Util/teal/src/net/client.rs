@@ -21,9 +21,9 @@ pub trait Client : Send + Sync + Debug + 'static {
     async fn set_id(&self, id: String) -> Result<(), Box<dyn Error + Send + Sync>>;
     fn get_server(&self) ->  Arc<Mutex<Server>>;
 
+    async fn send_bytes(&self, buf: &[u8]) -> Result<(), Box<dyn Error + Send + Sync>>;
     async fn run(&self) -> Result<(), Box<dyn Error + Send>>;
     async fn frame(&self, buf: &[u8]);
-    async fn send_bytes(&self, buf: &[u8]) -> Result<(), Box<dyn Error + Send + Sync>>;
 }
 
 /**

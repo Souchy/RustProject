@@ -1,13 +1,9 @@
 use std::error::Error;
 
 use async_trait::async_trait;
-use coral_commons::protos::messages::{QueueState, SetQueueRequest};
 use prost_reflect::DynamicMessage;
 use realm_commons::protos::server::CreatedLobby;
-use teal::{
-    net::{handler::MessageHandler, message::serialize},
-    DynamicClient,
-};
+use teal::{net::handler::MessageHandler, DynamicClient};
 
 #[derive(Debug, Default)]
 pub(crate) struct CreatedLobbyHandler;
@@ -22,11 +18,12 @@ impl MessageHandler for CreatedLobbyHandler {
         println!("hey coraline got {:?}", message);
 
         // Set lobby in active queue
-        let mut queue = SetQueueRequest::default();
-        queue.queue = 1;
-        queue.state = QueueState::Active as i32;
-        queue.lobby = message.lobby;
-        let buf = serialize(&queue);
-        client.send_bytes(&buf).await
+        // let mut queue = SetQueueRequest::default();
+        // queue.queue = 1;
+        // queue.state = QueueState::Active as i32;
+        // queue.lobby = message.lobby;
+        // let buf = serialize(&queue);
+        // client.send_bytes(&buf).await
+        Ok(())
     }
 }

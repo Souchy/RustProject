@@ -12,7 +12,6 @@ pub struct MessageHandlers {
     pools: HashMap<u16, Arc<DescriptorPool>>,
     deserializers: HashMap<u16, MessageDescriptor>,
     handlers: HashMap<u16, Box<dyn MessageHandler>>,
-    // pub invalid_message_handler: fn(&[u8], &ArcClient),
 }
 
 impl MessageHandlers {
@@ -21,7 +20,6 @@ impl MessageHandlers {
             pools: HashMap::new(),
             deserializers: HashMap::new(),
             handlers: HashMap::new(),
-            // invalid_message_handler: Self::default_handler,
         }
     }
 
@@ -98,8 +96,4 @@ impl MessageHandlers {
         return handler.handle(dynamic_message, client).await;
     }
 
-    // fn default_handler(frame: &[u8], _client: &DynamicClient) {
-    //     let st = std::str::from_utf8(&frame).unwrap();
-    //     println!("received invalid message: {}", st);
-    // }
 }

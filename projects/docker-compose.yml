@@ -17,19 +17,33 @@ services:
 
   coral:
     network_mode: "host"
-    # container_name: Coral
+    container_name: Coral
     ports:
       - '0:8000'
     command: [ "host.docker.internal:8000" ]
     build:
       context: ./
       dockerfile: "Layer 2 - Application/coral/Dockerfile"
-    deploy:
-      mode: replicated
-      replicas: 4
+    # deploy:
+    #   mode: replicated
+    #   replicas: 4
 
-  # coraline:
-  #   build:
-  #     context: ./Layer 2 - Application/coraline
-  #     dockerfile: coraline/Dockerfile
-  #   # build: ./Layer 2 - Application/coraline
+  coraline-1:
+    build:
+      context: ./Layer 2 - Application/coraline
+      dockerfile: coraline/Dockerfile
+
+  coraline-2:
+    build:
+      context: ./Layer 2 - Application/coraline
+      dockerfile: coraline/Dockerfile
+      
+  coraline-3:
+    build:
+      context: ./Layer 2 - Application/coraline
+      dockerfile: coraline/Dockerfile
+      
+  coraline-4:
+    build:
+      context: ./Layer 2 - Application/coraline
+      dockerfile: coraline/Dockerfile

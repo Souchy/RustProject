@@ -23,7 +23,7 @@ pub static mut DB: Option<redis::Connection> = None;
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
     
-    let client = redis::Client::open("redis://127.0.0.1:6371/")?;
+    let client = redis::Client::open("redis://127.0.0.1:6379/")?;
     let con = client.get_connection()?;
     unsafe {
         DB = Some(con);
@@ -58,8 +58,10 @@ fn create_handlers() -> MessageHandlers {
         &RaftHeartbeat::default(),
         Box::new(RaftHeartbeatHandler),
     );
+
     // coral
     reg.register(coral_commons::POOL_ID, &SetQueueRequest::default(), Box::new(SetQueueHandler));
+
     // realm
     reg.register(realm_commons::POOL_ID, &Identify::default(), Box::new(IdentifyHandler));
     reg.register(realm_commons::POOL_ID, &CreateLobby::default(), Box::new(CreateLobbyHandler));

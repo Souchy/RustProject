@@ -18,7 +18,7 @@ use super::message::{serialize, MessageIdentifiable};
 
 #[derive(Default, Debug)]
 pub struct Server {
-    pub clients: Vec<Arc<DefaultClient>>,
+    pub clients: Vec<Arc<dyn Client>>,
 }
 
 impl Server {

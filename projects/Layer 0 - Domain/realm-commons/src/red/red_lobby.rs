@@ -10,20 +10,28 @@ use std::{
 fn get_key_lobby(lobby: &String) -> String {
     "lobby:".to_string() + lobby
 }
+const KEY_TOKEN: &str = "token";
 const KEY_QUEUE: &str = "queue";
+const KEY_QUEUE_START_TIME: &str = "queue_start_time";
 const KEY_STATE: &str = "state";
 const KEY_AVERAGE_MMR: &str = "average_mmr";
-const KEY_INDEX_MMR: &str = "lobby_mmr";
+const KEY_INDEX_MMR: &str = "queue_lobby_mmr";
 fn get_key_lobby_players(lobby: &String) -> String {
     let mut str: String = get_key_lobby(lobby);
     str.push_str(":players");
     str
 }
-
+fn get_key_queue_lobby_mmr(queue: &i32) -> String {
+    let mut str: String = KEY_INDEX_MMR.to_string();
+    str.push_str(":");
+    str.push_str(&queue.to_string());
+    str
+}
 
 // Sets
 pub fn set(db: &mut redis::Connection, lobby: &Lobby) -> Result<(), Box<dyn Error + Send + Sync>> {
     set_queue(db, lobby)?;
+    set_queue_start_time(db, lobby)?;
     set_state(db, lobby)?;
     set_players(db, lobby)?;
     set_average_mmr(db, lobby)?;
@@ -64,6 +72,13 @@ pub fn set_state(
     db.hset(get_key_lobby(&lobby.id), KEY_STATE, &lobby.state)?;
     Ok(())
 }
+pub fn set_queue_start_time(
+    db: &mut redis::Connection,
+    lobby: &Lobby,
+) -> Result<(), Box<dyn Error + Send + Sync>> {
+    db.hset(get_key_lobby(&lobby.id), KEY_QUEUE_START_TIME, &lobby.queue_start_time)?;
+    Ok(())
+}
 pub fn set_average_mmr(
     db: &mut redis::Connection,
     lobby: &Lobby,
@@ -99,10 +114,18 @@ pub fn get(db: &mut redis::Connection, id: &String) -> Result<Lobby, Box<dyn Err
     let mut lobby = Lobby::default();
     lobby.id = id.clone();
     get_queue(db, &mut lobby)?;
+    get_queue_start_time(db, &mut lobby)?;
     get_state(db, &mut lobby)?;
     get_players(db, &mut lobby)?;
     get_average_mmr(db, &mut lobby)?;
     Ok(lobby)
+}
+pub fn get_token(
+    db: &mut redis::Connection,
+    lobby: &mut Lobby,
+) -> Result<String, Box<dyn Error + Send + Sync>> {
+    lobby.token = get_token_by_id(db, &lobby.id)?;
+    Ok(lobby.token.clone())
 }
 pub fn get_queue(
     db: &mut redis::Connection,
@@ -110,6 +133,13 @@ pub fn get_queue(
 ) -> Result<i32, Box<dyn Error + Send + Sync>> {
     lobby.queue = get_queue_by_id(db, &lobby.id)?;
     Ok(lobby.queue)
+}
+pub fn get_queue_start_time(
+    db: &mut redis::Connection,
+    lobby: &mut Lobby,
+) -> Result<u64, Box<dyn Error + Send + Sync>> {
+    lobby.queue_start_time = get_queue_start_time_by_id(db, &lobby.id)?;
+    Ok(lobby.queue_start_time)
 }
 pub fn get_state(
     db: &mut redis::Connection,
@@ -132,33 +162,49 @@ pub fn get_average_mmr(
     lobby.average_mmr = get_average_mmr_by_id(db, &lobby.id)?;
     Ok(lobby.average_mmr)
 }
+
+// Gets by id
+pub fn get_token_by_id(
+    db: &mut redis::Connection,
+    id: &String,
+) -> Result<String, Box<dyn Error + Send + Sync>> {
+    let val = db.hget(get_key_lobby(&id), KEY_TOKEN)?;
+    Ok(val)
+}
 pub fn get_queue_by_id(
     db: &mut redis::Connection,
     id: &String,
 ) -> Result<i32, Box<dyn Error + Send + Sync>> {
-    let queue = db.hget(get_key_lobby(&id), KEY_QUEUE)?;
-    Ok(queue)
+    let val = db.hget(get_key_lobby(&id), KEY_QUEUE)?;
+    Ok(val)
+}
+pub fn get_queue_start_time_by_id(
+    db: &mut redis::Connection,
+    id: &String,
+) -> Result<u64, Box<dyn Error + Send + Sync>> {
+    let val = db.hget(get_key_lobby(&id), KEY_QUEUE_START_TIME)?;
+    Ok(val)
 }
 pub fn get_state_by_id(
     db: &mut redis::Connection,
     id: &String,
 ) -> Result<i32, Box<dyn Error + Send + Sync>> {
-    let state = db.hget(get_key_lobby(&id), KEY_STATE)?;
-    Ok(state)
+    let val = db.hget(get_key_lobby(&id), KEY_STATE)?;
+    Ok(val)
 }
 pub fn get_average_mmr_by_id(
     db: &mut redis::Connection,
     id: &String,
 ) -> Result<u32, Box<dyn Error + Send + Sync>> {
-    let mmr = db.hget(get_key_lobby(&id), KEY_AVERAGE_MMR)?;
-    Ok(mmr)
+    let val = db.hget(get_key_lobby(&id), KEY_AVERAGE_MMR)?;
+    Ok(val)
 }
 pub fn get_players_by_id(
     db: &mut redis::Connection,
     id: &String,
 ) -> Result<Vec<String>, Box<dyn Error + Send + Sync>> {
-    let players = db.lrange(get_key_lobby_players(id), 0, -1)?;
-    Ok(players)
+    let val = db.lrange(get_key_lobby_players(id), 0, -1)?;
+    Ok(val)
 }
 
 // Queries
@@ -177,11 +223,15 @@ pub fn find_lobby_match(
     let min = lobby1.average_mmr - offset;
     let max = lobby1.average_mmr + offset;
 
-    let range = db.zrangebyscore::<&str, u32, u32, Vec<String>>(KEY_INDEX_MMR, min, max)?;
+    let key = get_key_queue_lobby_mmr(&lobby1.queue);
+    let range = db.zrangebyscore::<&str, u32, u32, Vec<String>>(&key, min, max)?;
 
     if range.len() == 0 {
         return Ok(None);
     }
-    // TODO Should return the closest match, but use the first for now.
+
+    // TODO Use the first for now but should use a score based on the closest match and the time spent in queue for each lobby.
+    // range.iter().min_by_key(|x| get_queue_start_time(x))
+
     Ok(Some(range[0].clone()))
 }
