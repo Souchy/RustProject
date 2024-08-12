@@ -37,12 +37,12 @@ fn get_key_queue_lobby_mmr(queue: &i32) -> String {
 
 // Sets
 pub fn set(db: &mut redis::Connection, lobby: &Lobby) -> Result<(), Box<dyn Error + Send + Sync>> {
-    set_queue(db, &lobby)?;
-    set_queue_start_time(db, &lobby)?;
-    set_state(db, &lobby)?;
-    set_players(db, &lobby)?;
-    set_average_mmr(db, &lobby)?;
-    set_mmr_index(db, &lobby)?;
+    set_queue(db, lobby)?;
+    set_queue_start_time(db, lobby)?;
+    set_state(db, lobby)?;
+    set_players(db, lobby)?;
+    set_average_mmr(db, lobby)?;
+    set_mmr_index(db, lobby)?;
     db.sadd(KEY_LOBBY_INDEX, &lobby.id)?;
     Ok(())
 }
@@ -132,9 +132,21 @@ pub fn set_players(
     db: &mut redis::Connection,
     lobby: &Lobby,
 ) -> Result<(), Box<dyn Error + Send + Sync>> {
+    // println!("Lobby set players: {}", lobby.players.len());
+
     let key = get_key_lobby_players(&lobby.id);
-    db.del(&key)?;
+    // db.del(&key)?;
+    
+    let len = db.llen(&key)?;
+    let opt_len = NonZeroUsize::new(len);
+    db.lpop(&key, opt_len)?;
     db.lpush(&key, &lobby.players)?;
+
+    // if lobby.players.len() > 0 {
+    //     db.lpush(&key, &lobby.players)?;
+    // }
+
+    // println!("Lobby set players done");
     Ok(())
 }
 
@@ -146,10 +158,15 @@ pub fn get_index(db: &mut redis::Connection) -> Result<Vec<String>, Box<dyn Erro
 pub fn get(db: &mut redis::Connection, id: &String) -> Result<Lobby, Box<dyn Error + Send + Sync>> {
     let mut lobby = Lobby::default();
     lobby.id = id.clone();
+    println!("lobby get 1");
     get_queue(db, &mut lobby)?;
+    println!("lobby get 2");
     get_queue_start_time(db, &mut lobby)?;
+    println!("lobby get 3");
     get_state(db, &mut lobby)?;
+    println!("lobby get 4");
     get_players(db, &mut lobby)?;
+    println!("lobby get 5");
     get_average_mmr(db, &mut lobby)?;
     Ok(lobby)
 }
@@ -202,6 +219,7 @@ pub fn get_token_by_id(
     id: &String,
 ) -> Result<String, Box<dyn Error + Send + Sync>> {
     let val = db.hget(get_key_lobby(&id), KEY_TOKEN)?;
+    println!("Lobby get token: {:?}", val);
     Ok(val)
 }
 pub fn get_queue_by_id(
@@ -209,6 +227,7 @@ pub fn get_queue_by_id(
     id: &String,
 ) -> Result<i32, Box<dyn Error + Send + Sync>> {
     let val = db.hget(get_key_lobby(&id), KEY_QUEUE)?;
+    println!("Lobby get queue: {:?}", val);
     Ok(val)
 }
 pub fn get_queue_start_time_by_id(
@@ -216,6 +235,7 @@ pub fn get_queue_start_time_by_id(
     id: &String,
 ) -> Result<u64, Box<dyn Error + Send + Sync>> {
     let val = db.hget(get_key_lobby(&id), KEY_QUEUE_START_TIME)?;
+    println!("Lobby get start_time: {:?}", val);
     Ok(val)
 }
 pub fn get_state_by_id(
@@ -223,6 +243,7 @@ pub fn get_state_by_id(
     id: &String,
 ) -> Result<i32, Box<dyn Error + Send + Sync>> {
     let val = db.hget(get_key_lobby(&id), KEY_STATE)?;
+    println!("Lobby get state: {:?}", val);
     Ok(val)
 }
 pub fn get_average_mmr_by_id(
@@ -230,6 +251,7 @@ pub fn get_average_mmr_by_id(
     id: &String,
 ) -> Result<u32, Box<dyn Error + Send + Sync>> {
     let val = db.hget(get_key_lobby(&id), KEY_AVERAGE_MMR)?;
+    println!("Lobby get mmr: {:?}", val);
     Ok(val)
 }
 pub fn get_players_by_id(
@@ -237,6 +259,7 @@ pub fn get_players_by_id(
     id: &String,
 ) -> Result<Vec<String>, Box<dyn Error + Send + Sync>> {
     let val = db.lrange(get_key_lobby_players(id), 0, -1)?;
+    println!("Lobby get players: {:?}", val);
     Ok(val)
 }
 

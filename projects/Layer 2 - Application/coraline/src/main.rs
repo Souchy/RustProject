@@ -43,6 +43,7 @@ pub static CORALINE: Lazy<Mutex<Coraline>> = Lazy::new(|| Mutex::new(Coraline::d
  */
 #[tokio::main]
 pub async fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    env::set_var("RUST_BACKTRACE", "1");
     let envi = env::args().nth(1).unwrap_or(".env.dev".to_string());
     dotenv::from_filename(envi).ok();
 
@@ -103,6 +104,8 @@ async fn coraline_launch() -> Result<(), JoinError> {
         player.id = player_id.to_string();
         player.mmr = 1000;
         player.state = PlayerState::InLobby as i32;
+        player.recent_matches = vec![];
+
         let _ = red_player::set(db, &player);
     }
     coraline.player = player;

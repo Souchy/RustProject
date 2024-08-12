@@ -19,6 +19,7 @@ pub static mut DB: Option<redis::Connection> = None;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
+    env::set_var("RUST_BACKTRACE", "1");
     let envi = env::args().nth(1).unwrap_or(".env.dev".to_string());
     dotenv::from_filename(envi).ok();
 

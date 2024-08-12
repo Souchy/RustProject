@@ -44,14 +44,15 @@ impl MessageHandler for SetQueueHandler {
 
         let server = client.get_server();
         let player_id = client.get_id_ref().lock().await.clone();
+        
+        println!("With player_id {:?}", player_id);
 
         unsafe {
             if let Some(db) = &mut crate::DB {
                 let mut player = red_player::get(db, &player_id)?;
+                println!("With player {:?}", player);
                 let mut lobby = red_lobby::get(db, &player.lobby)?;
-
-                // println!("With player {:?}", player);
-                // println!("With lobby {:?}", lobby);
+                println!("With lobby {:?}", lobby);
 
                 if lobby.players.contains(&player_id) {
                     let time = SystemTime::now().duration_since(UNIX_EPOCH)?;

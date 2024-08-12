@@ -1,4 +1,4 @@
-use std::error::Error;
+use std::{error::Error, num::NonZeroUsize};
 
 use redis::Commands;
 
@@ -114,16 +114,19 @@ pub fn set_recent_matches(
     db: &mut redis::Connection,
     player: &Player,
 ) -> Result<(), Box<dyn Error + Send + Sync>> {
-    set_recent_matches_by_id(db, &player.id, &player.recent_matches)
-}
-pub fn set_recent_matches_by_id(
-    db: &mut redis::Connection,
-    player_id: &String,
-    recent_matches: &Vec<String>,
-) -> Result<(), Box<dyn Error + Send + Sync>> {
-    let key = get_key_player_recent_matches(&player_id);
-    db.del(&key)?;
-    db.lpush(&key, &recent_matches)?;
+    // println!("Player set recent_matches: {}", player.recent_matches.len());
+
+    let key = get_key_player_recent_matches(&player.id);
+    // db.del(&key)?;
+    let len = db.llen(&key)?;
+    let opt_len = NonZeroUsize::new(len);
+    db.lpop(&key, opt_len)?;
+
+    if player.recent_matches.len() > 0 {
+        db.lpush(&key, &player.recent_matches)?;
+    }
+    
+    // println!("Player set recent_matches done");
     Ok(())
 }
 
@@ -137,6 +140,7 @@ pub fn get(
     id: &String,
 ) -> Result<Player, Box<dyn Error + Send + Sync>> {
     let mut player = Player::default();
+    player.recent_matches = vec![];
     player.id = id.clone();
     get_lobby(db, &mut player)?;
     get_game(db, &mut player)?;
@@ -187,6 +191,7 @@ pub fn get_lobby_by_id(
     id: &String,
 ) -> Result<String, Box<dyn Error + Send + Sync>> {
     let val = db.hget(get_key_player(&id), KEY_LOBBY)?;
+    println!("Player get lobby: {:?}", val);
     Ok(val)
 }
 pub fn get_game_by_id(
@@ -194,6 +199,7 @@ pub fn get_game_by_id(
     id: &String,
 ) -> Result<String, Box<dyn Error + Send + Sync>> {
     let val = db.hget(get_key_player(&id), KEY_GAME)?;
+    println!("Player get game: {:?}", val);
     Ok(val)
 }
 pub fn get_mmr_by_id(
@@ -201,6 +207,7 @@ pub fn get_mmr_by_id(
     id: &String,
 ) -> Result<u32, Box<dyn Error + Send + Sync>> {
     let val = db.hget(get_key_player(&id), KEY_MMR)?;
+    println!("Player get mmr: {:?}", val);
     Ok(val)
 }
 pub fn get_state_by_id(
@@ -208,6 +215,7 @@ pub fn get_state_by_id(
     id: &String,
 ) -> Result<i32, Box<dyn Error + Send + Sync>> {
     let val = db.hget(get_key_player(&id), KEY_STATE)?;
+    println!("Player get state: {:?}", val);
     Ok(val)
 }
 pub fn get_recent_matches_by_id(
@@ -215,5 +223,6 @@ pub fn get_recent_matches_by_id(
     id: &String,
 ) -> Result<Vec<String>, Box<dyn Error + Send + Sync>> {
     let val = db.lrange(get_key_player_recent_matches(id), 0, -1)?;
+    println!("Player get matches: {:?}", val);
     Ok(val)
 }
