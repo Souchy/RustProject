@@ -24,18 +24,30 @@ namespace Models {
     static MatchReflection() {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
-            "CgtNYXRjaC5wcm90bxIGbW9kZWxzIlUKBU1hdGNoEgoKAmlkGAEgASgJEg0K",
-            "BXF1ZXVlGAIgASgFEhEKCWdhbWVfcG9ydBgDIAEoBRINCgV0b2tlbhgEIAEo",
-            "CRIPCgdwbGF5ZXJzGAUgAygJYgZwcm90bzM="));
+            "CgtNYXRjaC5wcm90bxIGbW9kZWxzItIBCgVNYXRjaBIKCgJpZBgBIAEoCRIM",
+            "CgRkYXRlGAIgASgEEiEKBXN0YXRlGAMgASgOMhIubW9kZWxzLk1hdGNoU3Rh",
+            "dGUSDQoFcXVldWUYBCABKAUSEQoJZ2FtZV9wb3J0GAUgASgFEg0KBXRva2Vu",
+            "GAYgASgJEisKB3BsYXllcnMYByADKAsyGi5tb2RlbHMuTWF0Y2guUGxheWVy",
+            "c0VudHJ5Gi4KDFBsYXllcnNFbnRyeRILCgNrZXkYASABKAkSDQoFdmFsdWUY",
+            "AiABKAk6AjgBKiYKCk1hdGNoU3RhdGUSDAoIRmluaXNoZWQQABIKCgZBY3Rp",
+            "dmUQAWIGcHJvdG8z"));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
-          new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
-            new pbr::GeneratedClrTypeInfo(typeof(global::Models.Match), global::Models.Match.Parser, new[]{ "Id", "Queue", "GamePort", "Token", "Players" }, null, null, null, null)
+          new pbr::GeneratedClrTypeInfo(new[] {typeof(global::Models.MatchState), }, null, new pbr::GeneratedClrTypeInfo[] {
+            new pbr::GeneratedClrTypeInfo(typeof(global::Models.Match), global::Models.Match.Parser, new[]{ "Id", "Date", "State", "Queue", "GamePort", "Token", "Players" }, null, null, null, new pbr::GeneratedClrTypeInfo[] { null, })
           }));
     }
     #endregion
 
   }
+  #region Enums
+  public enum MatchState {
+    [pbr::OriginalName("Finished")] Finished = 0,
+    [pbr::OriginalName("Active")] Active = 1,
+  }
+
+  #endregion
+
   #region Messages
   [global::System.Diagnostics.DebuggerDisplayAttribute("{ToString(),nq}")]
   public sealed partial class Match : pb::IMessage<Match>
@@ -73,6 +85,8 @@ namespace Models {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public Match(Match other) : this() {
       id_ = other.id_;
+      date_ = other.date_;
+      state_ = other.state_;
       queue_ = other.queue_;
       gamePort_ = other.gamePort_;
       token_ = other.token_;
@@ -98,8 +112,38 @@ namespace Models {
       }
     }
 
+    /// <summary>Field number for the "date" field.</summary>
+    public const int DateFieldNumber = 2;
+    private ulong date_;
+    /// <summary>
+    /// Time at which the match started
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public ulong Date {
+      get { return date_; }
+      set {
+        date_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "state" field.</summary>
+    public const int StateFieldNumber = 3;
+    private global::Models.MatchState state_ = global::Models.MatchState.Finished;
+    /// <summary>
+    /// Match state
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public global::Models.MatchState State {
+      get { return state_; }
+      set {
+        state_ = value;
+      }
+    }
+
     /// <summary>Field number for the "queue" field.</summary>
-    public const int QueueFieldNumber = 2;
+    public const int QueueFieldNumber = 4;
     private int queue_;
     /// <summary>
     /// Type of match
@@ -114,7 +158,7 @@ namespace Models {
     }
 
     /// <summary>Field number for the "game_port" field.</summary>
-    public const int GamePortFieldNumber = 3;
+    public const int GamePortFieldNumber = 5;
     private int gamePort_;
     /// <summary>
     /// Game server
@@ -129,7 +173,7 @@ namespace Models {
     }
 
     /// <summary>Field number for the "token" field.</summary>
-    public const int TokenFieldNumber = 4;
+    public const int TokenFieldNumber = 6;
     private string token_ = "";
     /// <summary>
     /// Access token to the game on the game server
@@ -144,16 +188,16 @@ namespace Models {
     }
 
     /// <summary>Field number for the "players" field.</summary>
-    public const int PlayersFieldNumber = 5;
-    private static readonly pb::FieldCodec<string> _repeated_players_codec
-        = pb::FieldCodec.ForString(42);
-    private readonly pbc::RepeatedField<string> players_ = new pbc::RepeatedField<string>();
+    public const int PlayersFieldNumber = 7;
+    private static readonly pbc::MapField<string, string>.Codec _map_players_codec
+        = new pbc::MapField<string, string>.Codec(pb::FieldCodec.ForString(10, ""), pb::FieldCodec.ForString(18, ""), 58);
+    private readonly pbc::MapField<string, string> players_ = new pbc::MapField<string, string>();
     /// <summary>
-    /// List of players in the match
+    /// List of &lt;player, team> in the match where team is the source lobby id
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public pbc::RepeatedField<string> Players {
+    public pbc::MapField<string, string> Players {
       get { return players_; }
     }
 
@@ -173,10 +217,12 @@ namespace Models {
         return true;
       }
       if (Id != other.Id) return false;
+      if (Date != other.Date) return false;
+      if (State != other.State) return false;
       if (Queue != other.Queue) return false;
       if (GamePort != other.GamePort) return false;
       if (Token != other.Token) return false;
-      if(!players_.Equals(other.players_)) return false;
+      if (!Players.Equals(other.Players)) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -185,10 +231,12 @@ namespace Models {
     public override int GetHashCode() {
       int hash = 1;
       if (Id.Length != 0) hash ^= Id.GetHashCode();
+      if (Date != 0UL) hash ^= Date.GetHashCode();
+      if (State != global::Models.MatchState.Finished) hash ^= State.GetHashCode();
       if (Queue != 0) hash ^= Queue.GetHashCode();
       if (GamePort != 0) hash ^= GamePort.GetHashCode();
       if (Token.Length != 0) hash ^= Token.GetHashCode();
-      hash ^= players_.GetHashCode();
+      hash ^= Players.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -211,19 +259,27 @@ namespace Models {
         output.WriteRawTag(10);
         output.WriteString(Id);
       }
-      if (Queue != 0) {
+      if (Date != 0UL) {
         output.WriteRawTag(16);
+        output.WriteUInt64(Date);
+      }
+      if (State != global::Models.MatchState.Finished) {
+        output.WriteRawTag(24);
+        output.WriteEnum((int) State);
+      }
+      if (Queue != 0) {
+        output.WriteRawTag(32);
         output.WriteInt32(Queue);
       }
       if (GamePort != 0) {
-        output.WriteRawTag(24);
+        output.WriteRawTag(40);
         output.WriteInt32(GamePort);
       }
       if (Token.Length != 0) {
-        output.WriteRawTag(34);
+        output.WriteRawTag(50);
         output.WriteString(Token);
       }
-      players_.WriteTo(output, _repeated_players_codec);
+      players_.WriteTo(output, _map_players_codec);
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -238,19 +294,27 @@ namespace Models {
         output.WriteRawTag(10);
         output.WriteString(Id);
       }
-      if (Queue != 0) {
+      if (Date != 0UL) {
         output.WriteRawTag(16);
+        output.WriteUInt64(Date);
+      }
+      if (State != global::Models.MatchState.Finished) {
+        output.WriteRawTag(24);
+        output.WriteEnum((int) State);
+      }
+      if (Queue != 0) {
+        output.WriteRawTag(32);
         output.WriteInt32(Queue);
       }
       if (GamePort != 0) {
-        output.WriteRawTag(24);
+        output.WriteRawTag(40);
         output.WriteInt32(GamePort);
       }
       if (Token.Length != 0) {
-        output.WriteRawTag(34);
+        output.WriteRawTag(50);
         output.WriteString(Token);
       }
-      players_.WriteTo(ref output, _repeated_players_codec);
+      players_.WriteTo(ref output, _map_players_codec);
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -264,6 +328,12 @@ namespace Models {
       if (Id.Length != 0) {
         size += 1 + pb::CodedOutputStream.ComputeStringSize(Id);
       }
+      if (Date != 0UL) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt64Size(Date);
+      }
+      if (State != global::Models.MatchState.Finished) {
+        size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) State);
+      }
       if (Queue != 0) {
         size += 1 + pb::CodedOutputStream.ComputeInt32Size(Queue);
       }
@@ -273,7 +343,7 @@ namespace Models {
       if (Token.Length != 0) {
         size += 1 + pb::CodedOutputStream.ComputeStringSize(Token);
       }
-      size += players_.CalculateSize(_repeated_players_codec);
+      size += players_.CalculateSize(_map_players_codec);
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
       }
@@ -289,6 +359,12 @@ namespace Models {
       if (other.Id.Length != 0) {
         Id = other.Id;
       }
+      if (other.Date != 0UL) {
+        Date = other.Date;
+      }
+      if (other.State != global::Models.MatchState.Finished) {
+        State = other.State;
+      }
       if (other.Queue != 0) {
         Queue = other.Queue;
       }
@@ -298,7 +374,7 @@ namespace Models {
       if (other.Token.Length != 0) {
         Token = other.Token;
       }
-      players_.Add(other.players_);
+      players_.MergeFrom(other.players_);
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
 
@@ -319,19 +395,27 @@ namespace Models {
             break;
           }
           case 16: {
-            Queue = input.ReadInt32();
+            Date = input.ReadUInt64();
             break;
           }
           case 24: {
+            State = (global::Models.MatchState) input.ReadEnum();
+            break;
+          }
+          case 32: {
+            Queue = input.ReadInt32();
+            break;
+          }
+          case 40: {
             GamePort = input.ReadInt32();
             break;
           }
-          case 34: {
+          case 50: {
             Token = input.ReadString();
             break;
           }
-          case 42: {
-            players_.AddEntriesFrom(input, _repeated_players_codec);
+          case 58: {
+            players_.AddEntriesFrom(input, _map_players_codec);
             break;
           }
         }
@@ -354,19 +438,27 @@ namespace Models {
             break;
           }
           case 16: {
-            Queue = input.ReadInt32();
+            Date = input.ReadUInt64();
             break;
           }
           case 24: {
+            State = (global::Models.MatchState) input.ReadEnum();
+            break;
+          }
+          case 32: {
+            Queue = input.ReadInt32();
+            break;
+          }
+          case 40: {
             GamePort = input.ReadInt32();
             break;
           }
-          case 34: {
+          case 50: {
             Token = input.ReadString();
             break;
           }
-          case 42: {
-            players_.AddEntriesFrom(ref input, _repeated_players_codec);
+          case 58: {
+            players_.AddEntriesFrom(ref input, _map_players_codec);
             break;
           }
         }
