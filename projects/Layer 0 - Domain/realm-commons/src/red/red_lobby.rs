@@ -15,14 +15,15 @@ const KEY_QUEUE: &str = "queue";
 const KEY_QUEUE_START_TIME: &str = "queue_start_time";
 const KEY_STATE: &str = "state";
 const KEY_AVERAGE_MMR: &str = "average_mmr";
-const KEY_INDEX_MMR: &str = "queue_lobby_mmr";
+const KEY_INDEX_QUEUE_MMR: &str = "queue_lobby_mmr";
+const KEY_LOBBY_INDEX: &str = "lobby_ids";
 fn get_key_lobby_players(lobby: &String) -> String {
     let mut str: String = get_key_lobby(lobby);
     str.push_str(":players");
     str
 }
 fn get_key_queue_lobby_mmr(queue: &i32) -> String {
-    let mut str: String = KEY_INDEX_MMR.to_string();
+    let mut str: String = KEY_INDEX_QUEUE_MMR.to_string();
     str.push_str(":");
     str.push_str(&queue.to_string());
     str
@@ -36,11 +37,17 @@ pub fn set(db: &mut redis::Connection, lobby: &Lobby) -> Result<(), Box<dyn Erro
     set_players(db, lobby)?;
     set_average_mmr(db, lobby)?;
     set_mmr_index(db, lobby)?;
+    db.sadd(KEY_LOBBY_INDEX, &lobby.id)?;
     Ok(())
 }
 pub fn delete_all(db: &mut redis::Connection) -> Result<(), Box<dyn Error + Send + Sync>> {
-    let keys: Vec<String> = db.keys("lobby:*")?;
-    db.del(keys)?;
+    // let keys: Vec<String> = db.keys("lobby:*")?;
+    // db.del(keys)?;
+    let members: Vec<String> = db.smembers(KEY_LOBBY_INDEX)?;
+    for member in members.iter() {
+        delete_by_id(db, member)?;
+    }
+    db.del(KEY_LOBBY_INDEX)?;
     Ok(())
 }
 pub fn delete(
@@ -55,7 +62,8 @@ pub fn delete_by_id(
 ) -> Result<(), Box<dyn Error + Send + Sync>> {
     db.del(get_key_lobby(&id))?;
     db.del(get_key_lobby_players(&id))?;
-    db.zrem(KEY_INDEX_MMR, &id)?;
+    db.zrem(KEY_INDEX_QUEUE_MMR, &id)?;
+    db.srem(KEY_LOBBY_INDEX, &id)?;
     Ok(())
 }
 pub fn set_queue(
@@ -76,7 +84,11 @@ pub fn set_queue_start_time(
     db: &mut redis::Connection,
     lobby: &Lobby,
 ) -> Result<(), Box<dyn Error + Send + Sync>> {
-    db.hset(get_key_lobby(&lobby.id), KEY_QUEUE_START_TIME, &lobby.queue_start_time)?;
+    db.hset(
+        get_key_lobby(&lobby.id),
+        KEY_QUEUE_START_TIME,
+        &lobby.queue_start_time,
+    )?;
     Ok(())
 }
 pub fn set_average_mmr(
@@ -94,7 +106,7 @@ pub fn set_mmr_index(
     db: &mut redis::Connection,
     lobby: &Lobby,
 ) -> Result<(), Box<dyn Error + Send + Sync>> {
-    db.zadd(KEY_INDEX_MMR, &lobby.id, &lobby.average_mmr)?;
+    db.zadd(KEY_INDEX_QUEUE_MMR, &lobby.id, &lobby.average_mmr)?;
     Ok(())
 }
 pub fn set_players(
@@ -110,6 +122,10 @@ pub fn set_players(
 }
 
 // Gets
+pub fn get_index(db: &mut redis::Connection) -> Result<Vec<String>, Box<dyn Error + Send + Sync>> {
+    let members: Vec<String> = db.smembers(KEY_LOBBY_INDEX)?;
+    Ok(members)
+}
 pub fn get(db: &mut redis::Connection, id: &String) -> Result<Lobby, Box<dyn Error + Send + Sync>> {
     let mut lobby = Lobby::default();
     lobby.id = id.clone();

@@ -10,7 +10,7 @@ teal = { path = "../../Layer - Util/teal" }
 coral-commons = { path = "../../Layer 0 - Domain/coral-commons" }
 realm-commons = { path = "../../Layer 0 - Domain/realm-commons" }
 
-
+dotenv = "*"
 redis = "*"
 tokio = { version = "*", features = ["full"] }
 serde = "*"

@@ -1,16 +1,19 @@
 use realm_commons::{protos::models::Player, red::red_player};
 use rocket::{get, serde::json::Json};
-use rocket_okapi::{openapi, openapi_get_routes};
+use rocket_okapi::{
+    okapi::openapi3::OpenApi, openapi, openapi_get_routes, openapi_get_routes_spec,
+    settings::OpenApiSettings,
+};
 
 use crate::CORALINE;
 
-pub fn get_routes() -> Vec<rocket::Route> {
-    openapi_get_routes![get_player]
+pub fn get_routes_and_docs(settings: &OpenApiSettings) -> (Vec<rocket::Route>, OpenApi) {
+    openapi_get_routes_spec![settings: get]
 }
 
 #[openapi(tag = "Player")]
 #[get("/")]
-async fn get_player() -> Json<Option<Player>> {
+async fn get() -> Json<Option<Player>> {
     let mut coraline = CORALINE.lock().await;
     let player_id = coraline.player.id.clone();
 

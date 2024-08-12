@@ -18,8 +18,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let includes = ["src/protos"];
 
     let mut config = prost_build::Config::new();
-    config.enum_attribute(".", "#[derive(::serde::Serialize, ::serde::Deserialize, ::schemars::JsonSchema)]");
-    config.message_attribute(".", "#[derive(::serde::Serialize, ::serde::Deserialize, ::schemars::JsonSchema)]"); //, ::rocket::form::FromForm)]");
+    config.enum_attribute(".", "#[derive(::serde::Serialize, ::serde::Deserialize, ::schemars::JsonSchema, ::rocket::FromFormField)]");
+    config.message_attribute(".", "#[derive(::serde::Serialize, ::serde::Deserialize, ::schemars::JsonSchema)]");
     prost_reflect_build::Builder::new()
         .descriptor_pool("crate::DESCRIPTOR_POOL")
         .compile_protos_with_config(config, &protos, &includes)?;

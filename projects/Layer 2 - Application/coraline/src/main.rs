@@ -16,7 +16,7 @@ use realm_commons::{
     red::{red_lobby, red_player},
 };
 use snowflake::SnowflakeIdGenerator;
-use std::{error::Error, sync::Arc};
+use std::{env, error::Error, sync::Arc};
 use teal::{
     net::{
         client::{Client, DefaultClient},
@@ -26,6 +26,7 @@ use teal::{
     protos::messages::Ping,
 };
 use tokio::{sync::Mutex, task::JoinError};
+
 
 #[derive(Default)]
 pub struct Coraline {
@@ -41,22 +42,31 @@ pub static CORALINE: Lazy<Mutex<Coraline>> = Lazy::new(|| Mutex::new(Coraline::d
  */
 #[tokio::main]
 pub async fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
-    let client = redis::Client::open("redis://127.0.0.1:6379/")?;
-    let con = client.get_connection()?;
+    let envi = env::args().nth(1).unwrap_or(".env.dev".to_string());
+    dotenv::from_filename(envi).ok();
+
+    // Allow passing an address to listen on as the first argument of this
+    // program, but otherwise we'll just set up our TCP listener on
+    // localhost:8000 for connections.
+    let coral_url = env::var("CORAL_URL").unwrap_or("localhost:8000".to_string());
+    let redis_url = env::var("REDIS_URL").unwrap_or("localhost:6379".to_string());
+    
+    println!("Connecting to Coral on {} and Redis on {}", coral_url, redis_url);
+
+    let redis_client = redis::Client::open("redis://".to_string() + &redis_url)?;
+    let conn = redis_client.get_connection()?;
 
     // Handlers
     let reg = create_handlers();
 
     // Client
     let client: DefaultClient =
-        DefaultClient::new_connection("127.0.0.1:8000", Arc::new(reg)).await?;
+        DefaultClient::new_connection(&coral_url, Arc::new(reg)).await?;
 
-    println!("Coraline client created");
     let mut coraline = CORALINE.lock().await;
-    coraline.client = Some(Arc::new(client));
-    coraline.db = Some(con);
+    // coraline.client = Some(Arc::new(client));
+    coraline.db = Some(conn);
     drop(coraline);
-    println!("Coraline db set");
 
     // Start
     let _ = tokio::join!(

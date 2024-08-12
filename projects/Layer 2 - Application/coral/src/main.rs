@@ -1,5 +1,5 @@
-#![warn(rust_2018_idioms)]
 mod handlers;
+mod api;
 
 use coral_commons::protos::messages::SetQueueRequest;
 use handlers::create_lobby_handler::CreateLobbyHandler;
@@ -19,24 +19,34 @@ pub static mut DB: Option<redis::Connection> = None;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
-    let client = redis::Client::open("redis://127.0.0.1:6379/")?;
-    let con = client.get_connection()?;
-    unsafe {
-        DB = Some(con);
-    }
+    let envi = env::args().nth(1).unwrap_or(".env.dev".to_string());
+    dotenv::from_filename(envi).ok();
 
     // Allow passing an address to listen on as the first argument of this
     // program, but otherwise we'll just set up our TCP listener on
-    // 127.0.0.1:8080 for connections.
-    let addr = env::args()
-        .nth(1)
-        .unwrap_or_else(|| "127.0.0.1:8000".to_string());
+    // localhost:8000 for connections.
+    let coral_url = env::var("CORAL_URL").unwrap_or("localhost:8000".to_string());
+    let redis_url = env::var("REDIS_URL").unwrap_or("localhost:6379".to_string());
+
+    println!("Starting Coral on {} and connecting to Redis on {}", coral_url, redis_url);
+
+    let redis_client = redis::Client::open("redis://".to_string() + &redis_url)?;
+    let conn = redis_client.get_connection()?;
+    unsafe {
+        DB = Some(conn);
+    }
 
     // Handlers
     let reg = create_handlers();
 
     // Server start
-    Server::run(addr, Arc::new(reg)).await.ok();
+    
+    let _ = tokio::join!(
+        // game client
+        // Server::run(coral_url, Arc::new(reg)),
+        // api server
+        api::rocket_launch()
+    );
 
     Ok(())
 }

@@ -10,13 +10,14 @@ teal = { path = "../../Layer - Util/teal" }
 coral-commons = { path = "../../Layer 0 - Domain/coral-commons" }
 realm-commons = { path = "../../Layer 0 - Domain/realm-commons" }
 
+dotenv = "*"
 redis = "*"
 tokio = {version = "*", features = ["full"]}
 serde = "1.0.188"
 futures = "0.3.28"
 async-trait = "0.1.79"
 
-rocket = { version = "=0.5.0", default-features = false, features = ["json"] }
+rocket = { version = "*", features = ["json"] }
 rocket_okapi = { version = "*", features = ["swagger", "rapidoc"] }
 schemars = "*"
 

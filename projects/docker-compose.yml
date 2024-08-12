@@ -1,49 +1,34 @@
 version: '2'
 services:
-
-  mongo:
-    image: mongo
-
   redis:
     image: redis/redis-stack
     restart: always
     ports:
-      - '6371:6379'
-
-  # realm:
-  #   build:
-  #     context: ./Layer 2 - Application/realm
-  #     dockerfile: Dockerfile
-
+      - '6379:6379'
   coral:
-    network_mode: "host"
     container_name: Coral
+    network_mode: host
     ports:
-      - '0:8000'
-    command: [ "host.docker.internal:8000" ]
+      - '8000:8000'
+      - '9000:900'
+    command:
+      - 'host.docker.internal:8000'
     build:
       context: ./
-      dockerfile: "Layer 2 - Application/coral/Dockerfile"
-    # deploy:
-    #   mode: replicated
-    #   replicas: 4
-
+      dockerfile: Layer 2 - Application/coral/Dockerfile
   coraline-1:
+    container_name: Coraline-1
+    network_mode: host
+    ports:
+      - '7001:7000'
     build:
-      context: ./Layer 2 - Application/coraline
-      dockerfile: coraline/Dockerfile
-
+      context: ./
+      dockerfile: Layer 2 - Application/coraline/Dockerfile
   coraline-2:
+    container_name: Coraline-2
+    network_mode: host
+    ports:
+      - '7002:7000'
     build:
-      context: ./Layer 2 - Application/coraline
-      dockerfile: coraline/Dockerfile
-      
-  # coraline-3:
-  #   build:
-  #     context: ./Layer 2 - Application/coraline
-  #     dockerfile: coraline/Dockerfile
-      
-  # coraline-4:
-  #   build:
-  #     context: ./Layer 2 - Application/coraline
-  #     dockerfile: coraline/Dockerfile
+      context: ./
+      dockerfile: Layer 2 - Application/coraline/Dockerfile
