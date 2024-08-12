@@ -187,10 +187,11 @@ async fn find_match(
                 let match_buf = serialize(&game);
 
                 // For all players in the game
-                for id in &game.players {
+                for (id, team_id) in &game.players {
                     // Set players in game
                     let _ = red_player::set_state_by_id(db, id, PlayerState::InGame);
                     let _ = red_player::set_game_by_id(db, id, &game.id);
+                    let _ = red_player::set_lobby_by_id(db, id, &"".to_string());
 
                     // Find Client corresponding to the player
                     for c in clients {

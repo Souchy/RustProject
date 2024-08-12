@@ -57,6 +57,14 @@ pub fn set_lobby(
     db.hset(get_key_player(&player.id), KEY_LOBBY, &player.lobby)?;
     Ok(())
 }
+pub fn set_lobby_by_id(
+    db: &mut redis::Connection,
+    id: &String,
+    lobby: &String,
+) -> Result<(), Box<dyn Error + Send + Sync>> {
+    db.hset(get_key_player(&id), KEY_LOBBY, &lobby)?;
+    Ok(())
+}
 pub fn set_game(
     db: &mut redis::Connection,
     player: &Player,
