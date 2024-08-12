@@ -4,7 +4,7 @@ use realm_commons::{
     protos::models::Lobby,
     red::{red_lobby, red_player},
 };
-use rocket::{form::FromForm, post, serde::json::Json};
+use rocket::{form::FromForm, get, post, serde::json::Json};
 use rocket_okapi::{
     okapi::openapi3::OpenApi, openapi, openapi_get_routes, openapi_get_routes_spec,
     settings::OpenApiSettings,
@@ -36,7 +36,7 @@ impl Default for SetLobbyQueueModel {
 }
 
 #[openapi(tag = "Lobby")]
-#[post("/")]
+#[get("/")]
 async fn get() -> Json<Option<Lobby>> {
     let mut coraline = CORALINE.lock().await;
     let player_id = coraline.player.id.clone();

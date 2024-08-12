@@ -7,16 +7,19 @@ services:
       - '6379:6379'
   coral:
     container_name: Coral
-    network_mode: host
+    depends_on:
+      - redis
     ports:
       - '8000:8000'
-      - '80:80'
+      - '9000:9000'
     build:
       context: ./
       dockerfile: Layer 2 - Application/coral/Dockerfile
   coraline-1:
     container_name: Coraline-1
-    network_mode: host
+    depends_on:
+      - redis
+      - coral
     ports:
       - '7001:7000'
     build:
@@ -24,7 +27,9 @@ services:
       dockerfile: Layer 2 - Application/coraline/Dockerfile
   coraline-2:
     container_name: Coraline-2
-    network_mode: host
+    depends_on:
+      - redis
+      - coral
     ports:
       - '7002:7000'
     build:

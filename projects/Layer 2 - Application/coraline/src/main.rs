@@ -49,8 +49,8 @@ pub async fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     // Allow passing an address to listen on as the first argument of this
     // program, but otherwise we'll just set up our TCP listener on
     // localhost:8000 for connections.
-    let coral_url = env::var("CORAL_URL").unwrap_or("localhost:8000".to_string());
-    let redis_url = env::var("REDIS_URL").unwrap_or("localhost:6379".to_string());
+    let coral_url = env::var("CORAL_URL").unwrap();
+    let redis_url = env::var("REDIS_URL").unwrap();
     
     println!("Connecting to Coral on {} and Redis on {}", coral_url, redis_url);
 

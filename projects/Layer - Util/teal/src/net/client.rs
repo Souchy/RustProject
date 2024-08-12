@@ -118,11 +118,6 @@ impl DefaultClient {
         handlers: Arc<MessageHandlers>,
     ) -> Result<Self, Box<dyn Error + Send + Sync>> {
         let socket = TcpStream::connect(addr).await?;
-
-        // let retry_strategy = ExponentialBackoff::from_millis(10)
-        //     .map(jitter); // add jitter to delays
-        // let result = Retry::spawn(retry_strategy, || TcpStream::connect(addr)).await?;
-
         Ok(Self::new(
             socket,
             handlers,

@@ -32,16 +32,15 @@ pub async fn rocket_launch() -> Result<Rocket<Ignite>, rocket::error::Error> {
 
     println!("Starting Rocket on {}:{}", add, port);
 
-    // let address = IpAddr::from_str(&add).unwrap();
-
-    // let config = rocket::config::Config {
-    //     port,
-    //     // address,
-    //     ..Default::default()
-    // };
+    let address = IpAddr::from_str(&add).unwrap();
+    let config = rocket::config::Config {
+        port,
+        address,
+        ..Default::default()
+    };
 
     let mut building_rocket = rocket::build()
-        // .configure(config)
+        .configure(config)
         .mount(
             "/swagger/",
             make_swagger_ui(&SwaggerUIConfig {
