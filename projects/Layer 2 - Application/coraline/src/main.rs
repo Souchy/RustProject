@@ -64,7 +64,7 @@ pub async fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
         DefaultClient::new_connection(&coral_url, Arc::new(reg)).await?;
 
     let mut coraline = CORALINE.lock().await;
-    // coraline.client = Some(Arc::new(client));
+    coraline.client = Some(Arc::new(client));
     coraline.db = Some(conn);
     drop(coraline);
 
@@ -118,7 +118,7 @@ async fn coraline_launch() -> Result<(), JoinError> {
 
     // Send a message to create a Lobby.
     // When it is created, we'll respond by setting the queue active.
-    let create_lobby = CreateLobby { queue: 1 };
+    let create_lobby = CreateLobby { queue: 0 };
     let create_lobby_buf = message::serialize(&create_lobby);
     client_ref.send_bytes(&create_lobby_buf).await.unwrap();
 

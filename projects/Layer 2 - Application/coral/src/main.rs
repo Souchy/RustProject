@@ -43,7 +43,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     
     let _ = tokio::join!(
         // game client
-        // Server::run(coral_url, Arc::new(reg)),
+        Server::run(coral_url, Arc::new(reg)),
         // api server
         api::rocket_launch()
     );

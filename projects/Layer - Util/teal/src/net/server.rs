@@ -27,7 +27,7 @@ impl Server {
         // connections. This TCP listener is bound to the address we determined
         // above and must be associated with an event loop.
         let listener = TcpListener::bind(&addr).await?;
-        println!("Listening on: {}", addr);
+        println!("Server listening on: {}", addr);
 
         let server = Self {
             clients: Vec::new(),

@@ -98,8 +98,8 @@ async fn enter_queue_ranked() {
 }
 
 #[openapi(tag = "Lobby")]
-#[post("/exit_queue", data = "<json>")]
-async fn exit_queue(json: Json<SetLobbyQueueModel>) {
+#[post("/exit_queue")]
+async fn exit_queue() {
     let coraline = CORALINE.lock().await;
     let client_ref = coraline.client.clone().unwrap();
 
