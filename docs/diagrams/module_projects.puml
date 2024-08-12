@@ -1,0 +1,20 @@
+@startuml vue-module
+
+package Util {
+	component Teal
+}
+
+package Domain {
+	component CoralCommons
+	component RealmCommons
+}
+
+package Application {
+	component Coral
+	component Coraline
+}
+
+Application -up-> Domain
+Domain -up-> Util
+
+@enduml

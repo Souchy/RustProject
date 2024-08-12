@@ -10,9 +10,7 @@ services:
     network_mode: host
     ports:
       - '8000:8000'
-      - '9000:900'
-    command:
-      - 'host.docker.internal:8000'
+      - '80:80'
     build:
       context: ./
       dockerfile: Layer 2 - Application/coral/Dockerfile

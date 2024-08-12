@@ -1,5 +1,5 @@
 # Rust as the base image
-FROM rust:alpine
+FROM rust:latest AS build
 
 # 1. Create empty shell projects
 RUN USER=root cargo new --lib "./Layer - Util/teal"
@@ -35,12 +35,23 @@ COPY ["./Layer 0 - Domain/coral-commons/build.rs", "./Layer 0 - Domain/coral-com
 COPY ["./Layer 0 - Domain/realm-commons/src", "./Layer 0 - Domain/realm-commons/src"]
 COPY ["./Layer 0 - Domain/realm-commons/build.rs", "./Layer 0 - Domain/realm-commons/build.rs"]
 COPY ["./Layer 2 - Application/coral/src", "./Layer 2 - Application/coral/src"]
-COPY ["./Layer 2 - Application/coral/.env.docker", "./Layer 2 - Application/coral/.env.docker"]
 
 # 6. Build for release.
 WORKDIR "/Layer 2 - Application/coral/"
-EXPOSE 8000
-EXPOSE 9000
+RUN cargo build --release
 
-RUN ["cargo", "build", "--release"]
-ENTRYPOINT ["cargo", "run", "--release", ".env.docker"]
+WORKDIR "/Layer 2 - Application/coral/target/release"
+RUN ls
+
+# Use a slim Dockerfile with just our app to publish
+FROM debian:latest AS app
+COPY --from=build ["/Layer 2 - Application/coral/target/release/coral", "/coral"]
+COPY ["/Layer 2 - Application/coral/.env.docker", "/.env.docker"]
+
+ENV ROCKET_ADDRESS=127.0.0.1
+ENV ROCKET_PORT=80
+EXPOSE 8000
+EXPOSE 80
+
+ENTRYPOINT ["/coral", ".env.docker"]
+# ENTRYPOINT ["cargo", "run", "--release", ".env.docker"]

@@ -22,18 +22,27 @@ pub fn get_routes_and_docs(settings: &OpenApiSettings) -> (Vec<rocket::Route>, O
  * Start api server
  */
 pub async fn rocket_launch() -> Result<Rocket<Ignite>, rocket::error::Error> {
-    let config = rocket::config::Config {
-        port: env::var("API_PORT")
-            .unwrap_or(7000.to_string())
-            .parse::<u16>()
-            .unwrap(),
-        address: IpAddr::from_str(&env::var("API_ADDR").unwrap_or("localhost".to_string()))
-            .unwrap(),
-        ..Default::default()
-    };
+    
+    let port = env::var("ROCKET_PORT")
+        .unwrap_or(9000.to_string())
+        .parse::<u16>()
+        .unwrap();
+    let add = env::var("ROCKET_ADDRESS").unwrap_or("127.0.0.1".to_string());
+
+    println!("Starting Rocket on {}:{}", add, port);
+    
+    // let config = rocket::config::Config {
+    //     port: env::var("ROCKET_PORT")
+    //         .unwrap_or(7000.to_string())
+    //         .parse::<u16>()
+    //         .unwrap(),
+    //     address: IpAddr::from_str(&env::var("ROCKET_ADDRESS").unwrap_or("localhost".to_string()))
+    //         .unwrap(),
+    //     ..Default::default()
+    // };
 
     let mut building_rocket = rocket::build()
-        .configure(config)
+        // .configure(config)
         .mount(
             "/swagger/",
             make_swagger_ui(&SwaggerUIConfig {
