@@ -13,6 +13,7 @@ realm-commons = { path = "../../Layer 0 - Domain/realm-commons" }
 dotenv = "*"
 redis = "*"
 tokio = { version = "*", features = ["full"] }
+tokio-retry = "*"
 serde = "*"
 futures = "0.3.28"
 async-trait = "0.1.79"

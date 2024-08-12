@@ -1,7 +1,7 @@
 pub mod api;
 pub mod handlers;
 
-use coral_commons::protos::{messages::SetQueueResponse, models::Match};
+use coral_commons::protos::{messages::{QueueType, SetQueueResponse}, models::Match};
 use handlers::{
     created_lobby_handler::CreatedLobbyHandler, match_handler::MatchHandler,
     ping_handler::PingHandler, set_queue_response_handler::SetQueueResponseHandler,
@@ -32,13 +32,14 @@ use tokio::{sync::Mutex, task::JoinError};
 pub struct Coraline {
     pub client: Option<Arc<dyn Client>>,
     pub player: Player,
+    // Client wouldn't have a DB connection in real life. Used as a dev shortcut.
     pub db: Option<redis::Connection>,
 }
 pub static CORALINE: Lazy<Mutex<Coraline>> = Lazy::new(|| Mutex::new(Coraline::default()));
 
 /**
  * Coraline is a game client.
- * Coraline creates a player and a game lobby to find a match on the server.
+ * It creates a player and a game lobby to find a match on the server.
  */
 #[tokio::main]
 pub async fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
@@ -118,7 +119,7 @@ async fn coraline_launch() -> Result<(), JoinError> {
 
     // Send a message to create a Lobby.
     // When it is created, we'll respond by setting the queue active.
-    let create_lobby = CreateLobby { queue: 0 };
+    let create_lobby = CreateLobby { queue: QueueType::Idle as i32 };
     let create_lobby_buf = message::serialize(&create_lobby);
     client_ref.send_bytes(&create_lobby_buf).await.unwrap();
 

@@ -1,7 +1,7 @@
 use std::any::{Any, TypeId};
 use std::error::Error;
-use std::sync::Arc;
 use std::fmt::Debug;
+use std::sync::Arc;
 
 use async_trait::async_trait;
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
@@ -9,17 +9,17 @@ use tokio::net::TcpStream;
 use tokio::sync::Mutex;
 
 use crate::net::handlers::MessageHandlers;
-use crate::{ Reader, Writer};
+use crate::{Reader, Writer};
 use crate::{HEADER_LEN, LEN_LEN};
 
 use super::server::Server;
 
 #[async_trait]
-pub trait Client : Send + Sync + Debug + 'static {
+pub trait Client: Send + Sync + Debug + 'static {
     fn get_id_ref(&self) -> Arc<Mutex<String>>;
     fn get_id_sync(&self) -> String;
     async fn set_id(&self, id: String) -> Result<(), Box<dyn Error + Send + Sync>>;
-    fn get_server(&self) ->  Arc<Mutex<Server>>;
+    fn get_server(&self) -> Arc<Mutex<Server>>;
 
     async fn send_bytes(&self, buf: &[u8]) -> Result<(), Box<dyn Error + Send + Sync>>;
     async fn run(&self) -> Result<(), Box<dyn Error + Send>>;
@@ -87,7 +87,6 @@ impl dyn Client {
     }
 }
 
-
 #[derive(Clone, Debug)]
 pub struct DefaultClient {
     pub id: Arc<Mutex<String>>,
@@ -119,7 +118,16 @@ impl DefaultClient {
         handlers: Arc<MessageHandlers>,
     ) -> Result<Self, Box<dyn Error + Send + Sync>> {
         let socket = TcpStream::connect(addr).await?;
-        Ok(Self::new(socket, handlers, Arc::new(Mutex::new(Server::default()))))
+
+        // let retry_strategy = ExponentialBackoff::from_millis(10)
+        //     .map(jitter); // add jitter to delays
+        // let result = Retry::spawn(retry_strategy, || TcpStream::connect(addr)).await?;
+
+        Ok(Self::new(
+            socket,
+            handlers,
+            Arc::new(Mutex::new(Server::default())),
+        ))
     }
 }
 
@@ -200,4 +208,3 @@ impl Client for DefaultClient {
         Ok(())
     }
 }
-
