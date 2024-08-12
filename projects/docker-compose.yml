@@ -22,6 +22,7 @@ services:
       - coral
     ports:
       - '7001:7000'
+    command: ["1"]
     build:
       context: ./
       dockerfile: Layer 2 - Application/coraline/Dockerfile
@@ -32,6 +33,29 @@ services:
       - coral
     ports:
       - '7002:7000'
+    command: ["2"]
+    build:
+      context: ./
+      dockerfile: Layer 2 - Application/coraline/Dockerfile
+  coraline-3:
+    container_name: Coraline-3
+    depends_on:
+      - redis
+      - coral
+    ports:
+      - '7003:7000'
+    command: ["3"]
+    build:
+      context: ./
+      dockerfile: Layer 2 - Application/coraline/Dockerfile
+  coraline-4:
+    container_name: Coraline-4
+    depends_on:
+      - redis
+      - coral
+    ports:
+      - '7004:7000'
+    command: ["4"]
     build:
       context: ./
       dockerfile: Layer 2 - Application/coraline/Dockerfile

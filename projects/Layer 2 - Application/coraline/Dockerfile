@@ -45,8 +45,9 @@ FROM debian:latest AS app
 COPY --from=build ["/Layer 2 - Application/coraline/target/release/coraline", "/coraline"]
 COPY ["/Layer 2 - Application/coraline/.env.docker", "/.env.docker"]
 
+ENV ENV_FILE=.env.docker
 ENV ROCKET_ADDRESS=0.0.0.0
 ENV ROCKET_PORT=7000
 EXPOSE 7000
 
-ENTRYPOINT ["/coraline", ".env.docker"]
+ENTRYPOINT ["/coraline"]

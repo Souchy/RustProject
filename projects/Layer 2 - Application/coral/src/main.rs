@@ -21,7 +21,7 @@ pub static mut DB: Option<redis::Connection> = None;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
-    let envi = env::args().nth(1).unwrap_or(".env.dev".to_string());
+    let envi = env::var("ENV_FILE").unwrap_or(".env.dev".to_string());
     dotenv::from_filename(envi).ok();
 
     // Allow passing an address to listen on as the first argument of this

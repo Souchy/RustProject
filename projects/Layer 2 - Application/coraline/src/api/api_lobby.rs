@@ -40,7 +40,7 @@ impl Default for SetLobbyQueueModel {
 #[get("/")]
 async fn get() -> Json<Option<Lobby>> {
     let mut coraline = CORALINE.lock().await;
-    let player_id = coraline.player.id.clone();
+    let player_id = coraline.player_id.clone();
 
     if let Some(db) = &mut coraline.db {
         let player = red_player::get(db, &player_id).ok();
@@ -67,64 +67,80 @@ async fn create_lobby() {
 #[openapi(tag = "Lobby")]
 #[post("/set_queue", data = "<json>")]
 async fn set_queue(json: Json<SetLobbyQueueModel>) {
-    let coraline = CORALINE.lock().await;
+    let mut coraline = CORALINE.lock().await;
     let client_ref = coraline.client.clone().unwrap();
+    let player_id = coraline.player_id.clone();
 
-    let lobby_id = coraline.player.lobby.clone();
-    let req = SetQueueRequest {
-        lobby: lobby_id,
-        queue: json.queue as i32,
-    };
+    if let Some(db) = &mut coraline.db {
+        let player = red_player::get(db, &player_id).unwrap();
 
-    let buf = message::serialize(&req);
-    let _ = client_ref.send_bytes(&buf).await;
+        let req = SetQueueRequest {
+            lobby: player.lobby.clone(),
+            queue: json.queue as i32,
+        };
+
+        let buf = message::serialize(&req);
+        client_ref.send_bytes(&buf).await.ok();
+    }
+    
 }
 
 #[openapi(tag = "Lobby")]
 #[post("/enter_queue_normal")]
 async fn enter_queue_normal() {
-    let coraline = CORALINE.lock().await;
+    let mut coraline = CORALINE.lock().await;
     let client_ref = coraline.client.clone().unwrap();
+    let player_id = coraline.player_id.clone();
 
-    let lobby_id = coraline.player.lobby.clone();
-    let req = SetQueueRequest {
-        lobby: lobby_id,
-        queue: QueueType::Normal as i32,
-    };
+    if let Some(db) = &mut coraline.db {
+        let player = red_player::get(db, &player_id).unwrap();
 
-    let buf = message::serialize(&req);
-    client_ref.send_bytes(&buf).await.ok();
+        let req = SetQueueRequest {
+            lobby: player.lobby.clone(),
+            queue: QueueType::Normal as i32,
+        };
+    
+        let buf = message::serialize(&req);
+        client_ref.send_bytes(&buf).await.ok();
+    }
 }
 
 #[openapi(tag = "Lobby")]
 #[post("/enter_queue_ranked")]
 async fn enter_queue_ranked() {
-    let coraline = CORALINE.lock().await;
+    let mut coraline = CORALINE.lock().await;
     let client_ref = coraline.client.clone().unwrap();
+    let player_id = coraline.player_id.clone();
 
-    let lobby_id = coraline.player.lobby.clone();
-    let req = SetQueueRequest {
-        lobby: lobby_id,
-        queue: QueueType::Ranked as i32,
-    };
+    if let Some(db) = &mut coraline.db {
+        let player = red_player::get(db, &player_id).unwrap();
 
-    let buf = message::serialize(&req);
-    client_ref.send_bytes(&buf).await.ok();
+        let req = SetQueueRequest {
+            lobby: player.lobby.clone(),
+            queue: QueueType::Ranked as i32,
+        };
+    
+        let buf = message::serialize(&req);
+        client_ref.send_bytes(&buf).await.ok();
+    }
 }
 
 #[openapi(tag = "Lobby")]
 #[post("/exit_queue")]
 async fn exit_queue() {
-    let coraline = CORALINE.lock().await;
+    let mut coraline = CORALINE.lock().await;
     let client_ref = coraline.client.clone().unwrap();
+    let player_id = coraline.player_id.clone();
 
-    let lobby_id = coraline.player.lobby.clone();
+    if let Some(db) = &mut coraline.db {
+        let player = red_player::get(db, &player_id).unwrap();
 
-    let req = SetQueueRequest {
-        lobby: lobby_id,
-        queue: QueueType::Idle as i32,
-    };
-
-    let buf = message::serialize(&req);
-    client_ref.send_bytes(&buf).await.ok();
+        let req = SetQueueRequest {
+            lobby: player.lobby.clone(),
+            queue: QueueType::Idle as i32,
+        };
+    
+        let buf = message::serialize(&req);
+        client_ref.send_bytes(&buf).await.ok();
+    }
 }

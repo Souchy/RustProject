@@ -1,4 +1,4 @@
-use coral_commons::{protos::models::Match, red::red_match};
+use coral_commons::{protos::models::{Match, MatchState}, red::red_match};
 use rocket::{get, post, serde::json::Json};
 use rocket_okapi::{
     okapi::openapi3::OpenApi, openapi, openapi_get_routes_spec, settings::OpenApiSettings,
@@ -21,8 +21,8 @@ async fn get(id: String) -> Json<Option<Match>> {
 }
 
 #[openapi(tag = "Matches")]
-#[get("/all")]
-async fn get_all() -> Json<Vec<Match>> {
+#[get("/all/<state>")]
+async fn get_all(state: i32) -> Json<Vec<Match>> {
     unsafe {
         if let Some(db) = &mut crate::DB {
             let opt_index = red_match::get_index(db).ok();
@@ -31,7 +31,9 @@ async fn get_all() -> Json<Vec<Match>> {
                 for id in index.iter() {
                     let opt_match = red_match::get(db, id).ok();
                     if let Some(r#match) = opt_match {
-                        matches.push(r#match);
+                        if r#match.state == state {
+                            matches.push(r#match);
+                        }
                     }
                 }
                 return Json(matches);

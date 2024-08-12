@@ -48,6 +48,7 @@ FROM debian:latest AS app
 COPY --from=build ["/Layer 2 - Application/coral/target/release/coral", "/coral"]
 COPY ["/Layer 2 - Application/coral/.env.docker", "/.env.docker"]
 
+ENV ENV_FILE=.env.docker
 ENV ROCKET_ADDRESS=0.0.0.0
 ENV ROCKET_PORT=9000
 EXPOSE 8000

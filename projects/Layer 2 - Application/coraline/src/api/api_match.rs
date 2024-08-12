@@ -22,11 +22,11 @@ pub fn get_routes_and_docs(settings: &OpenApiSettings) -> (Vec<rocket::Route>, O
 #[get("/")]
 async fn get() -> Json<Option<Match>> {
     let mut coraline = CORALINE.lock().await;
-    let player_id = coraline.player.id.clone();
+    let player_id = coraline.player_id.clone();
 
     if let Some(db) = &mut coraline.db {
         let player = red_player::get(db, &player_id).ok();
-        let game = red_match::get(db, &player.unwrap().lobby).ok();
+        let game = red_match::get(db, &player.unwrap().game).ok();
         return Json(game);
     }
     return Json(None);
@@ -37,7 +37,7 @@ async fn get() -> Json<Option<Match>> {
 async fn win() {
     let mut coraline = CORALINE.lock().await;
     let client_ref = coraline.client.clone().unwrap();
-    let player_id = coraline.player.id.clone();
+    let player_id = coraline.player_id.clone();
 
     if let Some(db) = &mut coraline.db {
         let player = red_player::get(db, &player_id).unwrap();
@@ -55,7 +55,7 @@ async fn win() {
 async fn lose() {
     let mut coraline = CORALINE.lock().await;
     let client_ref = coraline.client.clone().unwrap();
-    let player_id = coraline.player.id.clone();
+    let player_id = coraline.player_id.clone();
 
     if let Some(db) = &mut coraline.db {
         let player = red_player::get(db, &player_id).unwrap();
