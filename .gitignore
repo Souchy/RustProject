@@ -1,7 +1,6 @@
 # Custom
 .vs/
 .vscode/
-.env*
 obj/
 bin/
 temp/
