@@ -45,13 +45,13 @@ impl MessageHandler for SetQueueHandler {
         let server = client.get_server();
         let player_id = client.get_id_ref().lock().await.clone();
         
-        println!("With player_id {:?}", player_id);
+        // println!("With player_id {:?}", player_id);
 
         unsafe {
             if let Some(db) = &mut crate::DB {
                 let mut player = red_player::get(db, &player_id)?;
-                println!("With player {:?}", player);
                 let mut lobby = red_lobby::get(db, &player.lobby)?;
+                println!("With player {:?}", player);
                 println!("With lobby {:?}", lobby);
 
                 if lobby.players.contains(&player_id) {
@@ -59,7 +59,7 @@ impl MessageHandler for SetQueueHandler {
                     let mut total_mmr: u32 = 0;
                     for play in &lobby.players {
                         let mmr = red_player::get_mmr_by_id(db, &play)?;
-                        println!("Add player {} mmr {} to average ", play, mmr);
+                        // println!("Add player {} mmr {} to average ", play, mmr);
                         total_mmr += mmr;
                     }
 
@@ -92,12 +92,11 @@ impl MessageHandler for SetQueueHandler {
 
                         // TODO Try to find a match for the lobby
                         let lobby_find_match = lobby.clone();
+                        println!("Activating queue for lobby {}", lobby.id);
                         let task = tokio::spawn(async move {
                             let _result = find_match(lobby_find_match, server).await;
                         });
                         QUEUES.lock().await.tasks.insert(lobby.id.clone(), task);
-
-                        println!("Activated queue for lobby {}", lobby.id);
                     }
                 }
 

@@ -43,7 +43,6 @@ pub static CORALINE: Lazy<Mutex<Coraline>> = Lazy::new(|| Mutex::new(Coraline::d
  */
 #[tokio::main]
 pub async fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
-    env::set_var("RUST_BACKTRACE", "1");
     let envi = env::args().nth(1).unwrap_or(".env.dev".to_string());
     dotenv::from_filename(envi).ok();
 
