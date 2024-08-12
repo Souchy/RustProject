@@ -116,7 +116,9 @@ pub fn set_recent_matches(
 ) -> Result<(), Box<dyn Error + Send + Sync>> {
     let key = get_key_player_recent_matches(&player.id);
     db.del(&key)?;
-    db.lpush(&key, &player.recent_matches)?;
+    if player.recent_matches.len() > 0 {
+        db.lpush(&key, &player.recent_matches)?;
+    }
     Ok(())
 }
 
@@ -180,14 +182,14 @@ pub fn get_lobby_by_id(
     db: &mut redis::Connection,
     id: &String,
 ) -> Result<String, Box<dyn Error + Send + Sync>> {
-    let val = db.hget(get_key_player(&id), KEY_LOBBY)?;
+    let val = db.hget(get_key_player(&id), KEY_LOBBY).unwrap_or("0".to_string());
     Ok(val)
 }
 pub fn get_game_by_id(
     db: &mut redis::Connection,
     id: &String,
 ) -> Result<String, Box<dyn Error + Send + Sync>> {
-    let val = db.hget(get_key_player(&id), KEY_GAME)?;
+    let val = db.hget(get_key_player(&id), KEY_GAME).unwrap_or("0".to_string());
     Ok(val)
 }
 pub fn get_mmr_by_id(

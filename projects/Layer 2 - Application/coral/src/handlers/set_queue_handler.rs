@@ -9,6 +9,7 @@ use realm_commons::{
     red::{red_lobby, red_player},
 };
 use snowflake::SnowflakeIdGenerator;
+use std::ptr::null;
 use std::{
     collections::HashMap,
     error::Error,
@@ -50,6 +51,9 @@ impl MessageHandler for SetQueueHandler {
         unsafe {
             if let Some(db) = &mut crate::DB {
                 let mut player = red_player::get(db, &player_id)?;
+                if player.lobby == "0" {
+                    return Ok(());
+                }
                 let mut lobby = red_lobby::get(db, &player.lobby)?;
                 println!("With player {:?}", player);
                 println!("With lobby {:?}", lobby);
@@ -121,7 +125,7 @@ async fn find_match(
     unsafe {
         if let Some(db) = &mut crate::DB {
             loop {
-                println!("In task! {}", i);
+                println!("In task! {} - {}", lobby1.id, i);
                 i = i + 1;
                 tokio::time::sleep(Duration::from_secs(2)).await;
 
@@ -191,7 +195,7 @@ async fn find_match(
                     // Set players in game
                     let _ = red_player::set_state_by_id(db, id, PlayerState::InGame);
                     let _ = red_player::set_game_by_id(db, id, &game.id);
-                    let _ = red_player::set_lobby_by_id(db, id, &"".to_string());
+                    let _ = red_player::set_lobby_by_id(db, id, &"0".to_string());
 
                     // Find Client corresponding to the player
                     for c in clients {

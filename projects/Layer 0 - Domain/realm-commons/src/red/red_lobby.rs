@@ -134,7 +134,9 @@ pub fn set_players(
 ) -> Result<(), Box<dyn Error + Send + Sync>> {
     let key = get_key_lobby_players(&lobby.id);
     db.del(&key)?;
-    db.lpush(&key, &lobby.players)?;
+    if lobby.players.len() > 0 {
+        db.lpush(&key, &lobby.players)?;
+    }
     Ok(())
 }
 
@@ -146,6 +148,7 @@ pub fn get_index(db: &mut redis::Connection) -> Result<Vec<String>, Box<dyn Erro
 pub fn get(db: &mut redis::Connection, id: &String) -> Result<Lobby, Box<dyn Error + Send + Sync>> {
     let mut lobby = Lobby::default();
     lobby.id = id.clone();
+    lobby.players = vec![];
     get_queue(db, &mut lobby)?;
     get_queue_start_time(db, &mut lobby)?;
     get_state(db, &mut lobby)?;
