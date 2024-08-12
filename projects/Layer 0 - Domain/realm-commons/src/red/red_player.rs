@@ -5,14 +5,22 @@ use redis::Commands;
 use crate::protos::models::{player::PlayerState, Player};
 
 // Keys
-fn get_key_player(player: &String) -> String {
-    "player:".to_string() + player
-}
+const KEY_PLAYER: &str = "player";
 const KEY_STATE: &str = "state";
 const KEY_LOBBY: &str = "lobby";
 const KEY_GAME: &str = "game";
 const KEY_MMR: &str = "mmr";
+const KEY_RECENT_MATCHES: &str = "recent_matches";
 const KEY_PLAYER_INDEX: &str = "player_ids";
+fn get_key_player(player: &String) -> String {
+    KEY_PLAYER.to_string() + ":" + player
+}
+fn get_key_player_recent_matches(player: &String) -> String {
+    let mut str: String = get_key_player(player);
+    str.push_str(":");
+    str.push_str(KEY_RECENT_MATCHES);
+    str
+}
 
 // Values
 pub fn set(
@@ -23,6 +31,7 @@ pub fn set(
     set_game(db, &player)?;
     set_mmr(db, &player)?;
     set_state(db, &player)?;
+    set_recent_matches(db, &player)?;
     db.sadd(KEY_PLAYER_INDEX, &player.id)?;
     Ok(())
 }
@@ -47,6 +56,7 @@ pub fn delete_by_id(
     id: &String,
 ) -> Result<(), Box<dyn Error + Send + Sync>> {
     db.del(get_key_player(&id))?;
+    db.del(get_key_player_recent_matches(&id))?;
     db.srem(KEY_PLAYER_INDEX, &id)?;
     Ok(())
 }
@@ -100,6 +110,22 @@ pub fn set_state_by_id(
     db.hset(get_key_player(player_id), KEY_STATE, &(state as i32))?;
     Ok(())
 }
+pub fn set_recent_matches(
+    db: &mut redis::Connection,
+    player: &Player,
+) -> Result<(), Box<dyn Error + Send + Sync>> {
+    set_recent_matches_by_id(db, &player.id, &player.recent_matches)
+}
+pub fn set_recent_matches_by_id(
+    db: &mut redis::Connection,
+    player_id: &String,
+    recent_matches: &Vec<String>,
+) -> Result<(), Box<dyn Error + Send + Sync>> {
+    let key = get_key_player_recent_matches(&player_id);
+    db.del(&key)?;
+    db.lpush(&key, &recent_matches)?;
+    Ok(())
+}
 
 // Gets
 pub fn get_index(db: &mut redis::Connection) -> Result<Vec<String>, Box<dyn Error + Send + Sync>> {
@@ -116,6 +142,7 @@ pub fn get(
     get_game(db, &mut player)?;
     get_mmr(db, &mut player)?;
     get_state(db, &mut player)?;
+    get_recent_matches(db, &mut player)?;
     Ok(player)
 }
 pub fn get_lobby(
@@ -146,31 +173,47 @@ pub fn get_state(
     player.state = get_state_by_id(db, &player.id)?;
     Ok(player.state)
 }
+pub fn get_recent_matches(
+    db: &mut redis::Connection,
+    player: &mut Player,
+) -> Result<(), Box<dyn Error + Send + Sync>> {
+    player.recent_matches = get_recent_matches_by_id(db, &player.id)?;
+    Ok(())
+}
+
+// Gets by id
 pub fn get_lobby_by_id(
     db: &mut redis::Connection,
     id: &String,
 ) -> Result<String, Box<dyn Error + Send + Sync>> {
-    let lobby = db.hget(get_key_player(&id), KEY_LOBBY)?;
-    Ok(lobby)
+    let val = db.hget(get_key_player(&id), KEY_LOBBY)?;
+    Ok(val)
 }
 pub fn get_game_by_id(
     db: &mut redis::Connection,
     id: &String,
 ) -> Result<String, Box<dyn Error + Send + Sync>> {
-    let lobby = db.hget(get_key_player(&id), KEY_GAME)?;
-    Ok(lobby)
+    let val = db.hget(get_key_player(&id), KEY_GAME)?;
+    Ok(val)
 }
 pub fn get_mmr_by_id(
     db: &mut redis::Connection,
     id: &String,
 ) -> Result<u32, Box<dyn Error + Send + Sync>> {
-    let mmr = db.hget(get_key_player(&id), KEY_MMR)?;
-    Ok(mmr)
+    let val = db.hget(get_key_player(&id), KEY_MMR)?;
+    Ok(val)
 }
 pub fn get_state_by_id(
     db: &mut redis::Connection,
     id: &String,
 ) -> Result<i32, Box<dyn Error + Send + Sync>> {
-    let state = db.hget(get_key_player(&id), KEY_STATE)?;
-    Ok(state)
+    let val = db.hget(get_key_player(&id), KEY_STATE)?;
+    Ok(val)
+}
+pub fn get_recent_matches_by_id(
+    db: &mut redis::Connection,
+    id: &String,
+) -> Result<Vec<String>, Box<dyn Error + Send + Sync>> {
+    let val = db.lrange(get_key_player_recent_matches(id), 0, -1)?;
+    Ok(val)
 }

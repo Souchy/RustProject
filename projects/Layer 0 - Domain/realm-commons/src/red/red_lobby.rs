@@ -133,9 +133,7 @@ pub fn set_players(
     lobby: &Lobby,
 ) -> Result<(), Box<dyn Error + Send + Sync>> {
     let key = get_key_lobby_players(&lobby.id);
-    let len = db.llen(&key)?;
-    let opt_len = NonZeroUsize::new(len);
-    db.lpop(&key, opt_len)?;
+    db.del(&key)?;
     db.lpush(&key, &lobby.players)?;
     Ok(())
 }
@@ -247,8 +245,8 @@ pub fn find_lobby_match(
     db: &mut redis::Connection,
     lobby1: &Lobby,
 ) -> Result<Option<String>, Box<dyn Error + Send + Sync>> {
-    // Increase mmr search range by 10 every 30 seconds
-    const MMR_PER_SEC: u64 = 10 / 30;
+    // Increase mmr search range by 10 every 1 seconds
+    const MMR_PER_SEC: u64 = 10 / 1;
     let mut offset: u32 = 100;
 
     let time = SystemTime::now().duration_since(UNIX_EPOCH)?;

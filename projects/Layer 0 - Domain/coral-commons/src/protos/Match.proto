@@ -4,13 +4,21 @@ package models;
 
 message Match {
 	string id = 1;
+	// Time at which the match started
+	uint64 date = 2;
+	// Match state
+	MatchState state = 3;
 	// Type of match
-	int32 queue = 2;
+	int32 queue = 4;
 	// Game server
-	int32 game_port = 3;
+	int32 game_port = 5;
 	// Access token to the game on the game server
-	string token = 4;
+	string token = 6;
 	// List of <player, team> in the match where team is the source lobby id
-	map<string, string> players = 5;
+	map<string, string> players = 7;
 }
 
+enum MatchState {
+	Finished = 0;
+	Active = 1;
+}

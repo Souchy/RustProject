@@ -1,5 +1,5 @@
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let protos = ["src/protos/Match.proto", "src/protos/SetQueue.proto"];
+    let protos = ["src/protos/Match.proto", "src/protos/MatchResult.proto", "src/protos/SetQueue.proto"];
     let includes = ["src/protos"];
 
     let mut config = prost_build::Config::new();

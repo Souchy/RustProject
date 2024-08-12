@@ -4,10 +4,10 @@ package models;
 
 message MatchResult {
 	string id = 1;
-	MatchresultType result = 2;
+	MatchResultType result = 2;
 }
 
-enum MatchresultType {
+enum MatchResultType {
 	Lose = 0;
 	Win = 1;
 }

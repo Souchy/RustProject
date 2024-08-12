@@ -1,6 +1,6 @@
 use async_trait::async_trait;
 use coral_commons::protos::messages::{QueueType, SetQueueRequest, SetQueueResponse};
-use coral_commons::protos::models::Match;
+use coral_commons::protos::models::{Match, MatchState};
 use coral_commons::red::red_match;
 use once_cell::sync::Lazy;
 use prost_reflect::DynamicMessage;
@@ -15,7 +15,6 @@ use std::{
     sync::Arc,
     time::{Duration, SystemTime, UNIX_EPOCH},
 };
-use teal::net::client::{self, Client};
 use teal::{
     net::{handler::MessageHandler, message::serialize, server::Server},
     DynamicClient,
@@ -124,7 +123,7 @@ async fn find_match(
             loop {
                 println!("In task! {}", i);
                 i = i + 1;
-                tokio::time::sleep(Duration::from_secs(3)).await;
+                tokio::time::sleep(Duration::from_secs(2)).await;
 
                 // let ids = red_lobby::get_ids(db);
                 let result = red_lobby::find_lobby_match(db, &lobby1);
@@ -142,9 +141,6 @@ async fn find_match(
                 let lobby2 = lobby2res.unwrap();
 
                 println!("Found match {} + {}", lobby1.id, lobby2.id);
-                // if true {
-                //     continue;
-                // }
 
                 // Lock Queues
                 let mut queues = QUEUES.lock().await;
@@ -161,10 +157,14 @@ async fn find_match(
                 drop(queues);
 
                 // Create Match
+
+                let time = SystemTime::now().duration_since(UNIX_EPOCH)?;
                 let mut id_generator_generator = SnowflakeIdGenerator::new(1, 1);
                 let game_id = id_generator_generator.real_time_generate();
                 let mut game = Match {
                     id: game_id.to_string(),
+                    date: time.as_secs(),
+                    state: MatchState::Active as i32,
                     queue: lobby1.queue,
                     game_port: 9999,
                     token: "".to_string(),
