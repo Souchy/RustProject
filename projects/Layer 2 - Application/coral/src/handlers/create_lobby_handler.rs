@@ -33,32 +33,34 @@ impl MessageHandler for CreateLobbyHandler {
         let player_id = client.get_id_ref().lock().await.clone();
         // println!("With player {}", player_id);
 
-        // Create lobby
-        let mut lobby = Lobby::default();
-        lobby.id = id.to_string();
-        lobby.queue = message.queue;
-        lobby.state = LobbyState::Idle as i32;
-        lobby.token = "token".to_string();
-        lobby.players.push(player_id.clone());
-
-        // Set lobby in Redis
         unsafe {
             if let Some(db) = &mut crate::DB {
+                let mut player = red_player::get(db, &player_id)?;
+
+                // Create lobby
+                let mut lobby = Lobby::default();
+                lobby.id = id.to_string();
+                lobby.queue = message.queue;
+                lobby.state = LobbyState::Idle as i32;
+                lobby.token = "token".to_string();
+                lobby.players.push(player_id.clone());
+                lobby.average_mmr = player.mmr;
                 red_lobby::set(db, &lobby)?;
 
-                let mut player = red_player::get(db, &player_id)?;
+                // Update player
                 player.lobby = lobby.id.clone();
                 player.state = PlayerState::InLobby as i32;
                 red_player::set(db, &player)?;
+
+                // Return lobby info to player
+                let mut response = CreatedLobby::default();
+                response.lobby = lobby.id.clone();
+                response.queue = 1;
+                response.token = lobby.token.clone();
+                let buf = serialize(&response);
+                return client.send_bytes(&buf).await;
             }
         }
-
-        // Return lobby info to player
-        let mut response = CreatedLobby::default();
-        response.lobby = lobby.id.clone();
-        response.queue = 1;
-        response.token = lobby.token.clone();
-        let buf = serialize(&response);
-        client.send_bytes(&buf).await
+        Ok(())
     }
 }

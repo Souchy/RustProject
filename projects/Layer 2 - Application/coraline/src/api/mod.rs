@@ -1,5 +1,6 @@
 pub mod api_lobby;
 pub mod api_player;
+pub mod api_match;
 
 use rocket::{Ignite, Rocket};
 use rocket_okapi::{
@@ -15,6 +16,7 @@ pub fn get_routes_and_docs(settings: &OpenApiSettings) -> (Vec<rocket::Route>, O
     get_nested_endpoints_and_docs! {
         "/player" => api_player::get_routes_and_docs(settings),
         "/lobby" => api_lobby::get_routes_and_docs(settings),
+        "/match" => api_match::get_routes_and_docs(settings),
     }
 }
 
@@ -22,27 +24,23 @@ pub fn get_routes_and_docs(settings: &OpenApiSettings) -> (Vec<rocket::Route>, O
  * Start api server
  */
 pub async fn rocket_launch() -> Result<Rocket<Ignite>, rocket::error::Error> {
-    
     let port = env::var("ROCKET_PORT")
-        .unwrap_or(9000.to_string())
+        .unwrap_or(7000.to_string())
         .parse::<u16>()
         .unwrap();
     let add = env::var("ROCKET_ADDRESS").unwrap_or("127.0.0.1".to_string());
 
     println!("Starting Rocket on {}:{}", add, port);
     
-    // let config = rocket::config::Config {
-    //     port: env::var("ROCKET_PORT")
-    //         .unwrap_or(7000.to_string())
-    //         .parse::<u16>()
-    //         .unwrap(),
-    //     address: IpAddr::from_str(&env::var("ROCKET_ADDRESS").unwrap_or("localhost".to_string()))
-    //         .unwrap(),
-    //     ..Default::default()
-    // };
+    let address = IpAddr::from_str(&add).unwrap();
+    let config = rocket::config::Config {
+        port,
+        address,
+        ..Default::default()
+    };
 
     let mut building_rocket = rocket::build()
-        // .configure(config)
+        .configure(config)
         .mount(
             "/swagger/",
             make_swagger_ui(&SwaggerUIConfig {

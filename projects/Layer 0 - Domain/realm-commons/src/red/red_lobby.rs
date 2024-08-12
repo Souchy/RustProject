@@ -7,9 +7,8 @@ use std::{
 };
 
 // Keys
-fn get_key_lobby(lobby: &String) -> String {
-    "lobby:".to_string() + lobby
-}
+const KEY_LOBBY: &str = "lobby";
+const KEY_PLAYERS: &str = "players";
 const KEY_TOKEN: &str = "token";
 const KEY_QUEUE: &str = "queue";
 const KEY_QUEUE_START_TIME: &str = "queue_start_time";
@@ -17,9 +16,16 @@ const KEY_STATE: &str = "state";
 const KEY_AVERAGE_MMR: &str = "average_mmr";
 const KEY_INDEX_QUEUE_MMR: &str = "queue_lobby_mmr";
 const KEY_LOBBY_INDEX: &str = "lobby_ids";
+fn get_key_lobby(lobby: &String) -> String {
+    let mut str: String = KEY_LOBBY.to_string();
+    str.push_str(":");
+    str.push_str(lobby);
+    str
+}
 fn get_key_lobby_players(lobby: &String) -> String {
     let mut str: String = get_key_lobby(lobby);
-    str.push_str(":players");
+    str.push_str(":");
+    str.push_str(KEY_PLAYERS);
     str
 }
 fn get_key_queue_lobby_mmr(queue: &i32) -> String {
@@ -31,12 +37,12 @@ fn get_key_queue_lobby_mmr(queue: &i32) -> String {
 
 // Sets
 pub fn set(db: &mut redis::Connection, lobby: &Lobby) -> Result<(), Box<dyn Error + Send + Sync>> {
-    set_queue(db, lobby)?;
-    set_queue_start_time(db, lobby)?;
-    set_state(db, lobby)?;
-    set_players(db, lobby)?;
-    set_average_mmr(db, lobby)?;
-    set_mmr_index(db, lobby)?;
+    set_queue(db, &lobby)?;
+    set_queue_start_time(db, &lobby)?;
+    set_state(db, &lobby)?;
+    set_players(db, &lobby)?;
+    set_average_mmr(db, &lobby)?;
+    set_mmr_index(db, &lobby)?;
     db.sadd(KEY_LOBBY_INDEX, &lobby.id)?;
     Ok(())
 }
@@ -60,10 +66,19 @@ pub fn delete_by_id(
     db: &mut redis::Connection,
     id: &String,
 ) -> Result<(), Box<dyn Error + Send + Sync>> {
+    let queue = get_queue_by_id(db, &id)?;
     db.del(get_key_lobby(&id))?;
     db.del(get_key_lobby_players(&id))?;
-    db.zrem(KEY_INDEX_QUEUE_MMR, &id)?;
+    delete_mmr_index(db, &id, &queue)?;
     db.srem(KEY_LOBBY_INDEX, &id)?;
+    Ok(())
+}
+pub fn delete_mmr_index(
+    db: &mut redis::Connection,
+    id: &String,
+    queue: &i32,
+) -> Result<(), Box<dyn Error + Send + Sync>> {
+    db.zrem(get_key_queue_lobby_mmr(&queue), &id)?;
     Ok(())
 }
 pub fn set_queue(
@@ -106,7 +121,11 @@ pub fn set_mmr_index(
     db: &mut redis::Connection,
     lobby: &Lobby,
 ) -> Result<(), Box<dyn Error + Send + Sync>> {
-    db.zadd(KEY_INDEX_QUEUE_MMR, &lobby.id, &lobby.average_mmr)?;
+    db.zadd(
+        get_key_queue_lobby_mmr(&lobby.queue),
+        &lobby.id,
+        &lobby.average_mmr,
+    )?;
     Ok(())
 }
 pub fn set_players(
@@ -240,7 +259,12 @@ pub fn find_lobby_match(
     let max = lobby1.average_mmr + offset;
 
     let key = get_key_queue_lobby_mmr(&lobby1.queue);
-    let range = db.zrangebyscore::<&str, u32, u32, Vec<String>>(&key, min, max)?;
+    let mut range = db.zrangebyscore::<&str, u32, u32, Vec<String>>(&key, min, max)?;
+
+    // Remove self lobby
+    if let Some(index) = range.iter().position(|i| i == &lobby1.id) {
+        range.swap_remove(index);
+    }
 
     if range.len() == 0 {
         return Ok(None);
@@ -248,6 +272,5 @@ pub fn find_lobby_match(
 
     // TODO Use the first for now but should use a score based on the closest match and the time spent in queue for each lobby.
     // range.iter().min_by_key(|x| get_queue_start_time(x))
-
     Ok(Some(range[0].clone()))
 }

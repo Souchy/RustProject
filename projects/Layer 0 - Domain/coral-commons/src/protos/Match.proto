@@ -10,7 +10,7 @@ message Match {
 	int32 game_port = 3;
 	// Access token to the game on the game server
 	string token = 4;
-	// List of players in the match
-	repeated string players = 5;
+	// List of <player, team> in the match where team is the source lobby id
+	map<string, string> players = 5;
 }
 

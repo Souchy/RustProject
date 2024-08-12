@@ -43,7 +43,7 @@ async fn get_all() -> Json<Vec<Player>> {
 }
 
 #[openapi(tag = "Players")]
-#[post("/delete")]
+#[post("/delete_all")]
 async fn delete_all() {
     unsafe {
         if let Some(db) = &mut crate::DB {

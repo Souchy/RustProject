@@ -10,6 +10,7 @@ fn get_key_player(player: &String) -> String {
 }
 const KEY_STATE: &str = "state";
 const KEY_LOBBY: &str = "lobby";
+const KEY_GAME: &str = "game";
 const KEY_MMR: &str = "mmr";
 const KEY_PLAYER_INDEX: &str = "player_ids";
 
@@ -18,9 +19,10 @@ pub fn set(
     db: &mut redis::Connection,
     player: &Player,
 ) -> Result<(), Box<dyn Error + Send + Sync>> {
-    set_lobby(db, player)?;
-    set_mmr(db, player)?;
-    set_state(db, player)?;
+    set_lobby(db, &player)?;
+    set_game(db, &player)?;
+    set_mmr(db, &player)?;
+    set_state(db, &player)?;
     db.sadd(KEY_PLAYER_INDEX, &player.id)?;
     Ok(())
 }
@@ -55,6 +57,20 @@ pub fn set_lobby(
     db.hset(get_key_player(&player.id), KEY_LOBBY, &player.lobby)?;
     Ok(())
 }
+pub fn set_game(
+    db: &mut redis::Connection,
+    player: &Player,
+) -> Result<(), Box<dyn Error + Send + Sync>> {
+    set_game_by_id(db, &player.id, &player.game)
+}
+pub fn set_game_by_id(
+    db: &mut redis::Connection,
+    id: &String,
+    game: &String,
+) -> Result<(), Box<dyn Error + Send + Sync>> {
+    db.hset(get_key_player(&id), KEY_GAME, &game)?;
+    Ok(())
+}
 pub fn set_mmr(
     db: &mut redis::Connection,
     player: &Player,
@@ -66,8 +82,7 @@ pub fn set_state(
     db: &mut redis::Connection,
     player: &Player,
 ) -> Result<(), Box<dyn Error + Send + Sync>> {
-    db.hset(get_key_player(&player.id), KEY_STATE, &player.state)?;
-    Ok(())
+    set_state_by_id(db, &player.id, player.state())
 }
 pub fn set_state_by_id(
     db: &mut redis::Connection,
@@ -90,6 +105,7 @@ pub fn get(
     let mut player = Player::default();
     player.id = id.clone();
     get_lobby(db, &mut player)?;
+    get_game(db, &mut player)?;
     get_mmr(db, &mut player)?;
     get_state(db, &mut player)?;
     Ok(player)
@@ -99,6 +115,13 @@ pub fn get_lobby(
     player: &mut Player,
 ) -> Result<(), Box<dyn Error + Send + Sync>> {
     player.lobby = get_lobby_by_id(db, &player.id)?;
+    Ok(())
+}
+pub fn get_game(
+    db: &mut redis::Connection,
+    player: &mut Player,
+) -> Result<(), Box<dyn Error + Send + Sync>> {
+    player.lobby = get_game_by_id(db, &player.id)?;
     Ok(())
 }
 pub fn get_mmr(
@@ -122,7 +145,13 @@ pub fn get_lobby_by_id(
     let lobby = db.hget(get_key_player(&id), KEY_LOBBY)?;
     Ok(lobby)
 }
-
+pub fn get_game_by_id(
+    db: &mut redis::Connection,
+    id: &String,
+) -> Result<String, Box<dyn Error + Send + Sync>> {
+    let lobby = db.hget(get_key_player(&id), KEY_GAME)?;
+    Ok(lobby)
+}
 pub fn get_mmr_by_id(
     db: &mut redis::Connection,
     id: &String,

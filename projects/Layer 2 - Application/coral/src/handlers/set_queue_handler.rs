@@ -1,6 +1,7 @@
 use async_trait::async_trait;
 use coral_commons::protos::messages::{QueueType, SetQueueRequest, SetQueueResponse};
 use coral_commons::protos::models::Match;
+use coral_commons::red::red_match;
 use once_cell::sync::Lazy;
 use prost_reflect::DynamicMessage;
 use realm_commons::{
@@ -14,6 +15,7 @@ use std::{
     sync::Arc,
     time::{Duration, SystemTime, UNIX_EPOCH},
 };
+use teal::net::client::{self, Client};
 use teal::{
     net::{handler::MessageHandler, message::serialize, server::Server},
     DynamicClient,
@@ -61,16 +63,20 @@ impl MessageHandler for SetQueueHandler {
                         total_mmr += mmr;
                     }
 
-                    lobby.queue = message.queue;
-                    lobby.queue_start_time = time.as_secs();
-                    lobby.average_mmr = total_mmr / lobby.players.len() as u32;
-                    println!("Average mmr: {}", lobby.average_mmr);
+                    // Remove from the queue index always before updating the queue value
+                    red_lobby::delete_mmr_index(db, &lobby.id, &lobby.queue)?;
 
                     // If there is already a queue thread for this lobby, terminate it
                     if let Some(task) = QUEUES.lock().await.tasks.remove(&lobby.id) {
                         task.abort();
                         println!("Cancelled queue for lobby {}", lobby.id);
                     }
+
+                    //Update
+                    lobby.queue = message.queue;
+                    lobby.queue_start_time = time.as_secs();
+                    lobby.average_mmr = total_mmr / lobby.players.len() as u32;
+                    println!("Average mmr: {}", lobby.average_mmr);
 
                     if message.queue == QueueType::Idle as i32 {
                         lobby.state = LobbyState::Idle as i32;
@@ -90,7 +96,7 @@ impl MessageHandler for SetQueueHandler {
                             let _result = find_match(lobby_find_match, server).await;
                         });
                         QUEUES.lock().await.tasks.insert(lobby.id.clone(), task);
-                        
+
                         println!("Activated queue for lobby {}", lobby.id);
                     }
                 }
@@ -135,35 +141,46 @@ async fn find_match(
                 }
                 let lobby2 = lobby2res.unwrap();
 
-                // FIXME if found a match
-                let mut id_generator_generator = SnowflakeIdGenerator::new(1, 1);
-                let id = id_generator_generator.real_time_generate();
+                println!("Found match {} + {}", lobby1.id, lobby2.id);
+                // if true {
+                //     continue;
+                // }
+
+                // Lock Queues
+                let mut queues = QUEUES.lock().await;
+                // If task was terminated by an other thread
+                if !queues.tasks.contains_key(&lobby1.id) {
+                    println!("Queue thread got terminated by another one");
+                    return Ok(());
+                }
+                queues.tasks.remove(&lobby1.id);
+                let t2 = queues.tasks.remove(&lobby2.id);
+                if let Some(task) = t2 {
+                    task.abort();
+                }
+                drop(queues);
 
                 // Create Match
+                let mut id_generator_generator = SnowflakeIdGenerator::new(1, 1);
+                let game_id = id_generator_generator.real_time_generate();
                 let mut game = Match {
-                    id: id.to_string(),
+                    id: game_id.to_string(),
                     queue: lobby1.queue,
                     game_port: 9999,
                     token: "".to_string(),
-                    players: vec![],
+                    players: HashMap::new(),
                 };
-                lobby1
-                    .players
-                    .iter()
-                    .for_each(|p| game.players.push(p.clone()));
-                lobby2
-                    .players
-                    .iter()
-                    .for_each(|p| game.players.push(p.clone()));
+                lobby1.players.iter().for_each(|p| {
+                    game.players.insert(p.clone(), lobby1.id.clone());
+                });
+                lobby2.players.iter().for_each(|p| {
+                    game.players.insert(p.clone(), lobby2.id.clone());
+                });
+                red_match::set(db, &game).ok();
 
                 // Delete the lobbies and the queue threads
                 let _ = red_lobby::delete(db, &lobby1);
                 let _ = red_lobby::delete(db, &lobby2);
-
-                let mut queues = QUEUES.lock().await;
-                queues.tasks.remove(&lobby1.id);
-                queues.tasks.remove(&lobby2.id);
-                drop(queues);
 
                 let serv = server.lock().await;
                 let clients = &serv.clients;
@@ -171,16 +188,23 @@ async fn find_match(
 
                 // For all players in the game
                 for id in &game.players {
-
-                    // Set players in game 
+                    // Set players in game
                     let _ = red_player::set_state_by_id(db, id, PlayerState::InGame);
-                    
-                    // Send Match
-                    if let Some(client) = clients.iter().find(|&c| c.get_id_sync().eq(id)) {
-                        let _ = client.send_bytes(&match_buf).await;
+                    let _ = red_player::set_game_by_id(db, id, &game.id);
+
+                    // Find Client corresponding to the player
+                    for c in clients {
+                        let re = c.get_id_ref();
+                        let id2 = re.lock().await;
+                        if id2.eq(id) {
+                            // Send match
+                            println!("Send match to client {}", id);
+                            let _ = c.send_bytes(&match_buf).await;
+                        }
                     }
                 }
 
+                println!("Queue thread complete");
                 return Ok(());
             }
         }
@@ -188,3 +212,7 @@ async fn find_match(
 
     Ok(())
 }
+
+// pub async fn compare_id(client: Arc<dyn Client>, id: &String) -> bool { // Result<bool, Box<dyn Error + Send + Sync>> {
+//     client.get_id_ref().lock().await.eq(id)
+// }

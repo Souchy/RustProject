@@ -11,6 +11,7 @@ message Player {
 	// optional int32 queueStartTime = 4;
 	repeated string recentMatches = 5; // map of recent players <playerId, intGameAgo> 
 	int64 geolocalisation = 6;
+	string game = 7;
 
 	enum PlayerState {
 		PLAYER_STATE_IDLE = 0;
