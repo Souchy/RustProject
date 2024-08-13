@@ -1,0 +1,70 @@
+
+@startuml Architecture1
+
+node GameServer {
+	component Realm as gs #SkyBlue {
+		package CoralCommons 
+	}
+	component Redis #Pink
+	cloud Coral {
+		component Coral as m1 #Coral
+		component Coral as m2 #Coral
+	}
+}
+
+node GameClient1 {
+	component RealmClient as c1 #SkyBlue
+}
+node GameClient2 {
+	component RealmClient as c2 #SkyBlue
+}
+
+c1 -up(0-> gs : TCP
+c2 -up(0-> gs : TCP
+
+Redis <-(0)-> gs : TCP
+Redis <-right(0)-> Coral : TCP
+
+@enduml
+
+@startuml ArchitectureDemo
+component Web as web #SkyBlue
+component Redis as redis #Pink
+component Coral as coral #Coral {
+	component TcpServer
+	component RedisClient as RedisClientCoral
+	component RocketApi as RocketApiCoral
+}
+component Coral as coral #Coral {
+	component TcpServer
+	component RedisClient as RedisClientCoral
+	component RocketApi as RocketApiCoral
+}
+component Coraline as coraline #Coral {
+	component TcpClient
+	' component "RedisClient (dev)" as RedisClientCoraline
+	component "RocketApi (dev)" as RocketApiCoraline
+}
+
+redis <-0)- RedisClientCoral : TCP
+' redis <.0). RedisClientCoraline : TCP
+web -(0-> RocketApiCoral : HTTP
+web .(0.> RocketApiCoraline : HTTP
+TcpServer <-0)- TcpClient : TCP
+@enduml
+
+
+@startuml ArchitectureDemo2
+component Web as web #SkyBlue
+component Redis as redis #Pink
+component Coral as coral #Coral
+component Coraline1 as coraline #Coral
+component Coraline2 as coraline2 #Coral
+
+redis <-0)- coral : TCP
+web -(0-> coral : HTTP
+web .(0.> coraline : HTTP
+web .(0.> coraline2 : HTTP
+coral <-0)- coraline : TCP
+coral <-0)- coraline2 : TCP
+@enduml

@@ -1,12 +1,6 @@
 syntax = "proto3";
 package models;
 
-enum LobbyState {
-	LOBBY_STATE_IDLE = 0;
-	LOBBY_STATE_IN_QUEUE = 1;
-	LOBBY_STATE_IN_PREMATCH = 2;
-}
-
 // Lobbies are stored in Redis
 message Lobby {
 	string id = 1;
@@ -16,4 +10,10 @@ message Lobby {
 	repeated string players = 5;
 	uint64 queueStartTime = 6;
 	uint32 average_mmr = 7;
+}
+
+enum LobbyState {
+	LOBBY_STATE_IDLE = 0;
+	LOBBY_STATE_IN_QUEUE = 1;
+	LOBBY_STATE_IN_PREMATCH = 2;
 }
