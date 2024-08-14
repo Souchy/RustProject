@@ -9,7 +9,6 @@ use realm_commons::{
     red::{red_lobby, red_player},
 };
 use snowflake::SnowflakeIdGenerator;
-use std::ptr::null;
 use std::{
     collections::HashMap,
     error::Error,
@@ -45,7 +44,7 @@ impl MessageHandler for SetQueueHandler {
 
         let server = client.get_server();
         let player_id = client.get_id_ref().lock().await.clone();
-        
+
         // println!("With player_id {:?}", player_id);
 
         unsafe {

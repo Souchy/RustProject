@@ -2,5 +2,5 @@ syntax = "proto3";
 package server;
 
 message BroadcastPlayerListInLobby {
-	repeated int64 players = 1;
+	repeated string players = 1;
 }

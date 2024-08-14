@@ -1,0 +1,61 @@
+
+@startuml
+
+participant Client as c
+
+box Server
+participant Handlers as h
+participant QueueTask as qt
+end box
+
+participant Redis as r
+
+c -> h: Identify message
+activate h
+h -> r: Get or Create Player
+deactivate h
+
+c -> h: CreateLobby message
+activate h
+h -> r: Create Lobby
+h -> r: Set Player.lobby
+h --> c: CreatedLobby message
+deactivate h
+
+
+c -> h: SetQueue(normal) message
+activate h
+h -> r: Set lobby.queue
+h -> qt: find_match
+activate qt
+h --> c: SetQueueResponse
+deactivate h
+
+opt Optionally change or stop the queue aborts the task
+	c -> h: SetQueue(idle)
+	activate h
+	h -> qt: abort
+	deactivate h
+end
+
+loop
+	qt -> qt: Sleep 2s
+	qt -> r: red_lobby::find_lobby_match
+	r --> qt: List of lobbies matching
+	opt successful case
+		qt -> r: Create Match
+		qt -> r: Delete Lobby
+		qt -> r: Set Player.game
+		qt -> qt: abort
+		qt --> c: Match message
+	end
+end
+deactivate qt
+
+c -> h: MatchResult message
+activate h
+h -> r: Set Match.state
+h -> r: Set Player.game
+h -> r: Set player.mmr
+
+@enduml

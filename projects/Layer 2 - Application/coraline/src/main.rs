@@ -1,23 +1,13 @@
 pub mod api;
 pub mod handlers;
 
-use coral_commons::protos::{
-    messages::{QueueType, SetQueueResponse},
-    models::Match,
-};
+use coral_commons::protos::{messages::SetQueueResponse, models::Match};
 use handlers::{
     created_lobby_handler::CreatedLobbyHandler, match_handler::MatchHandler,
     ping_handler::PingHandler, set_queue_response_handler::SetQueueResponseHandler,
 };
 use once_cell::sync::Lazy;
-use realm_commons::{
-    protos::{
-        client::{CreateLobby, Identify},
-        models::{player::PlayerState, Player},
-        server::CreatedLobby,
-    },
-    red::{red_lobby, red_player},
-};
+use realm_commons::protos::{client::Identify, server::CreatedLobby};
 use snowflake::SnowflakeIdGenerator;
 use std::{env, error::Error, sync::Arc};
 use teal::{

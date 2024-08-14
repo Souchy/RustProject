@@ -43,6 +43,7 @@ pub fn set(db: &mut redis::Connection, lobby: &Lobby) -> Result<(), Box<dyn Erro
     set_players(db, lobby)?;
     set_average_mmr(db, lobby)?;
     set_mmr_index(db, lobby)?;
+    set_token(db, lobby)?;
     db.sadd(KEY_LOBBY_INDEX, &lobby.id)?;
     Ok(())
 }
@@ -114,6 +115,24 @@ pub fn set_average_mmr(
         get_key_lobby(&lobby.id),
         KEY_AVERAGE_MMR,
         &lobby.average_mmr,
+    )?;
+    Ok(())
+}
+pub fn set_token(
+    db: &mut redis::Connection,
+    lobby: &Lobby,
+) -> Result<(), Box<dyn Error + Send + Sync>> {
+    set_token_by_id(db, &lobby.id, &lobby.token)    
+}
+pub fn set_token_by_id(
+    db: &mut redis::Connection,
+    id: &String,
+    token: &String
+) -> Result<(), Box<dyn Error + Send + Sync>> {
+    db.hset(
+        get_key_lobby(&id),
+        KEY_TOKEN,
+        &token,
     )?;
     Ok(())
 }

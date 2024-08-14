@@ -1,0 +1,68 @@
+@startuml Teal
+
+component Teal {
+	package net {
+		interface Client
+		struct DefaultClient
+		struct MessageHandlers
+		interface MessageHandler
+	}
+}
+component Coraline {
+	entity main {
+		{static} +CORALINE: Lazy<Mutex<Coraline>>
+		{static} -async main() -> Result<(), Box<dyn Error>>
+		{static} -async coraline_launch() -> Result<(), JoinError>
+		{static} -create_handlers() -> MessageHandlers
+	}
+	struct Coraline {
+		+client: Option<Arc<dyn Client>>
+		+player_id: String
+		+db: Option<redis::Connection>
+	}
+	package handlers {
+		struct CreatedLobbyHandler
+		struct MatchHandler
+		struct PingHandler
+		struct SetQueueResponseHandler
+	}
+	package api {
+		entity mod {
+			{static} +get_routes_and_docs(settings: &OpenApiSettings) -> (Vec<rocket::Route>, OpenApi)
+			{static} +async rocket_launch() -> Result<Rocket<Ignite>, rocket::error::Error>
+		}
+		entity api_lobby {
+			{static} +get_routes_and_docs(settings: &OpenApiSettings) -> (Vec<rocket::Route>, OpenApi)
+			{static} +async get() -> Json<Option<Lobby>>
+			{static} +async create_lobby()
+			{static} +async set_queue(json: Json<SetLobbyQueueModel>)
+			{static} +async enter_queue_normal()
+			{static} +async enter_queue_ranked()
+			{static} +async exit_queue()
+		}
+		entity api_match {
+			{static} +get_routes_and_docs(settings: &OpenApiSettings) -> (Vec<rocket::Route>, OpenApi)
+			{static} +async get() -> Json<Option<Match>>
+			{static} +async win()
+			{static} +async lose()
+		}
+		entity api_player {
+			{static} +get_routes_and_docs(settings: &OpenApiSettings) -> (Vec<rocket::Route>, OpenApi)
+			{static} +async get() -> Json<Option<Player>>
+		}
+		mod -down-> api_lobby
+		mod -down-> api_match
+		mod -down-> api_player
+		api_match -[hidden]down- api_lobby
+	}
+
+	handlers -up-|> MessageHandler
+	handlers -[hidden]down- api
+	main <-down-> api.mod
+	main -up-> handlers
+	main -up-> DefaultClient
+	main -up-> MessageHandlers
+	main *- Coraline
+	Coraline -up-> Client
+}
+@enduml

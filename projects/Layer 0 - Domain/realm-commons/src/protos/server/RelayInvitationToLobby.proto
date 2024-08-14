@@ -2,9 +2,8 @@ syntax = "proto3";
 package server;
 
 message RelayInvitationToLobby {
-	int32 queue = 1;
-	int64 player_to = 2;
-	int64 player_from = 3;
-	int64 lobby = 4;
-	string token = 5;
+	string player_from = 1;
+	string lobby = 2;
+	int32 queue = 3;
+	string token = 4;
 }

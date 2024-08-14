@@ -1,0 +1,140 @@
+@startuml Teal
+
+component prost {
+	interface "DynamicMessage" as p_dn {}
+	struct "MessageDescriptor" as p_md {}
+	p_dn --> p_md
+}
+component Teal {
+	package net {
+		interface "MessageIdentifiable" as mi
+	}
+}
+component Realm-commons {
+	entity build {
+		main()
+	}
+	package red {
+		entity red_lobby {
+			{static} +delete_by_id(db: &mut redis::Connection, id: String) -> Result<(), Box<dyn Error + Send + Sync>>
+			{static} +delete_all(db: &mut redis::Connection) -> Result<(), Box<dyn Error + Send + Sync>>
+
+			{static} +set(db: &mut redis::Connection, lobby: &Lobby)
+			{static} +set_queue_by_id(db: &mut redis::Connection, id: &String) -> Result<(), Box<dyn Error + Send + Sync>>
+			{static} +set_state_by_id(db: &mut redis::Connection, id: &String) -> Result<(), Box<dyn Error + Send + Sync>>
+			{static} +set_queue_start_time_by_id(db: &mut redis::Connection, lobby: &String,) -> Result<(), Box<dyn Error + Send + Sync>>
+			{static} +set_average_mmr_by_id(db: &mut redis::Connection, id: &String) -> Result<(), Box<dyn Error + Send + Sync>>
+			{static} +set_mmr_index_by_id(db: &mut redis::Connection,	id: &String) -> Result<(), Box<dyn Error + Send + Sync>>
+			{static} +set_players_by_id(db: &mut redis::Connection,	id: &String) -> Result<(), Box<dyn Error + Send + Sync>>
+
+			{static} +get(db: &mut redis::Connection, id: String) -> Lobby
+			{static} +get_token_by_id(db: &mut redis::Connection, id: &String) -> Result<String, Box<dyn Error + Send + Sync>>
+			{static} +get_queue_by_id(db: &mut redis::Connection, id: &String) -> Result<i32, Box<dyn Error + Send + Sync>>
+			{static} +get_queue_start_time_by_id(db: &mut redis::Connection, id: &String) -> Result<u64, Box<dyn Error + Send + Sync>>
+			{static} +get_state_by_id(db: &mut redis::Connection, id: &String) -> Result<i32, Box<dyn Error + Send + Sync>>
+			{static} +get_average_mmr_by_id(db: &mut redis::Connection, id: &String) -> Result<u32, Box<dyn Error + Send + Sync>>
+			{static} +get_players_by_id(db: &mut redis::Connection, id: String) -> Result<Vec<String>, Box<dyn Error + Send + Sync>>
+
+			{static} +get_index(db: &mut redis::Connection) -> Result<Vec<String>, Box<dyn Error + Send + Sync>>
+			{static} +find_lobby_match(db: &mut redis::Connection, lobby1: &Lobby) -> Result<Option<String>, Box<dyn Error + Send + Sync>>
+		}
+		entity red_player {
+			{static} +delete_by_id(db: &mut redis::Connection, id: &String) -> Result<(), Box<dyn Error + Send + Sync>>
+			{static} +delete_all(db: &mut redis::Connection) -> Result<(), Box<dyn Error + Send + Sync>>
+
+			{static} +set(db: &mut redis::Connection, player: &Player)
+			{static} +set_lobby_by_id(db: &mut redis::Connection, id: &String, lobby: &String) -> Result<(), Box<dyn Error + Send + Sync>>
+			{static} +set_game_by_id(db: &mut redis::Connection, id: &String, game: &String) -> Result<(), Box<dyn Error + Send + Sync>>
+			{static} +set_mmr_by_id(db: &mut redis::Connection, id: &String, mmr: u32) -> Result<(), Box<dyn Error + Send + Sync>>
+			{static} +set_state_by_id(db: &mut redis::Connection, id: &String, state: PlayerState) -> Result<(), Box<dyn Error + Send + Sync>>
+			{static} +set_recent_matchesby_id(db: &mut redis::Connection,	id: &String, matches: Vec<String>) -> Result<(), Box<dyn Error + Send + Sync>>
+
+			{static} +get(db: &mut redis::Connection, id: String) -> Player
+			{static} +get_lobby_by_id(db: &mut redis::Connection, id: &String) -> Result<String, Box<dyn Error + Send + Sync>>
+			{static} +get_game_by_id(db: &mut redis::Connection, id: &String) -> Result<String, Box<dyn Error + Send + Sync>>
+			{static} +get_mmr_by_id(db: &mut redis::Connection, id: &String) -> Result<u32, Box<dyn Error + Send + Sync>>
+			{static} +get_state_by_id(db: &mut redis::Connection, id: &String) -> Result<i32, Box<dyn Error + Send + Sync>>
+			{static} +get_recent_matches_by_id(db: &mut redis::Connection, id: &String) -> Result<Vec<String>, Box<dyn Error + Send + Sync>>
+
+			{static} +get_index(db: &mut redis::Connection) -> Result<Vec<String>, Box<dyn Error + Send + Sync>>
+		}
+		red_lobby -[hidden]- red_player
+	}
+	package protos {
+		package client {
+			struct CreateLobby {
+				+queue: i32
+			}
+			struct Identify {
+				+player_id: String
+			}
+			struct JoinLobby {
+				+queue: i32
+				+lobby: String
+				+token: String
+			}
+			struct SendInvitationToLobby {
+				+queue: i32
+				+player_to: String
+				+token: String
+			}
+			struct QuitLobby {}
+		}
+		package models {
+			struct Lobby {
+				+id: String
+				+token: String
+				+state: LobbyState
+				+queue: i32
+				+queue_start_time: u64
+				+average_mmr: u32
+				+players: Vec<String>
+			}
+			enum LobbyState {
+				+Idle
+				+InQueue
+				+InPrematch
+			}
+			Lobby -down-> LobbyState
+			struct Player {
+				+id: String
+				+state: PlayerState
+				+lobby: String
+				+mmr: u32
+				game: String
+				+recent_matches: Vec<String>
+			}
+			enum PlayerState {
+				+Idle
+				+InLobby
+				+InQueue
+				+InPregame
+				+InGame
+			}
+			Player -down-> PlayerState
+		}
+		package server {
+			struct BroadcastPlayerListInLobby {
+				players: Vec<String>
+			}
+			struct RelayInvitationToLobby {
+				+player_from: String
+				+lobby: String
+				+queue: i32
+				+token: String
+			}
+			struct ListLobbies {
+				+lobbies: Vec<Lobby>
+			}
+			struct CreatedLobby {
+				+lobby: String
+				+queue: i32
+				+token: String
+			}
+		}
+	}
+	protos .up.|> mi
+	protos .up.|> p_dn
+	build -> protos
+}
+@enduml

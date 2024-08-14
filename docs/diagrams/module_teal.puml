@@ -1,9 +1,9 @@
-@startuml vue-module
+@startuml Teal
 
 component prost {
-	interface DynamicMessage {
-
-	}
+	interface "DynamicMessage" as p_dn {}
+	struct "MessageDescriptor" as p_md {}
+	p_dn --> p_md
 }
 
 component Teal {
@@ -17,19 +17,17 @@ component Teal {
 			+frame(&self, buf: &[u8])
 			+send_bytes(&self, buf: &[u8]) -> Result<(), Box<dyn Error + Send + Sync>>
 		}
-		interface "MessageIdentifiable" as mi {
-			+id(&self) -> u16
-			+name(&self) -> String
-		}
-		object Message {
-			+serialize<T: MessageIdentifiable>(msg: &T) -> Vec<u8>
-		}
 		struct "DefaultClient" as dc {
 			+id: Arc<Mutex<String>>
 			+server: Arc<Mutex<Server>>
 			+reader: Reader
 			+writer: Writer
 			+handlers: Arc<MessageHandlers>
+		}
+		interface "MessageIdentifiable" as mi {
+			+id(&self) -> u16
+			+name(&self) -> String
+			+serialize<T: MessageIdentifiable>(msg: &T) -> Vec<u8>
 		}
 		interface "MessageHandler" as mh {
 			+handle(&self, msg: DynamicMessage, client: &dyn Client) -> Result<(), Box<dyn Error + Send + Sync>>
@@ -38,12 +36,20 @@ component Teal {
 			+pools: HashMap<u16, Arc<DescriptorPool>>
 			+deserializers: HashMap<u16, MessageDescriptor>
 			+handlers: HashMap<u16, Box<dyn MessageHandler>>
+
+			+new() -> Self
+			+register_pool(&mut self, pool_id: u16, pool: Arc<DescriptorPool>)
+			+register(&mut self, pool_id: u16, msg: &dyn MessageIdentifiable, handler: Box<dyn MessageHandler>)
+			+deserialize(&self, frame: &[u8]) -> Result<(u16, DynamicMessage), Box<dyn Error + Send + Sync>> 
+			+async handle(&self, frame: &[u8], client: &DynamicClient) -> Result<(), Box<dyn Error + Send + Sync>>
 		}
 		struct "Server" as server {
-			+clients: Vec<Arc<DefaultClient>>
+			+clients: Vec<Arc<dyn Client>>
+			+async run(addr: String, handlers: Arc<MessageHandlers>) -> Result<(), Box<dyn Error>>
+			+async broadcast_bytes(&self, buf: &[u8]) -> Result<(), Box<dyn Error>>
 		}
 		dc .up.|> client
-		dc -right-o server
+		client -up-o server
 		mh -up-o mhs
 		dc o-- mhs
 	}
@@ -52,11 +58,7 @@ component Teal {
 		struct "Ping" as ping
 		struct "Pong" as pong
 	}
-	' ping .up.|> mi
-	' pong .up.|> mi
-	' heartbeat .up.|> mi
 	protos .up.|> mi
-	protos .up.|> DynamicMessage
-	' mi <|.. ping
+	protos .up.|> p_dn
 }
 @enduml

@@ -1,0 +1,88 @@
+@startuml Teal
+
+component prost {
+	interface "DynamicMessage" as p_dn {}
+	struct "MessageDescriptor" as p_md {}
+	p_dn --> p_md
+}
+component Teal {
+	package net {
+		interface "MessageIdentifiable" as mi
+	}
+}
+component Coral-commons as cc {
+	entity build {
+		main()
+	}
+	package red {
+		entity red_match {
+			{static} +delete_by_id(db: &mut redis::Connection, id: String) -> Result<(), Box<dyn Error + Send + Sync>>
+			{static} +delete_all(db: &mut redis::Connection) -> Result<(), Box<dyn Error + Send + Sync>>
+
+			{static} +set(db: &mut redis::Connection, r#match: &Match)
+			{static} +set_queue(db: &mut redis::Connection, r#match: &Match) -> Result<(), Box<dyn Error + Send + Sync>>
+			{static} +set_port(db: &mut redis::Connection, r#match: &Match) -> Result<(), Box<dyn Error + Send + Sync>>
+			{static} +set_date(db: &mut redis::Connection, r#match: &Match,) -> Result<(), Box<dyn Error + Send + Sync>>
+			{static} +set_state( db: &mut redis::Connection, r#match: &Match) -> Result<(), Box<dyn Error + Send + Sync>>
+			{static} +set_players(db: &mut redis::Connection,	r#match: &Match) -> Result<(), Box<dyn Error + Send + Sync>>
+
+			{static} +get(db: &mut redis::Connection, id: String) -> Match
+			{static} +get_queue_by_id(db: &mut redis::Connection, id: &String) -> Result<i32, Box<dyn Error + Send + Sync>>
+			{static} +get_state_by_id(db: &mut redis::Connection, id: &String) -> Result<i32, Box<dyn Error + Send + Sync>>
+			{static} +get_date_by_id(db: &mut redis::Connection, id: &String) -> Result<u64, Box<dyn Error + Send + Sync>>
+			{static} +get_port_by_id(db: &mut redis::Connection, id: &String) -> Result<i32, Box<dyn Error + Send + Sync>>
+			{static} +get_players_by_id(db: &mut redis::Connection, id: String) -> Result<HashMap<String, String>, Box<dyn Error + Send + Sync>>
+
+			{static} +get_index(db: &mut redis::Connection) -> Result<Vec<String>, Box<dyn Error + Send + Sync>>
+		}
+	}
+	red -[hidden]- protos
+	package protos {
+		struct "Match" as match {
+			+id: string
+			+date: u64
+			+state: MatchState
+			+queue: i32
+			+game_port: i32
+			+token: string
+			+players: map<string, string>
+		}
+		enum "MatchState" as ms {
+			Finished
+			Active
+		}
+		struct "MatchResult" as mr {
+			+id: string
+			+result: MatchResultType
+		}
+		enum "MatchResultType" as mrt {
+			+Lose
+			+Win
+		}
+		struct "SetQueueRequest" as sqr {
+			+lobby: string
+			+queue: QueueType
+		}
+		struct "SetQueueResponse" as sqres {
+			+queue: QueueType
+		}
+		enum "QueueType" as qt {
+			+Idle
+			+Normal
+			+Ranked
+		}
+		match -down-> ms
+		mr -down-> mrt
+		sqr -down-> qt
+		sqres -down-> qt
+	}
+	build -> protos
+	protos .up.|> mi
+	protos .up.|> p_dn
+}
+Teal -[hidden]left- red
+Teal -[hidden]left- red_match
+' prost -[hidden]right- red
+Teal -[hidden]down- prost
+
+@enduml

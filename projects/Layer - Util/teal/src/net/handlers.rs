@@ -95,5 +95,4 @@ impl MessageHandlers {
             .ok_or(Errors::Missing(id.to_string(), "handlers".to_string()))?;
         return handler.handle(dynamic_message, client).await;
     }
-
 }
