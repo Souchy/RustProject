@@ -1,7 +1,7 @@
 
 @startuml Architecture1
 
-node "Server Machines" <<Cluster>> as sm{
+node "Server machine" as sm {
 	component Realm as gs #SkyBlue {
 		package CoralCommons 
 	}
