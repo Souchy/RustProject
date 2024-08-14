@@ -1,7 +1,7 @@
 
 @startuml Architecture1
 
-node GameServer {
+node "Server Machines" <<Cluster>> as sm{
 	component Realm as gs #SkyBlue {
 		package CoralCommons 
 	}
@@ -12,10 +12,10 @@ node GameServer {
 	}
 }
 
-node GameClient1 {
+node "Client machine 1" {
 	component RealmClient as c1 #SkyBlue
 }
-node GameClient2 {
+node "Client machine 2" {
 	component RealmClient as c2 #SkyBlue
 }
 

@@ -1,4 +1,4 @@
-@startuml Teal
+@startuml Coraline
 
 component Teal {
 	package net {

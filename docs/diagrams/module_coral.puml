@@ -1,4 +1,4 @@
-@startuml Teal
+@startuml Coral
 
 component Teal {
 	package net {

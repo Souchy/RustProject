@@ -1,4 +1,4 @@
-@startuml Teal
+@startuml Coralcommons
 
 component prost {
 	interface "DynamicMessage" as p_dn {}

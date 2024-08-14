@@ -25,7 +25,7 @@ deactivate h
 
 c -> h: SetQueue(normal) message
 activate h
-h -> r: Set lobby.queue
+h -> r: Set Lobby.queue
 h -> qt: find_match
 activate qt
 h --> c: SetQueueResponse
