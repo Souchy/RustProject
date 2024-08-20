@@ -1,6 +1,5 @@
 use std::{error::Error, sync::Arc};
 
-use async_trait::async_trait;
 use tokio::{net::TcpListener, sync::Mutex};
 use tracing::error;
 
@@ -48,7 +47,7 @@ impl Server {
             // let server_ref = Arc::new(self);
 
             let client: DefaultClient =
-                DefaultClient::new(socket, handlers.clone(), server_ptr.clone());
+                DefaultClient::new(socket, Arc::clone(&handlers), Arc::clone(&server_ptr));
 
             let client_runner = Arc::new(client);
             server_ptr.lock().await.clients.push(client_runner.clone());

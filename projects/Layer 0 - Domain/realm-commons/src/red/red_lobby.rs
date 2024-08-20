@@ -1,8 +1,7 @@
 use crate::protos::models::Lobby;
-use redis::{cmd, Commands, ConnectionLike};
+use redis::Commands;
 use std::{
     error::Error,
-    num::NonZeroUsize,
     time::{SystemTime, UNIX_EPOCH},
 };
 
@@ -122,18 +121,14 @@ pub fn set_token(
     db: &mut redis::Connection,
     lobby: &Lobby,
 ) -> Result<(), Box<dyn Error + Send + Sync>> {
-    set_token_by_id(db, &lobby.id, &lobby.token)    
+    set_token_by_id(db, &lobby.id, &lobby.token)
 }
 pub fn set_token_by_id(
     db: &mut redis::Connection,
     id: &String,
-    token: &String
+    token: &String,
 ) -> Result<(), Box<dyn Error + Send + Sync>> {
-    db.hset(
-        get_key_lobby(&id),
-        KEY_TOKEN,
-        &token,
-    )?;
+    db.hset(get_key_lobby(&id), KEY_TOKEN, &token)?;
     Ok(())
 }
 pub fn set_mmr_index(

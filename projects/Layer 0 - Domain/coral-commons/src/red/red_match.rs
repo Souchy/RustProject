@@ -1,5 +1,5 @@
 use redis::Commands;
-use std::{collections::HashMap, error::Error, num::NonZeroUsize};
+use std::{collections::HashMap, error::Error};
 
 use crate::protos::models::{Match, MatchState};
 

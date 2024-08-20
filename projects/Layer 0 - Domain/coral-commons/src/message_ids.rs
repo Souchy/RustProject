@@ -1,7 +1,10 @@
 // use crate::protos::gen::{Match::Match, RequestMatch::RequestMatch, SetInQueue::SetInQueue};
 use teal::net::message::MessageIdentifiable;
 
-use crate::protos::{messages::{SetQueueRequest, SetQueueResponse}, models::{Match, MatchResult}};
+use crate::protos::{
+    messages::{SetQueueRequest, SetQueueResponse},
+    models::{Match, MatchResult},
+};
 
 const CORAL: u16 = 8000;
 const MODEL: u16 = CORAL + 0;

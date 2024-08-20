@@ -1,6 +1,12 @@
 use async_trait::async_trait;
 use prost_reflect::DynamicMessage;
-use realm_commons::{protos::{client::Identify, models::{player::PlayerState, Player}}, red::red_player};
+use realm_commons::{
+    protos::{
+        client::Identify,
+        models::{player::PlayerState, Player},
+    },
+    red::red_player,
+};
 use std::error::Error;
 use teal::{net::handler::MessageHandler, DynamicClient};
 

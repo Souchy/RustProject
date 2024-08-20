@@ -1,20 +1,20 @@
-use std::sync::Arc;
 use net::client::Client;
 use net::handlers::MessageHandlers;
 use net::message::MessageIdentifiable;
+use once_cell::sync::Lazy;
+use prost_reflect::DescriptorPool;
+use std::sync::Arc;
 use tokio::net::tcp::{OwnedReadHalf, OwnedWriteHalf};
 use tokio::sync::Mutex;
-use prost_reflect::DescriptorPool;
-use once_cell::sync::Lazy;
 
-pub mod net;
 pub mod messages;
+pub mod net;
 pub mod protos;
 
 pub type Reader = Arc<Mutex<OwnedReadHalf>>;
 pub type Writer = Arc<Mutex<OwnedWriteHalf>>;
 
-pub type BoxMessageDyn = Box<dyn MessageIdentifiable>;// + Send + Sync
+pub type BoxMessageDyn = Box<dyn MessageIdentifiable>; // + Send + Sync
 pub type DynamicClient = (dyn Client);
 
 pub const ID_LEN: usize = 2;
@@ -32,7 +32,6 @@ pub const POOL_ID: u16 = 0;
 pub fn register_pool(reg: &mut MessageHandlers) {
     reg.register_pool(POOL_ID, Arc::new(DESCRIPTOR_POOL.to_owned()));
 }
-
 
 #[derive(thiserror::Error, Debug)]
 pub enum Errors {

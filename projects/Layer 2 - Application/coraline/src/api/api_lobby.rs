@@ -6,8 +6,7 @@ use realm_commons::{
 };
 use rocket::{form::FromForm, get, post, serde::json::Json};
 use rocket_okapi::{
-    okapi::openapi3::OpenApi, openapi, openapi_get_routes, openapi_get_routes_spec,
-    settings::OpenApiSettings,
+    okapi::openapi3::OpenApi, openapi, openapi_get_routes_spec, settings::OpenApiSettings,
 };
 use serde::{Deserialize, Serialize};
 use teal::net::message;
@@ -50,7 +49,6 @@ async fn get() -> Json<Option<Lobby>> {
     return Json(None);
 }
 
-
 #[openapi(tag = "Lobby")]
 #[post("/create_lobby")]
 async fn create_lobby() {
@@ -59,7 +57,9 @@ async fn create_lobby() {
 
     // Send a message to create a Lobby.
     // When it is created, we'll respond by setting the queue active.
-    let create_lobby = CreateLobby { queue: QueueType::Idle as i32 };
+    let create_lobby = CreateLobby {
+        queue: QueueType::Idle as i32,
+    };
     let create_lobby_buf = message::serialize(&create_lobby);
     client_ref.send_bytes(&create_lobby_buf).await.unwrap();
 }
@@ -82,7 +82,6 @@ async fn set_queue(json: Json<SetLobbyQueueModel>) {
         let buf = message::serialize(&req);
         client_ref.send_bytes(&buf).await.ok();
     }
-    
 }
 
 #[openapi(tag = "Lobby")]
@@ -99,7 +98,7 @@ async fn enter_queue_normal() {
             lobby: player.lobby.clone(),
             queue: QueueType::Normal as i32,
         };
-    
+
         let buf = message::serialize(&req);
         client_ref.send_bytes(&buf).await.ok();
     }
@@ -119,7 +118,7 @@ async fn enter_queue_ranked() {
             lobby: player.lobby.clone(),
             queue: QueueType::Ranked as i32,
         };
-    
+
         let buf = message::serialize(&req);
         client_ref.send_bytes(&buf).await.ok();
     }
@@ -139,7 +138,7 @@ async fn exit_queue() {
             lobby: player.lobby.clone(),
             queue: QueueType::Idle as i32,
         };
-    
+
         let buf = message::serialize(&req);
         client_ref.send_bytes(&buf).await.ok();
     }

@@ -93,7 +93,7 @@ impl MessageHandler for SetQueueHandler {
                         red_player::set_state(db, &player)?;
                         red_lobby::set(db, &lobby)?;
 
-                        // TODO Try to find a match for the lobby
+                        // Try to find a match for the lobby
                         let lobby_find_match = lobby.clone();
                         println!("Activating queue for lobby {}", lobby.id);
                         let task = tokio::spawn(async move {
@@ -118,7 +118,6 @@ async fn find_match(
     lobby1: Lobby,
     server: Arc<Mutex<Server>>,
 ) -> Result<(), Box<dyn Error + Send + Sync>> {
-    // let lobby2: Lobby = Lobby::default();
     let mut i = 0;
 
     unsafe {
@@ -128,7 +127,6 @@ async fn find_match(
                 i = i + 1;
                 tokio::time::sleep(Duration::from_secs(2)).await;
 
-                // let ids = red_lobby::get_ids(db);
                 let result = red_lobby::find_lobby_match(db, &lobby1);
                 if result.is_err() {
                     continue;
@@ -216,7 +214,3 @@ async fn find_match(
 
     Ok(())
 }
-
-// pub async fn compare_id(client: Arc<dyn Client>, id: &String) -> bool { // Result<bool, Box<dyn Error + Send + Sync>> {
-//     client.get_id_ref().lock().await.eq(id)
-// }

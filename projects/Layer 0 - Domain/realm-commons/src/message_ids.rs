@@ -1,6 +1,10 @@
 use teal::net::message::MessageIdentifiable;
 
-use crate::protos::{client::{CreateLobby, Identify, JoinLobby, QuitLobby, SendInvitationToLobby}, models::{Lobby, Player, User}, server::{BroadcastPlayerListInLobby, CreatedLobby, ListLobbies, RelayInvitationToLobby}};
+use crate::protos::{
+    client::{CreateLobby, Identify, JoinLobby, QuitLobby, SendInvitationToLobby},
+    models::{Lobby, Player, User},
+    server::{BroadcastPlayerListInLobby, CreatedLobby, ListLobbies, RelayInvitationToLobby},
+};
 
 const REALM: u16 = 9000;
 const MODEL: u16 = REALM + 0;
@@ -70,4 +74,3 @@ impl MessageIdentifiable for BroadcastPlayerListInLobby {
         REQUEST + 4
     }
 }
-

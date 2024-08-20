@@ -1,4 +1,7 @@
-use crate::{net::message::MessageIdentifiable, protos::messages::{Heartbeat, RaftHeartbeat}};
+use crate::{
+    net::message::MessageIdentifiable,
+    protos::messages::{Heartbeat, RaftHeartbeat},
+};
 
 impl MessageIdentifiable for Heartbeat {
     fn id(&self) -> u16 {

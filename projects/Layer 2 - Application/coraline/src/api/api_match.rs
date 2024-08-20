@@ -3,7 +3,7 @@ use coral_commons::{
     protos::models::{Match, MatchResult, MatchResultType},
     red::red_match,
 };
-use realm_commons::{protos::models::Lobby, red::red_player};
+use realm_commons::red::red_player;
 use rocket::{get, post, serde::json::Json};
 use rocket_okapi::{
     okapi::openapi3::OpenApi, openapi, openapi_get_routes_spec, settings::OpenApiSettings,

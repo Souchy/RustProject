@@ -1,4 +1,4 @@
-use std::{error::Error, sync::Arc};
+use std::error::Error;
 
 use async_trait::async_trait;
 use coral_commons::{
@@ -7,10 +7,7 @@ use coral_commons::{
 };
 use prost_reflect::DynamicMessage;
 use realm_commons::red::red_player;
-use teal::{
-    net::{client::DefaultClient, handler::MessageHandler},
-    DynamicClient,
-};
+use teal::{net::handler::MessageHandler, DynamicClient};
 
 #[derive(Debug, Default)]
 pub(crate) struct MatchResultHandler;

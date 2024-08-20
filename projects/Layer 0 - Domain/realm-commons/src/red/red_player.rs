@@ -1,4 +1,4 @@
-use std::{error::Error, num::NonZeroUsize};
+use std::error::Error;
 
 use redis::Commands;
 
@@ -182,14 +182,18 @@ pub fn get_lobby_by_id(
     db: &mut redis::Connection,
     id: &String,
 ) -> Result<String, Box<dyn Error + Send + Sync>> {
-    let val = db.hget(get_key_player(&id), KEY_LOBBY).unwrap_or("0".to_string());
+    let val = db
+        .hget(get_key_player(&id), KEY_LOBBY)
+        .unwrap_or("0".to_string());
     Ok(val)
 }
 pub fn get_game_by_id(
     db: &mut redis::Connection,
     id: &String,
 ) -> Result<String, Box<dyn Error + Send + Sync>> {
-    let val = db.hget(get_key_player(&id), KEY_GAME).unwrap_or("0".to_string());
+    let val = db
+        .hget(get_key_player(&id), KEY_GAME)
+        .unwrap_or("0".to_string());
     Ok(val)
 }
 pub fn get_mmr_by_id(

@@ -1,5 +1,5 @@
-mod handlers;
 mod api;
+mod handlers;
 
 use coral_commons::protos::messages::SetQueueRequest;
 use coral_commons::protos::models::MatchResult;
@@ -30,7 +30,10 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let coral_url = env::var("CORAL_URL").unwrap();
     let redis_url = env::var("REDIS_URL").unwrap();
 
-    println!("Starting Coral on {} and connecting to Redis on {}", coral_url, redis_url);
+    println!(
+        "Starting Coral on {} and connecting to Redis on {}",
+        coral_url, redis_url
+    );
 
     let redis_client = redis::Client::open("redis://".to_string() + &redis_url)?;
     let conn = redis_client.get_connection()?;
@@ -42,7 +45,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let reg = create_handlers();
 
     // Server start
-    
+
     let _ = tokio::join!(
         // game client
         Server::run(coral_url, Arc::new(reg)),
