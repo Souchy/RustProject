@@ -1,0 +1,31 @@
+[package]
+name = "coraline"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+teal = { path = "../../Layer - Util/teal" }
+coral-commons = { path = "../../Layer 0 - Domain/coral-commons" }
+realm-commons = { path = "../../Layer 0 - Domain/realm-commons" }
+
+dotenv = "*"
+redis = "*"
+tokio = { version = "*", features = ["full"] }
+tokio-retry = "*"
+serde = "*"
+futures = "0.3.28"
+async-trait = "0.1.79"
+
+rocket = { version = "=0.5.0", default-features = false, features = ["json"] }
+rocket_okapi = { version = "*", features = ["swagger", "rapidoc"] }
+schemars = "*"
+
+# Protobuf
+tonic = "*"
+prost = "*"
+prost-reflect = { version = "*", features = ["derive", "text-format"] }
+once_cell = "1.9.0"
+
+rs-snowflake = "*"

@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package messages;
+
+// Request to set lobby's queue state
+message SetQueueRequest {
+	string lobby = 1;
+	QueueType queue = 2;
+}
+
+message SetQueueResponse {
+	QueueType queue = 1;
+}
+
+enum QueueType {
+	IDLE = 0;
+	NORMAL = 1;
+	RANKED = 2;
+}

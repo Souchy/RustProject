@@ -1,0 +1,18 @@
+syntax = "proto3";
+package models;
+
+message Lobby {
+	string id = 1;
+	string token = 2;
+	int32 queue = 3;
+	LobbyState state = 4;
+	repeated string players = 5;
+	uint64 queueStartTime = 6;
+	uint32 average_mmr = 7;
+}
+
+enum LobbyState {
+	LOBBY_STATE_IDLE = 0;
+	LOBBY_STATE_IN_QUEUE = 1;
+	LOBBY_STATE_IN_PREMATCH = 2;
+}

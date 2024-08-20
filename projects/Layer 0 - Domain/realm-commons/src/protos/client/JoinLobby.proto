@@ -1,0 +1,8 @@
+syntax = "proto3";
+package client;
+
+message JoinLobby {
+	int32 queue = 1;
+	string lobby = 2;
+	string token = 3;
+}

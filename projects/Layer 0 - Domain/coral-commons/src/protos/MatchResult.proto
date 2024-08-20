@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package models;
+
+message MatchResult {
+	string id = 1;
+	MatchResultType result = 2;
+}
+
+enum MatchResultType {
+	Lose = 0;
+	Win = 1;
+}

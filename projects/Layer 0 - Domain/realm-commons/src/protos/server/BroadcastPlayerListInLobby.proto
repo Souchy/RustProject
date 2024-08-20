@@ -1,0 +1,6 @@
+syntax = "proto3";
+package server;
+
+message BroadcastPlayerListInLobby {
+	repeated string players = 1;
+}

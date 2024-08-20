@@ -1,0 +1,68 @@
+@startuml Coral
+
+component Teal {
+	package net {
+		struct Server
+		struct MessageHandlers
+		interface MessageHandler
+	}
+}
+component Coral {
+	entity main {
+		{static} +DB: Option<redis::Connection>
+		{static} -async main() -> Result<(), Box<dyn Error>>
+		{static} -create_handlers() -> MessageHandlers
+	}
+	package handlers {
+		struct CreateLobbyHandler
+		struct IdentifyHandler
+		struct MatchResultHandler
+		struct PingHandler
+		struct SetQueueHandler {
+			{static} +QUEUES: Lazy<Mutex<Queues>>
+		}
+		struct Queues {
+			+tasks: HashMap<String, JoinHandle<()>>
+		}
+		SetQueueHandler *- Queues
+	}
+	package api {
+		entity mod {
+			{static} +get_routes_and_docs(settings: &OpenApiSettings) -> (Vec<rocket::Route>, OpenApi)
+			{static} +async rocket_launch() -> Result<Rocket<Ignite>, rocket::error::Error>
+		}
+		entity api_lobbies {
+			{static} +get_routes_and_docs(settings: &OpenApiSettings) -> (Vec<rocket::Route>, OpenApi)
+			{static} +async get(id: String) -> Json<Option<Lobby>>
+			{static} +async get_all() -> Json<Vec<Lobby>>
+			{static} +async delete_all()
+		}
+		entity api_matches {
+			{static} +get_routes_and_docs(settings: &OpenApiSettings) -> (Vec<rocket::Route>, OpenApi)
+			{static} +async get(id: String) -> Json<Option<Match>>
+			{static} +async get_all() -> Json<Vec<Match>>
+			{static} +async delete_all()
+		}
+		entity api_players {
+			{static} +get_routes_and_docs(settings: &OpenApiSettings) -> (Vec<rocket::Route>, OpenApi)
+			{static} +async get(id: String) -> Json<Option<Player>>
+			{static} +async get_all() -> Json<Vec<Player>>
+			{static} +async delete_all()
+		}
+		mod -down-> api_lobbies
+		mod -down-> api_matches
+		mod -down-> api_players
+		api_matches -[hidden]down- api_lobbies
+	}
+	handlers .up.|> MessageHandler
+	handlers -[hidden]down- api
+	CreateLobbyHandler -[hidden]down- mod
+	PingHandler -[hidden]down- mod
+	SetQueueHandler -[hidden]down- mod
+	Queues -[hidden]down- mod
+	main -> api.mod
+	main -up-> handlers
+	main -up-> Server
+	main -up-> MessageHandlers
+}
+@enduml

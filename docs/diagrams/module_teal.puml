@@ -1,0 +1,64 @@
+@startuml Teal
+
+component prost {
+	interface "DynamicMessage" as p_dn {}
+	struct "MessageDescriptor" as p_md {}
+	p_dn --> p_md
+}
+
+component Teal {
+	package net {
+		interface "Client" as client {
+			+get_id_ref(&self) -> Arc<Mutex<String>>
+			+get_id_sync(&self) -> String
+			+set_id(&self, id: String) -> Result<(), Box<dyn Error + Send + Sync>>
+			+get_server(&self) ->  Arc<Mutex<Server>>
+			+run(&self) -> Result<(), Box<dyn Error + Send>>
+			+frame(&self, buf: &[u8])
+			+send_bytes(&self, buf: &[u8]) -> Result<(), Box<dyn Error + Send + Sync>>
+		}
+		struct "DefaultClient" as dc {
+			+id: Arc<Mutex<String>>
+			+server: Arc<Mutex<Server>>
+			+reader: Reader
+			+writer: Writer
+			+handlers: Arc<MessageHandlers>
+		}
+		interface "MessageIdentifiable" as mi {
+			+id(&self) -> u16
+			+name(&self) -> String
+			+serialize<T: MessageIdentifiable>(msg: &T) -> Vec<u8>
+		}
+		interface "MessageHandler" as mh {
+			+handle(&self, msg: DynamicMessage, client: &dyn Client) -> Result<(), Box<dyn Error + Send + Sync>>
+		}
+		struct "MessageHandlers" as mhs {
+			+pools: HashMap<u16, Arc<DescriptorPool>>
+			+deserializers: HashMap<u16, MessageDescriptor>
+			+handlers: HashMap<u16, Box<dyn MessageHandler>>
+
+			+new() -> Self
+			+register_pool(&mut self, pool_id: u16, pool: Arc<DescriptorPool>)
+			+register(&mut self, pool_id: u16, msg: &dyn MessageIdentifiable, handler: Box<dyn MessageHandler>)
+			+deserialize(&self, frame: &[u8]) -> Result<(u16, DynamicMessage), Box<dyn Error + Send + Sync>> 
+			+async handle(&self, frame: &[u8], client: &DynamicClient) -> Result<(), Box<dyn Error + Send + Sync>>
+		}
+		struct "Server" as server {
+			+clients: Vec<Arc<dyn Client>>
+			+async run(addr: String, handlers: Arc<MessageHandlers>) -> Result<(), Box<dyn Error>>
+			+async broadcast_bytes(&self, buf: &[u8]) -> Result<(), Box<dyn Error>>
+		}
+		dc .up.|> client
+		client -up-o server
+		mh -up-o mhs
+		dc o-- mhs
+	}
+	package protos {
+		struct "Heartbeat" as heartbeat
+		struct "Ping" as ping
+		struct "Pong" as pong
+	}
+	protos .up.|> mi
+	protos .up.|> p_dn
+}
+@enduml
