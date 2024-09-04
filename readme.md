@@ -1,5 +1,11 @@
 # Projet spécial Rust: Systèmes hautement scalables en Rust
 
+## Documentation
+
+Rapport final: https://github.com/Souchy/RustProject/blob/master/docs/Rapport%20final.pdf
+
+## Structure
+
 Le projet est séparé en couches
 
 - Util
